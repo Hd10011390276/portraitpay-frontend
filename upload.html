@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传肖像 - PortraitPay AI</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #2d2d2f;
+            --text: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #2997ff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 80px 20px 40px;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { font-size: 32px; margin-bottom: 8px; }
+        .subtitle { color: var(--text-secondary); margin-bottom: 32px; }
+        
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px;
+            background: #1d1d1f;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 16px;
+        }
+        
+        .form-input:focus { outline: none; border-color: var(--accent); }
+        
+        .upload-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-zone:hover { border-color: var(--accent); }
+        .upload-zone.has-image { border-style: solid; padding: 10px; }
+        .upload-zone img { max-width: 100%; border-radius: 12px; }
+        .upload-icon { font-size: 48px; margin-bottom: 12px; }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .btn:disabled { opacity: 0.5; }
+        
+        .declaration {
+            background: #1d1d1f;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+        .declaration label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .declaration input { width: 20px; height: 20px; margin-top: 2px; }
+        
+        .file-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #1d1d1f;
+            border-radius: 8px;
+            margin-top: 16px;
+            cursor: pointer;
+        }
+        .file-link:hover { background: #3d3d3f; }
+        
+        .nav { position: fixed; top: 0; left: 0; right: 0; height: 48px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav a { color: var(--text-secondary); text-decoration: none; font-size: 14px; }
+        .nav-logo { font-size: 18px; font-weight: 700; color: var(--text); }
+        
+        .toast {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.9); color: #000;
+            padding: 14px 28px; border-radius: 24px; font-size: 14px;
+            opacity: 0; transition: opacity 0.3s; z-index: 2000;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-logo">← PortraitPay AI</a>
+        <a href="#" onclick="logout()">退出</a>
+    </nav>
+    
+    <div class="container">
+        <h1>上传肖像</h1>
+        <p class="subtitle">请上传您的真实肖像，用于版权保护</p>
+        
+        <div class="card">
+            <div class="form-group">
+                <label>您的姓名/艺名</label>
+                <input type="text" id="faceName" class="form-input" placeholder="请输入姓名" required>
+            </div>
+            
+            <div class="form-group">
+                <label>年龄</label>
+                <input type="number" id="age" class="form-input" placeholder="必须年满18岁" min="18" max="150" required>
+            </div>
+            
+            <div class="form-group">
+                <label>肖像照片</label>
+                <div class="upload-zone" id="portraitZone" onclick="document.getElementById('portraitInput').click()">
+                    <div class="upload-icon">📷</div>
+                    <div>点击上传肖像照片</div>
+                </div>
+                <input type="file" id="portraitInput" accept="image/*" style="display:none" onchange="handlePortrait(this)">
+            </div>
+            
+            <div class="form-group">
+                <label>身份证照片（用于验证真实性）</label>
+                <div class="upload-zone" id="idZone" onclick="document.getElementById('idInput').click()">
+                    <div class="upload-icon">🪪</div>
+                    <div>点击上传身份证照片（可选）</div>
+                </div>
+                <input type="file" id="idInput" accept="image/*" style="display:none" onchange="handleId(this)">
+            </div>
+            
+            <div class="declaration">
+                <label>
+                    <input type="checkbox" id="declaration" required>
+                    <span>我确认上传内容为本人真实肖像，已年满18岁，非AI生成。如有侵权或年龄不实，愿承担法律责任。</span>
+                </label>
+            </div>
+            
+            <button class="btn" onclick="submitUpload()">提交上传</button>
+        </div>
+        
+        <div id="result" style="display:none">
+            <div class="card">
+                <h3 style="margin-bottom:16px">✅ 上传成功！</h3>
+                <p style="color:var(--text-secondary);margin-bottom:16px">您的肖像已保存到本地：</p>
+                <div class="file-link" onclick="openFolder()">
+                    <span>📁</span>
+                    <span id="filePath">点击打开文件夹</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        const API = window.location.hostname === 'localhost' ? 'http://127.0.0.1:5000/api' : 'https://web-production-2757f.up.railway.app/api';
+        let portraitData = '';
+        let idData = '';
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        
+        function handlePortrait(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                portraitData = e.target.result.split(',')[1];
+                document.getElementById('portraitZone').innerHTML = '<img src="' + e.target.result + '">';
+                document.getElementById('portraitZone').classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function handleId(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                idData = e.target.result.split(',')[1];
+                document.getElementById('idZone').innerHTML = '<img src="' + e.target.result + '">';
+                document.getElementById('idZone').classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        async function submitUpload() {
+            const name = document.getElementById('faceName').value;
+            const age = parseInt(document.getElementById('age').value);
+            const declaration = document.getElementById('declaration').checked;
+            const token = localStorage.getItem('portrait_token');
+            
+            if (!token) {
+                showToast('请先登录');
+                return;
+            }
+            
+            if (!name || !age || !portraitData) {
+                showToast('请填写完整信息');
+                return;
+            }
+            
+            if (age < 18) {
+                showToast('必须年满18岁才能注册');
+                return;
+            }
+            
+            if (!declaration) {
+                showToast('请确认肖像权声明');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API}/upload/portrait`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': token
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        age: age,
+                        image: portraitData,
+                        id_image: idData,
+                        ai_declaration: 1
+                    })
+                });
+                const d = await res.json();
+                
+                if (d.success) {
+                    document.getElementById('result').style.display = 'block';
+                    document.getElementById('filePath').textContent = d.portrait_path;
+                    localStorage.setItem('portrait_path', d.portrait_path);
+                    showToast('上传成功！');
+                } else {
+                    showToast(d.error || '上传失败');
+                }
+            } catch(e) {
+                showToast('网络错误');
+            }
+        }
+        
+        function openFolder() {
+            const path = localStorage.getItem('portrait_path');
+            if (path) {
+                // Try to open the folder containing the file
+                const folder = path.substring(0, path.lastIndexOf('/'));
+                window.open('file://' + folder);
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('portrait_token');
+            localStorage.removeItem('portrait_user');
+            location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

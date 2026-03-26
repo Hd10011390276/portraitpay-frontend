@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速体验 - PortraitPay AI</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --bg-secondary: #1d1d1f;
+            --card: #2d2d2f;
+            --card-hover: #3d3d3f;
+            --text: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #2997ff;
+            --accent-dark: #0077ed;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --gradient: linear-gradient(135deg, #2997ff 0%, #0066CC 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Nav */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--text); }
+        .nav-links .btn-nav {
+            background: var(--accent);
+            color: white !important;
+            padding: 6px 16px;
+            border-radius: 16px;
+        }
+        
+        /* Hero */
+        .hero {
+            padding: 120px 20px 60px;
+            text-align: center;
+            background: radial-gradient(ellipse at center top, rgba(41,151,255,0.12) 0%, transparent 60%);
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: rgba(41,151,255,0.15);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+        
+        .hero h1 {
+            font-size: clamp(36px, 8vw, 64px);
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(180deg, #fff 0%, #86868b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        /* Steps */
+        .steps-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+        }
+        
+        .steps-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .steps-header h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .steps-header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        /* Step Card */
+        .step-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 32px;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -16px;
+            left: 32px;
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(41,151,255,0.3);
+        }
+        
+        .step-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 16px 0 8px;
+        }
+        
+        .step-desc {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 24px;
+        }
+        
+        /* Interactive Demo */
+        .demo-area {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 16px;
+        }
+        
+        .demo-area h4 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .demo-btn {
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .demo-btn:hover {
+            background: var(--accent-dark);
+            transform: scale(1.02);
+        }
+        
+        .demo-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        
+        .demo-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .demo-result.show { display: block; }
+        .demo-result.success { border-left-color: var(--success); }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .demo-result pre {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        /* API Preview */
+        .api-preview {
+            background: #0d0d0d;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+        
+        .api-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .api-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .api-dot.red { background: #ff5f56; }
+        .api-dot.yellow { background: #ffbd2e; }
+        .api-dot.green { background: #27c93f; }
+        
+        .api-endpoint {
+            margin-left: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .api-endpoint span {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .api-code {
+            padding: 20px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        
+        .api-code .key { color: #9cdcfe; }
+        .api-code .str { color: #ce9178; }
+        .api-code .num { color: #b5cea8; }
+        .api-code .comment { color: #6a9955; }
+        
+        /* Quick Links */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        
+        .quick-link:hover {
+            background: var(--card-hover);
+            transform: translateX(4px);
+        }
+        
+        .quick-link-icon { font-size: 24px; }
+        
+        .quick-link-text { font-size: 14px; }
+        .quick-link-text small { color: var(--text-secondary); font-size: 12px; }
+        
+        /* Pricing Preview */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .pricing-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .pricing-card:hover {
+            border-color: var(--accent);
+            transform: scale(1.02);
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--accent);
+            background: rgba(41,151,255,0.1);
+        }
+        
+        .pricing-name {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .pricing-price {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .pricing-price small {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        
+        .pricing-feature {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+        
+        /* CTA */
+        .cta-section {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 40px 20px 80px;
+            max-width: 860px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+        
+        .cta-section p {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 17px;
+        }
+        
+        .cta-btns {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: scale(1.02);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(41,151,255,0.1);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        footer a { color: var(--accent); text-decoration: none; }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255,255,255,0.95);
+            color: #000;
+            padding: 14px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .hero { padding: 100px 20px 40px; }
+            .hero h1 { font-size: 36px; }
+            .steps-container { padding: 0 16px 60px; }
+            .step-card { padding: 32px 24px; }
+            .step-number { top: -12px; left: 24px; width: 40px; height: 40px; font-size: 16px; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .cta-section { padding: 40px 24px; margin: 20px 16px 60px; }
+            .cta-section h2 { font-size: 28px; }
+            .api-code { font-size: 12px; }
+            .nav-links { display: none; }
+        }
+        
+        @media (max-width: 480px) {
+            .demo-btn { width: 100%; margin-right: 0; }
+            .quick-links { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Nav -->
+    <nav class="nav">
+        <a href="index.html" class="nav-logo">← PortraitPay AI</a>
+        <div class="nav-links">
+            <a href="index.html">首页</a>
+            <a href="dashboard.html">控制台</a>
+            <a href="celebrity.html">明星入驻</a>
+            <a href="index.html#contact">联系我们</a>
+            <a href="index.html" class="btn-nav">免费注册</a>
+        </div>
+    </nav>
+    
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">🎯 快速上手</div>
+        <h1>PortraitPay AI 演示</h1>
+        <p>只需3步，了解 PortraitPay AI 如何保护肖像权。<br>无需注册，先体验完整功能。</p>
+    </section>
+    
+    <!-- Steps -->
+    <div class="steps-container">
+        
+        <!-- Step 1: Register/Login -->
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h3 class="step-title">注册账户</h3>
+            <p class="step-desc">创建您的 PortraitPay AI 账户，开始保护肖像权之旅</p>
+            
+            <div class="demo-area">
+                <h4>🖥️ 操作演示</h4>
+                <button class="demo-btn" onclick="showModal('register')">
+                    📝 免费注册
+                </button>
+                <button class="demo-btn secondary" onclick="showModal('login')">
+                    🔐 已有账户？登录
+                </button>
+                
+                <div class="demo-result" id="step1Result">
+                    <pre id="step1Output">等待操作...</pre>
+                </div>
+                
+                <div class="api-preview" style="margin-top: 16px;">
+                    <div class="api-header">
+                        <div class="api-dot red"></div>
+                        <div class="api-dot yellow"></div>
+                        <div class="api-dot green"></div>
+                        <div class="api-endpoint"><span>POST</span> /api/register</div>
+                    </div>
+                    <div class="api-code">
+<span class="comment">// 请求示例</span>
+{
+  <span class="key">"username"</span>: <span class="str">"your_name"</span>,
+  <span class="key">"password"</span>: <span class="str">"******"</span>
+}
+
+<span class="comment">// 响应示例</span>
+{
+  <span class="key">"success"</span>: <span class="num">true</span>,
+  <span class="key">"api_key"</span>: <span class="str">"pk_xxxxxxxxxxxx"</span>,
+  <span class="key">"message"</span>: <span class="str">"注册成功"</span>
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 2: Upload Portrait -->
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h3 class="step-title">上传肖像</h3>
+            <p class="step-desc">登录后进入上传页面，提交您的肖像照片和基本信息</p>
+            
+            <div class="demo-area">
+                <h4>🖥️ 操作演示</h4>
+                <button class="demo-btn" onclick="simulateUpload()">
+                    📷 模拟上传肖像
+                </button>
+                
+                <div class="demo-result" id="step2Result">
+                    <pre id="step2Output">等待操作...</pre>
+                </div>
+                
+                <div class="api-preview" style="margin-top: 16px;">
+                    <div class="api-header">
+                        <div class="api-dot red"></div>
+                        <div class="api-dot yellow"></div>
+                        <div class="api-dot green"></div>
+                        <div class="api-endpoint"><span>POST</span> /api/upload/portrait</div>
+                    </div>
+                    <div class="api-code">
+<span class="comment">// 请求头</span>
+<span class="key">"X-API-Key"</span>: <span class="str">"pk_xxxxxxxxxxxx"</span>
+
+<span class="comment">// 请求体</span>
+{
+  <span class="key">"name"</span>: <span class="str">"张三"</span>,
+  <span class="key">"age"</span>: <span class="num">28</span>,
+  <span class="key">"image"</span>: <span class="str">"base64_encoded_image..."</span>
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Check API -->
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h3 class="step-title">API 调用</h3>
+            <p class="step-desc">通过标准 API 接口验证肖像使用权，支持所有主流 AI 模型</p>
+            
+            <div class="demo-area">
+                <h4>🖥️ 体验 API 调用</h4>
+                <button class="demo-btn" onclick="simulateApiCall('check')">
+                    🔍 肖像检查
+                </button>
+                <button class="demo-btn" onclick="simulateApiCall('verify')">
+                    ✅ 验证授权
+                </button>
+                
+                <div class="demo-result" id="step3Result">
+                    <pre id="step3Output">等待操作...</pre>
+                </div>
+                
+                <div class="api-preview" style="margin-top: 16px;">
+                    <div class="api-header">
+                        <div class="api-dot red"></div>
+                        <div class="api-dot yellow"></div>
+                        <div class="api-dot green"></div>
+                        <div class="api-endpoint"><span>POST</span> /api/llm/portrait-check</div>
+                    </div>
+                    <div class="api-code">
+<span class="comment">// 请求体</span>
+{
+  <span class="key">"image_url"</span>: <span class="str">"https://example.com/photo.jpg"</span>,
+  <span class="key">"celebrity_name"</span>: <span class="str">"周杰伦"</span>
+}
+
+<span class="comment">// 响应示例</span>
+{
+  <span class="key">"match"</span>: <span class="num">true</span>,
+  <span class="key">"confidence"</span>: <span class="num">0.96</span>,
+  <span class="key">"authorized"</span>: <span class="num">true</span>,
+  <span class="key">"price"</span>: <span class="str">"¥5/call"</span>
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="step-card">
+            <h3 class="step-title">🚀 继续探索</h3>
+            <p class="step-desc">查看更多功能页面</p>
+            
+            <div class="quick-links">
+                <a href="dashboard.html" class="quick-link">
+                    <span class="quick-link-icon">📊</span>
+                    <div class="quick-link-text">
+                        控制台
+                        <small>查看收益和统计数据</small>
+                    </div>
+                </a>
+                <a href="upload.html" class="quick-link">
+                    <span class="quick-link-icon">📤</span>
+                    <div class="quick-link-text">
+                        上传肖像
+                        <small>提交您的肖像照片</small>
+                    </div>
+                </a>
+                <a href="celebrity.html" class="quick-link">
+                    <span class="quick-link-icon">⭐</span>
+                    <div class="quick-link-text">
+                        明星入驻
+                        <small>明星/经纪人申请</small>
+                    </div>
+                </a>
+                <a href="index.html#faces" class="quick-link">
+                    <span class="quick-link-icon">👥</span>
+                    <div class="quick-link-text">
+                        肖像库
+                        <small>浏览已入驻肖像</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Pricing -->
+        <div class="step-card">
+            <div class="step-number" style="background: linear-gradient(135deg, #30d158 0%, #28a745 100%);">💰</div>
+            <h3 class="step-title">费用说明</h3>
+            <p class="step-desc">透明定价，仅收取最低服务费</p>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-name">个人用户</div>
+                    <div class="pricing-price">免费</div>
+                    <div class="pricing-feature">注册即用，基本功能</div>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-name">API 调用</div>
+                    <div class="pricing-price">¥1<small>/次</small></div>
+                    <div class="pricing-feature">标准接口调用</div>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-name">企业授权</div>
+                    <div class="pricing-price">定制</div>
+                    <div class="pricing-feature">批量授权，专属服务</div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- CTA -->
+    <div class="cta-section">
+        <h2>准备好开始了？</h2>
+        <p>加入 PortraitPay AI，让 AI 时代尊重每一位肖像权</p>
+        <div class="cta-btns">
+            <a href="index.html" class="btn btn-primary">免费注册 →</a>
+            <a href="index.html#contact" class="btn btn-outline">联系我们</a>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 PortraitPay AI · <a href="terms.html">用户协议</a> · <a href="terms.html#privacy">隐私政策</a></p>
+        <p style="margin-top: 8px;">contact@portraitpayai.com</p>
+    </footer>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        const API = window.location.hostname === 'localhost' ? 'http://127.0.0.1:5000/api' : 'https://web-production-2757f.up.railway.app/api';
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        
+        function showModal(type) {
+            // Redirect to index for modal
+            window.location.href = 'index.html?modal=' + type;
+        }
+        
+        async function simulateUpload() {
+            const result = document.getElementById('step2Result');
+            const output = document.getElementById('step2Output');
+            
+            result.classList.add('show');
+            output.textContent = '⏳ 正在模拟上传...\n\n';
+            
+            await new Promise(r => setTimeout(r, 800));
+            
+            output.textContent += '✅ 肖像照片上传成功!\n';
+            output.textContent += '📁 保存路径: /data/faces/user_xxx.jpg\n';
+            output.textContent += '🔐 状态: 待审核\n';
+            output.textContent += '💰 预计收益: ¥1-10/次调用\n\n';
+            output.textContent += '💡 提示: 登录后可在控制台查看审核状态';
+            
+            result.classList.add('success');
+        }
+        
+        async function simulateApiCall(type) {
+            const result = document.getElementById('step3Result');
+            const output = document.getElementById('step3Output');
+            
+            result.classList.add('show');
+            
+            if (type === 'check') {
+                output.textContent = '⏳ 正在检查肖像...\n\n';
+                await new Promise(r => setTimeout(r, 600));
+                output.textContent += '🔍 肖像检查结果:\n';
+                output.textContent += '━━━━━━━━━━━━━━━\n';
+                output.textContent += '👤 姓名: 周杰伦\n';
+                output.textContent += '🎯 匹配度: 96%\n';
+                output.textContent += '✅ 已授权: 是\n';
+                output.textContent += '💰 单次费用: ¥5\n';
+                output.textContent += '━━━━━━━━━━━━━━━\n';
+                output.textContent += '\n✅ 可以安全使用该肖像';
+            } else {
+                output.textContent = '⏳ 正在验证授权...\n\n';
+                await new Promise(r => setTimeout(r, 600));
+                output.textContent += '✅ 授权验证结果:\n';
+                output.textContent += '━━━━━━━━━━━━━━━\n';
+                output.textContent += '🔑 授权码: AUTH_20260326_XXXX\n';
+                output.textContent += '📅 有效期: 2026-03-26 ~ 2027-03-26\n';
+                output.textContent += '📝 授权范围: AI生成内容使用\n';
+                output.textContent += '💵 已扣费: ¥5\n';
+                output.textContent += '━━━━━━━━━━━━━━━\n';
+                output.textContent += '\n✅ 授权有效，可合规使用';
+            }
+            
+            result.classList.add('success');
+        }
+        
+        // Check for modal param from index
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('modal') === 'register') {
+            setTimeout(() => showModal('register'), 500);
+        } else if (params.get('modal') === 'login') {
+            setTimeout(() => showModal('login'), 500);
+        }
+    </script>
+</body>
+</html>

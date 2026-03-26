@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortraitPay AI - 名人入驻计划</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --bg-secondary: #1d1d1f;
+            --card: #2d2d2f;
+            --text: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #2997ff;
+            --gold: #FFD700;
+            --success: #30d158;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px;
+            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+        h1 {
+            font-size: clamp(40px, 8vw, 72px);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fff 0%, #86868b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
+        }
+        .cta-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: var(--card);
+            color: var(--text);
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #3d3d3f;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover {
+            background: #3d3d3f;
+        }
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 80px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--success);
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        /* Sections */
+        section {
+            padding: 100px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 60px;
+        }
+        
+        /* Benefits Grid */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .benefit-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            transition: transform 0.3s;
+        }
+        .benefit-card:hover {
+            transform: translateY(-8px);
+        }
+        .benefit-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .benefit-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .benefit-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        
+        /* How it Works */
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .step {
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+        }
+        .step-number {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .step-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Pricing */
+        .pricing-card {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .pricing-card:hover {
+            border-color: var(--accent);
+        }
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .pricing-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .pricing-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .pricing-amount {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .pricing-number {
+            font-size: 64px;
+            font-weight: 700;
+            color: var(--success);
+        }
+        .pricing-unit {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .testimonial-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+        }
+        .testimonial-text {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .testimonial-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .testimonial-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Trust Badges */
+        .trust-section {
+            background: var(--bg-secondary);
+            padding: 60px 24px;
+        }
+        .trust-grid {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .trust-item {
+            text-align: center;
+        }
+        .trust-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        .trust-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* FAQ */
+        .faq-list {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .faq-item {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .faq-question {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .faq-answer {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        
+        /* Contact Form */
+        .contact-section {
+            background: linear-gradient(180deg, #000 0%, #0a0a0a 100%);
+            padding: 100px 24px;
+            text-align: center;
+        }
+        .contact-form {
+            max-width: 500px;
+            margin: 40px auto 0;
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid #3d3d3f;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text);
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .form-textarea {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid #3d3d3f;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text);
+            font-size: 15px;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--bg);
+            border-top: 1px solid var(--bg-secondary);
+            padding: 40px 24px;
+            text-align: center;
+        }
+        footer p {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-bar { gap: 30px; }
+            h1 { font-size: 36px; }
+            .section-title { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="badge">⭐ 名人专属通道</div>
+            <h1>你的脸，你做主<br>你的收益，你定义</h1>
+            <p class="hero-subtitle">
+                PortraitPay AI 是 AI 时代领先的肖像权保护平台。<br>
+                入驻即享 99% 收益分成，让你的肖像价值最大化。
+            </p>
+            <div class="cta-group">
+                <a href="#contact" class="btn-primary">立即入驻 →</a>
+                <a href="demo.html" class="btn-secondary">查看演示</a>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">收益分成</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">AI 平台合作</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">¥10M+</div>
+                    <div class="stat-label">已发放收益</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">肖像泄露事件</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Celebrity Definition Section -->
+    <section style="background: var(--bg-secondary); padding: 60px 24px;">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <h2 style="text-align: center; font-size: 28px; margin-bottom: 12px;">📋 名人界定标准</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">符合以下任一条件者，即可申请名人入驻通道</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div style="background: var(--card); border-radius: 16px; padding: 24px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">🏆</div>
+                    <h4 style="font-size: 16px; margin-bottom: 8px;">知名公众人物</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">著名演员、歌手、运动员、导演等具有广泛社会知名度的娱乐、体育界人士</p>
+                </div>
+                <div style="background: var(--card); border-radius: 16px; padding: 24px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">💼</div>
+                    <h4 style="font-size: 16px; margin-bottom: 8px;">知名企业家</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">上市公司高管、知名创业者、商业领袖等商业界知名人士</p>
+                </div>
+                <div style="background: var(--card); border-radius: 16px; padding: 24px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">📱</div>
+                    <h4 style="font-size: 16px; margin-bottom: 8px;">头部自媒体</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">单一平台粉丝超过100万的网红博主、内容创作者、直播达人</p>
+                </div>
+                <div style="background: var(--card); border-radius: 16px; padding: 24px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">🎭</div>
+                    <h4 style="font-size: 16px; margin-bottom: 8px;">专业机构</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">经纪公司、唱片公司、影视制作公司等，可批量代理旗下艺人肖像权</p>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 20px; margin-top: 32px; text-align: center;">
+                <p style="font-size: 14px; color: var(--gold); margin: 0;">
+                    💡 如不符合上述条件，您仍可作为普通用户入驻，享受同等的数据与收益保护
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Benefits Section -->
+    <section>
+        <h2 class="section-title">为什么选择 PortraitPay AI</h2>
+        <p class="section-subtitle">专为公众人物设计的肖像权保护方案</p>
+        
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">💰</div>
+                <div class="benefit-title">99% 高额分成</div>
+                <div class="benefit-desc">行业最高分成比例。平台仅收取 1% 服务费，其余全部归您所有。每一笔收益都是您的。</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🛡️</div>
+                <div class="benefit-title">全方位法律保护</div>
+                <div class="benefit-desc">区块链时间戳确权、公证处合作、侵权追诉服务。您只需专注创作，我们来处理法律问题。</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">⚡</div>
+                <div class="benefit-title">实时收益通知</div>
+                <div class="benefit-desc">每一次肖像调用，实时推送通知。收益明细清晰透明，随时可查、可提现。</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🎯</div>
+                <div class="benefit-title">精准授权控制</div>
+                <div class="benefit-desc">您决定谁可以用、什么场景可以用、收多少钱。拒绝未经授权的使用。</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🤝</div>
+                <div class="benefit-title">专业商务对接</div>
+                <div class="benefit-desc">我们帮您对接 AI 平台、处理授权谈判。您省心省力，收益只增不减。</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">📊</div>
+                <div class="benefit-title">专属数据报表</div>
+                <div class="benefit-desc">详细的使用报告、收益分析、市场趋势。数据驱动您的决策。</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How it Works -->
+    <section>
+        <h2 class="section-title">入驻流程</h2>
+        <p class="section-subtitle">简单四步，开始保护您的肖像权益</p>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-title">注册账号</div>
+                <div class="step-desc">填写基本信息，完成实名认证。我们采用银行级加密保护您的数据。</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-title">上传肖像</div>
+                <div class="step-desc">上传您希望保护的人脸数据，设置使用价格和授权范围。</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-title">审核确认</div>
+                <div class="step-desc">我们的团队将在 24 小时内完成审核，确保资料真实有效。</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-title">开始收益</div>
+                <div class="step-desc">审核通过后，您的肖像即刻进入授权市场，开始产生收益。</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing -->
+    <section>
+        <h2 class="section-title">透明定价</h2>
+        <p class="section-subtitle">无隐藏费用，收益全归您</p>
+        
+        <div class="pricing-card">
+            <div class="pricing-header">
+                <div class="pricing-title">⭐ 名人专属计划</div>
+                <div class="pricing-subtitle">为公众人物打造的高级方案</div>
+            </div>
+            <div class="pricing-amount">
+                <span class="pricing-number">99%</span>
+                <span class="pricing-unit">收益分成</span>
+            </div>
+            <ul class="pricing-features">
+                <li>无限量人脸上传</li>
+                <li>优先审核通道</li>
+                <li>专属商务经理</li>
+                <li>法律维权支持</li>
+                <li>实时收益通知</li>
+                <li>月度收益报告</li>
+                <li>区块链确权证书</li>
+                <li>7×24 小时客服</li>
+            </ul>
+            <a href="#contact" class="btn-primary" style="width: 100%; text-align: center;">立即申请</a>
+        </div>
+    </section>
+    
+    <!-- Trust Section -->
+    <div class="trust-section">
+        <div class="trust-grid">
+            <div class="trust-item">
+                <div class="trust-icon">🔒</div>
+                <div class="trust-label">银行级加密</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">📜</div>
+                <div class="trust-label">法律合规</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">⚡</div>
+                <div class="trust-label">极速结算</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">🌍</div>
+                <div class="trust-label">全球保护</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FAQ -->
+    <section>
+        <h2 class="section-title">常见问题</h2>
+        <p class="section-subtitle">关于入驻的疑问，一一为您解答</p>
+        
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question">Q: 我的肖像数据安全吗？</div>
+                <div class="faq-answer">A: 我们采用 AES-256 加密存储、分离保存人脸向量与原始图像，并通过区块链技术确保数据不可篡改。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Q: 如果有人未经授权使用我的肖像？</div>
+                <div class="faq-answer">A: 我们提供 7×24 小时侵权监测，发现疑似侵权行为立即通知您，并提供法律维权支持。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Q: 收益如何提现？</div>
+                <div class="faq-answer">A: 每月1日结算上月收益，支持支付宝、微信、银行转账等多种方式，最低提现额度 ¥100。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Q: 我可以随时退出吗？</div>
+                <div class="faq-answer">A: 可以。撤回授权后，新的调用请求将不会被处理。已完成的交易不受影响。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Q: 哪些 AI 平台会使用我的肖像？</div>
+                <div class="faq-answer">A: 包括但不限于 ChatGPT、Midjourney、Claude 等主流 AI 平台。您可以在后台设置允许/禁止的平台类型。</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact -->
+    <div class="contact-section">
+        <h2 class="section-title">立即入驻</h2>
+        <p class="section-subtitle">填写以下信息，我们将在 24 小时内与您联系</p>
+        
+        <form class="contact-form" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+                <label class="form-label">姓名 *</label>
+                <input type="text" class="form-input" id="name" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">联系电话 *</label>
+                <input type="tel" class="form-input" id="phone" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">邮箱</label>
+                <input type="email" class="form-input" id="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">备注（粉丝数量、合作偏好等）</label>
+                <textarea class="form-textarea" id="note" placeholder="请简要介绍您的情况..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">提交入驻申请</button>
+        </form>
+    </div>
+    
+    <footer>
+        <p>© 2026 PortraitPay AI · 保护肖像权，让 AI 时代更美好</p>
+        <p style="margin-top: 8px;"><a href="terms.html" style="color: var(--accent);">用户协议</a> · <a href="terms.html#privacy" style="color: var(--accent);">隐私政策</a> · <a href="index.html" style="color: var(--accent);">返回首页</a></p>
+    </footer>
+    
+    <script>
+        function handleSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const note = document.getElementById('note').value;
+            
+            const subject = encodeURIComponent('明星入驻申请 - ' + name);
+            const body = encodeURIComponent(
+                '姓名: ' + name + '\n' +
+                '电话: ' + phone + '\n' +
+                '邮箱: ' + (email || '未填写') + '\n\n' +
+                '备注:\n' + (note || '无')
+            );
+            
+            window.location.href = 'mailto:contact@portraitpayai.com?subject=' + subject + '&body=' + body;
+            
+            // Show confirmation
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = '已打开邮件客户端...';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                form.reset();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
