@@ -665,22 +665,26 @@
         
         <form class="contact-form" onsubmit="handleSubmit(event)">
             <div class="form-group">
-                <label class="form-label">姓名 *</label>
-                <input type="text" class="form-input" id="name" required>
+                <label class="form-label">艺名 / 姓名 *</label>
+                <input type="text" class="form-input" id="name" placeholder="例如：张三" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">邮箱 *</label>
+                <input type="email" class="form-input" id="email" placeholder="your@email.com" required>
             </div>
             <div class="form-group">
                 <label class="form-label">联系电话 *</label>
-                <input type="tel" class="form-input" id="phone" required>
+                <input type="tel" class="form-input" id="phone" placeholder="手机号码" required>
             </div>
             <div class="form-group">
-                <label class="form-label">邮箱</label>
-                <input type="email" class="form-input" id="email">
+                <label class="form-label">设置密码 *</label>
+                <input type="password" class="form-input" id="password" placeholder="设置登录密码" required minlength="6">
             </div>
             <div class="form-group">
-                <label class="form-label">备注（粉丝数量、合作偏好等）</label>
-                <textarea class="form-textarea" id="note" placeholder="请简要介绍您的情况..."></textarea>
+                <label class="form-label">简介（粉丝数量、合作偏好等）</label>
+                <textarea class="form-textarea" id="note" placeholder="请简要介绍您的情况，如粉丝数量、所在行业等..."></textarea>
             </div>
-            <button type="submit" class="btn-primary" style="width: 100%;">提交入驻申请</button>
+            <button type="submit" class="btn-primary" style="width: 100%;" id="submitBtn">提交入驻申请</button>
         </form>
     </div>
     
@@ -690,34 +694,62 @@
     </footer>
     
     <script>
-        function handleSubmit(e) {
+        const API = window.location.hostname === 'localhost' ? 'http://127.0.0.1:5000/api' : 'https://web-production-2757f.up.railway.app/api';
+
+        function showToast(msg) {
+            const existing = document.getElementById('celebToast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.id = 'celebToast';
+            toast.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%) translateY(0);background:rgba(255,255,255,0.95);color:#000;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;transition:opacity 0.3s;opacity:1;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        async function handleSubmit(e) {
             e.preventDefault();
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
+            const username = document.getElementById('name').value;
             const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
             const note = document.getElementById('note').value;
-            
-            const subject = encodeURIComponent('明星入驻申请 - ' + name);
-            const body = encodeURIComponent(
-                '姓名: ' + name + '\n' +
-                '电话: ' + phone + '\n' +
-                '邮箱: ' + (email || '未填写') + '\n\n' +
-                '备注:\n' + (note || '无')
-            );
-            
-            window.location.href = 'mailto:contact@portraitpayai.com?subject=' + subject + '&body=' + body;
-            
-            // Show confirmation
-            const form = e.target;
-            const btn = form.querySelector('button[type="submit"]');
-            const originalText = btn.textContent;
-            btn.textContent = '已打开邮件客户端...';
+
+            const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            setTimeout(() => {
-                btn.textContent = originalText;
+            btn.textContent = '提交中...';
+
+            try {
+                const res = await fetch(`${API}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        phone,
+                        password,
+                        note,
+                        is_celebrity: 1
+                    })
+                });
+                const d = await res.json();
+
+                if (d.success || d.api_key) {
+                    localStorage.setItem('portrait_token', d.api_key);
+                    localStorage.setItem('portrait_user', username);
+                    showToast('入驻申请成功！正在跳转...');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                } else {
+                    showToast(d.error || '提交失败，请重试');
+                    btn.disabled = false;
+                    btn.textContent = '提交入驻申请';
+                }
+            } catch(e) {
+                showToast('网络错误，请检查网络后重试');
                 btn.disabled = false;
-                form.reset();
-            }, 3000);
+                btn.textContent = '提交入驻申请';
+            }
+            return false;
         }
     </script>
 </body>
