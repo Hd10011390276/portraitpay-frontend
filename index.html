@@ -1165,6 +1165,7 @@
             e.preventDefault();
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
+            const email = document.getElementById('regEmail').value;
             const declaration = document.getElementById('aiDeclaration').checked;
 
             if (!declaration) {
@@ -1176,7 +1177,7 @@
                 const res = await fetch(`${API}/register`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username, password})
+                    body: JSON.stringify({username, password, email})
                 });
                 const d = await res.json();
 
