@@ -20,7 +20,6 @@ export async function GET(
     // 查找该 application 对应的企业是否属于当前用户
     const application = await prisma.entAuthApplication.findUnique({
       where: { id: params.id },
-      include: { portrait: true },
     });
     if (!application) {
       return NextResponse.json({ success: false, error: "申请不存在" }, { status: 404 });
