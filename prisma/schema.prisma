@@ -1,6 +1,5 @@
 // ============================================================
-// PortraitPay AI — Extended Schema
-// Adds: Portrait model, enums, extended User, OTP fields
+// PortraitPay AI — Schema (No Enums for Neon Free Tier)
 // ============================================================
 
 generator client {
@@ -13,93 +12,6 @@ datasource db {
 }
 
 // ============================================================
-// Enums
-// ============================================================
-
-enum UserRole {
-  USER
-  ARTIST
-  AGENCY
-  ENTERPRISE
-  CELEBRITY
-  ADMIN
-  VERIFIER
-}
-
-enum KYCStatus {
-  NOT_STARTED
-  PENDING
-  APPROVED
-  REJECTED
-  EXPIRED
-}
-
-enum PortraitStatus {
-  DRAFT
-  UNDER_REVIEW
-  ACTIVE
-  SUSPENDED
-  ARCHIVED
-}
-
-enum AuthorizationStatus {
-  PENDING
-  ACTIVE
-  EXPIRED
-  REVOKED
-  REJECTED
-}
-
-enum TransactionType {
-  LICENSE_PURCHASE
-  LICENSE_RENEWAL
-  ROYALTY_PAYOUT
-  KYC_REFUND
-  PLATFORM_FEE
-  WITHDRAWAL
-  SETTLEMENT
-  PLATFORM_COMMISSION
-}
-
-enum TransactionStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-  DISPUTED
-}
-
-enum ReportStatus {
-  PENDING_REVIEW
-  VALIDATED
-  REJECTED
-  SETTLED
-  LEGAL_ACTION
-}
-
-enum InfringementType {
-  UNAUTHORIZED_USE
-  EXPIRED_LICENSE
-  SCOPE_VIOLATION
-  RESALE
-  DEEPFAKE
-}
-
-enum CelebrityAppStatus {
-  PENDING_REVIEW
-  APPROVED
-  REJECTED
-}
-
-enum LicenseType {
-  EXCLUSIVE
-  NON_EXCLUSIVE
-  SEMI_EXCLUSIVE
-  EDITORIAL
-  PERSONAL
-}
-
-// ============================================================
 // User
 // ============================================================
 
@@ -109,8 +21,10 @@ model User {
   passwordHash String?
   phone        String? @unique
 
-  role           UserRole  @default(USER)
-  kycStatus      KYCStatus @default(NOT_STARTED)
+  // Role: USER, ARTIST, AGENCY, ENTERPRISE, CELEBRITY, ADMIN, VERIFIER
+  role           String  @default("USER")
+  // KYC Status: NOT_STARTED, PENDING, APPROVED, REJECTED, EXPIRED
+  kycStatus      String  @default("NOT_STARTED")
   kycProviderRef String?
   kycVerifiedAt  DateTime?
   kycExpiredAt   DateTime?
@@ -121,7 +35,7 @@ model User {
   displayName String?
   bio         String?
 
-  // OTP fields (for phone login)
+  // OTP fields
   otpCode    String?
   otpExpires DateTime?
 
@@ -139,15 +53,12 @@ model User {
   kycLogs               KYCLog[]
   celebrityApplications CelebrityApplication[]
 
-  // Revenue & Settlement
   withdrawals Withdrawal[]
   settlements Settlement[]
   auditLogs   AuditLog[]   @relation("AuditAdmin")
 
-  // Infringement monitoring config (one per user)
   monitorConfig InfringementMonitorConfig?
 
-  // NextAuth
   accounts        Account[]
   sessions        Session[]
   name            String?
@@ -187,7 +98,8 @@ model Portrait {
   ipfsCid           String?
   certifiedAt       DateTime?
 
-  status        PortraitStatus @default(DRAFT)
+  // Status: DRAFT, UNDER_REVIEW, ACTIVE, SUSPENDED, ARCHIVED
+  status        String @default("DRAFT")
   faceEmbedding Float[]
 
   isPublic Boolean @default(false)
@@ -220,7 +132,8 @@ model Authorization {
   grantee   User   @relation("AuthGrantee", fields: [granteeId], references: [id])
   granter   User   @relation("AuthGranter", fields: [granterId], references: [id])
 
-  licenseType      LicenseType
+  // License Type: EXCLUSIVE, NON_EXCLUSIVE, SEMI_EXCLUSIVE, EDITORIAL, PERSONAL
+  licenseType      String
   usageScope       String[]    @default([])
   exclusivity      Boolean     @default(false)
   territorialScope String      @default("global")
@@ -236,7 +149,8 @@ model Authorization {
   contractHash    String? @unique
   contractIpfsCid String?
 
-  status AuthorizationStatus @default(PENDING)
+  // Status: PENDING, ACTIVE, EXPIRED, REVOKED, REJECTED
+  status String @default("PENDING")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -259,8 +173,10 @@ model Transaction {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  type   TransactionType
-  status TransactionStatus @default(PENDING)
+  // Type: LICENSE_PURCHASE, LICENSE_RENEWAL, ROYALTY_PAYOUT, KYC_REFUND, PLATFORM_FEE, WITHDRAWAL, SETTLEMENT, PLATFORM_COMMISSION
+  type   String
+  // Status: PENDING, COMPLETED, FAILED, REFUNDED, DISPUTED
+  status String @default("PENDING")
 
   amount   Decimal @db.Decimal(12, 2)
   currency String  @default("USD")
@@ -301,39 +217,35 @@ model InfringementReport {
   portraitId String
   portrait   Portrait @relation(fields: [portraitId], references: [id])
 
-  type InfringementType
+  // Type: UNAUTHORIZED_USE, EXPIRED_LICENSE, SCOPE_VIOLATION, RESALE, DEEPFAKE
+  type String
 
-  // 侵权证据
   evidenceUrls     String[] @default([])
-  evidenceHash     String? // 证据包 SHA-256 哈希
+  evidenceHash     String?
   originalImageUrl String?
 
-  // 侵权描述
   description String    @db.Text
-  detectedUrl String? // 发现侵权的 URL
+  detectedUrl String?
   detectedAt  DateTime?
 
-  status ReportStatus @default(PENDING_REVIEW)
+  // Status: PENDING_REVIEW, VALIDATED, REJECTED, SETTLED, LEGAL_ACTION
+  status String @default("PENDING_REVIEW")
 
-  // 平台处理
   verifierId String?
   verifiedAt DateTime?
   resolution String?   @db.Text
 
-  // 区块链存证
   reportHash    String? @unique
   reportIpfsCid String?
 
-  // 举报来源：AUTO = 系统自动监测，MANUAL = 用户手动举报
+  // Source: MANUAL, AUTO
   source String @default("MANUAL")
 
-  // 相似度分数（系统自动监测时记录）
   similarityScore Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // 关联的告警（系统监测产生）
   alertId String? @unique
 
   notices InfringementNotice[]
@@ -345,49 +257,36 @@ model InfringementReport {
 }
 
 // ============================================================
-// InfringementAlert — 系统自动监测产生的告警
+// InfringementAlert
 // ============================================================
-
-enum AlertStatus {
-  PENDING // 待确认
-  CONFIRMED // 确认侵权
-  FALSE_POSITIVE // 误报
-  EXPIRED // 超过确认时限自动关闭
-}
 
 model InfringementAlert {
   id String @id @default(cuid())
 
   portraitId String
 
-  // 发现的侵权来源
   sourceUrl  String
-  sourceName String // e.g. "Weibo", "Xiaohongshu", "Tiktok"
-  sourceType String // "social_media" | "ai_platform" | "ecommerce" | "website"
+  sourceName String
+  sourceType String
 
-  // 人脸比对结果
-  similarityScore  Float // 0-1 相似度
-  matchedEmbedding Float[] // 匹配到的人脸向量快照
+  similarityScore  Float
+  matchedEmbedding Float[]
 
-  // 证据截图
   screenshotUrl  String?
-  screenshotHash String? // 截图 SHA-256
+  screenshotHash String?
 
-  // 元数据
   pageTitle       String?
   pageDescription String?
-  authorName      String? // 发布者名称
-  publishedAt     DateTime? // 内容发布时间
+  authorName      String?
+  publishedAt     DateTime?
 
-  // 状态
-  status AlertStatus @default(PENDING)
+  // Status: PENDING, CONFIRMED, FALSE_POSITIVE, EXPIRED
+  status String @default("PENDING")
 
-  // 所有者确认
   ownerId          String?
   ownerConfirmedAt DateTime?
-  ownerDecision    String? // "CONFIRMED" | "FALSE_POSITIVE"
+  ownerDecision    String?
 
-  // 转为举报后
   reportId String? @unique
 
   createdAt DateTime @default(now())
@@ -399,7 +298,7 @@ model InfringementAlert {
 }
 
 // ============================================================
-// InfringementMonitorConfig — 用户监测配置
+// InfringementMonitorConfig
 // ============================================================
 
 model InfringementMonitorConfig {
@@ -408,30 +307,22 @@ model InfringementMonitorConfig {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  // 监测开关
   enabled Boolean @default(true)
 
-  // 相似度阈值：默认 0.85 (85%)
   similarityThreshold Float @default(0.85)
 
-  // 监测平台（留空表示全部）
   enabledPlatforms  String[] @default([])
-  // 排除平台（白名单）
   excludedPlatforms String[] @default([])
 
-  // 通知渠道
   notifyEmail  Boolean @default(true)
   notifySms    Boolean @default(false)
   notifyWechat Boolean @default(false)
 
-  // 免打扰时段（UTC）
-  quietHoursStart String? // "22:00"
-  quietHoursEnd   String? // "08:00"
+  quietHoursStart String?
+  quietHoursEnd   String?
 
-  // 高优先级（高相似度 > 0.95）不受免打扰限制
   highPriorityMuteExempt Boolean @default(true)
 
-  // 扫描频率（小时）
   scanIntervalHours Int @default(1)
 
   createdAt DateTime @default(now())
@@ -439,24 +330,8 @@ model InfringementMonitorConfig {
 }
 
 // ============================================================
-// InfringementNotice — 下架通知记录
+// InfringementNotice
 // ============================================================
-
-enum NoticeStatus {
-  DRAFT // 草稿
-  SENT // 已发送
-  RECEIVED // 对方已收
-  ACKNOWLEDGED // 对方已确认
-  COMPLIED // 已下架
-  REJECTED // 对方拒绝
-  ESCALATED // 升级处理
-}
-
-enum NoticeType {
-  TAKEDOWN // 下架通知
-  WARNING // 警告函
-  LEGAL // 律师函
-}
 
 model InfringementNotice {
   id String @id @default(cuid())
@@ -464,41 +339,35 @@ model InfringementNotice {
   reportId String
   report   InfringementReport @relation(fields: [reportId], references: [id])
 
-  type NoticeType @default(TAKEDOWN)
+  // Type: TAKEDOWN, WARNING, LEGAL
+  type String @default("TAKEDOWN")
 
-  // 通知对象
   recipientName    String
   recipientEmail   String?
   recipientPhone   String?
-  recipientAddress String? @db.Text // 邮寄地址
+  recipientAddress String? @db.Text
 
-  // 通知内容（JSON 模板渲染结果）
   subject      String
   body         String  @db.Text
   renderedHtml String? @db.Text
 
-  // 附件（PDF 版通知）
   attachmentUrl String?
 
-  // 发送渠道
-  channel String @default("EMAIL") // EMAIL | POST | API
+  // Channel: EMAIL, POST, API
+  channel String @default("EMAIL")
 
-  // 发送状态
-  status NoticeStatus @default(DRAFT)
+  // Status: DRAFT, SENT, RECEIVED, ACKNOWLEDGED, COMPLIED, REJECTED, ESCALATED
+  status String @default("DRAFT")
 
-  // 发送时间
   sentAt DateTime?
 
-  // 公证信息（预留）
-  notarizationId   String? // 公证处 API 返回的 ID
-  notarizationCert String? // 公证文书编号
+  notarizationId   String?
+  notarizationCert String?
   notarizedAt      DateTime?
 
-  // 区块链存证
   noticeHash    String? @unique
   noticeIpfsCid String?
 
-  // 对方回复
   responseReceivedAt DateTime?
   responseContent    String?   @db.Text
 
@@ -510,7 +379,7 @@ model InfringementNotice {
 }
 
 // ============================================================
-// EvidencePackage — 证据固化包（结构化证据）
+// EvidencePackage
 // ============================================================
 
 model EvidencePackage {
@@ -519,29 +388,21 @@ model EvidencePackage {
   reportId String? @unique
   alertId  String? @unique
 
-  // 证据类型
-  evidenceType String // "screenshot" | "html_archive" | "api_response"
+  evidenceType String
+  evidenceUrl  String
+  evidenceKey  String?
 
-  // 证据内容/URL
-  evidenceUrl String
-  evidenceKey String? // S3 key (if stored)
-
-  // 元数据
   capturedAt DateTime @default(now())
-  capturedBy String   @default("SYSTEM") // SYSTEM | USER
+  capturedBy String   @default("SYSTEM")
 
-  // SHA-256 哈希
   contentHash String @unique
 
-  // 原始页面信息
   pageUrl         String?
   pageTitle       String?
-  pageSnapshotUrl String? // Wayback Machine / 网页快照
+  pageSnapshotUrl String?
 
-  // IPFS 存证
   ipfsCid String?
 
-  // 公证状态
   notarized      Boolean @default(false)
   notarizationId String?
 
@@ -564,7 +425,6 @@ model KYCLog {
   action      String
   result      Json?
 
-  // Additional KYC verification fields
   level          Int?
   idCardNumber   String?
   idCardName     String?
@@ -604,7 +464,8 @@ model CelebrityApplication {
   agencyContact String?
   agencyPhone   String?
 
-  status CelebrityAppStatus @default(PENDING_REVIEW)
+  // Status: PENDING_REVIEW, APPROVED, REJECTED
+  status String @default("PENDING_REVIEW")
 
   reviewerId      String?
   reviewedAt      DateTime?
@@ -647,50 +508,38 @@ model License {
 // Enterprise
 // ============================================================
 
-enum EnterpriseStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  EXPIRED
-}
-
 model Enterprise {
   id String @id @default(cuid())
 
-  userId String @unique // 企业管理员账号
+  userId String @unique
 
-  // 营业执照信息
   companyName       String
-  unifiedCreditCode String    @unique // 统一社会信用代码
+  unifiedCreditCode String    @unique
   legalPersonName   String
-  legalPersonIdCard String // 法人身份证号（加密存储）
-  registeredCapital String? // 注册资本
+  legalPersonIdCard String
+  registeredCapital String?
   establishedDate   DateTime?
-  businessTerm      String? // 营业期限
-  businessScope     String?   @db.Text // 经营范围
+  businessTerm      String?
+  businessScope     String?   @db.Text
 
-  // 营业执照图片
-  licenseImageUrl           String // 营业执照扫描件
-  legalPersonIdCardFrontUrl String? // 法人身份证正面
-  legalPersonIdCardBackUrl  String? // 法人身份证背面
+  licenseImageUrl           String
+  legalPersonIdCardFrontUrl String?
+  legalPersonIdCardBackUrl  String?
 
-  // 联系信息
   contactName  String
   contactPhone String
   contactEmail String
 
-  // 审核信息
-  status          EnterpriseStatus @default(PENDING)
+  // Status: PENDING, APPROVED, REJECTED, EXPIRED
+  status          String @default("PENDING")
   reviewerId      String?
   reviewedAt      DateTime?
   rejectionReason String?          @db.Text
 
-  // 代理经纪公司
   isAgency         Boolean @default(false)
-  agencyLicenseUrl String? // 经纪许可证
+  agencyLicenseUrl String?
 
-  // 有效期
-  validUntil DateTime? // 认证有效期
+  validUntil DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -700,20 +549,20 @@ model Enterprise {
 }
 
 // ============================================================
-// Agency Artist Relation (经纪公司代理的艺人)
+// AgencyArtist
 // ============================================================
 
 model AgencyArtist {
   id String @id @default(cuid())
 
-  agencyId String // 经纪公司 Enterprise.id
-  artistId String // 艺人 User.id
+  agencyId String
+  artistId String
 
-  // 授权代理协议
-  proxyAgreementUrl String? // 代理协议扫描件
+  proxyAgreementUrl String?
   proxyStartDate    DateTime?
   proxyEndDate      DateTime?
-  proxyStatus       String    @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
+  // Status: ACTIVE, EXPIRED, REVOKED
+  proxyStatus String @default("ACTIVE")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -724,17 +573,8 @@ model AgencyArtist {
 }
 
 // ============================================================
-// Enterprise Authorization Application
+// EntAuthApplication
 // ============================================================
-
-enum EntAuthStatus {
-  PENDING_PORTRAIT_OWNER
-  PENDING_PLATFORM_REVIEW
-  APPROVED
-  REJECTED
-  REVOKED
-  EXPIRED
-}
 
 model EntAuthApplication {
   id String @id @default(cuid())
@@ -751,7 +591,8 @@ model EntAuthApplication {
   proposedFee Decimal @db.Decimal(12, 2)
   currency    String  @default("CNY")
 
-  status EntAuthStatus @default(PENDING_PORTRAIT_OWNER)
+  // Status: PENDING_PORTRAIT_OWNER, PENDING_PLATFORM_REVIEW, APPROVED, REJECTED, REVOKED, EXPIRED
+  status String @default("PENDING_PORTRAIT_OWNER")
 
   portraitOwnerConfirmedAt DateTime?
   portraitOwnerConfirmed   Boolean   @default(false)
@@ -808,15 +649,6 @@ model AuthorizationCertificate {
 // Withdrawal
 // ============================================================
 
-enum WithdrawalStatus {
-  PENDING
-  PROCESSING
-  APPROVED
-  REJECTED
-  COMPLETED
-  FAILED
-}
-
 model Withdrawal {
   id String @id @default(cuid())
 
@@ -833,7 +665,8 @@ model Withdrawal {
   bankAccountLast4 String?
   accountHolder    String?
 
-  status          WithdrawalStatus @default(PENDING)
+  // Status: PENDING, PROCESSING, APPROVED, REJECTED, COMPLETED, FAILED
+  status          String @default("PENDING")
   rejectionReason String?
   approvedAt      DateTime?
   approvedBy      String?
@@ -860,13 +693,6 @@ model Withdrawal {
 // Settlement
 // ============================================================
 
-enum SettlementStatus {
-  PENDING
-  CALCULATING
-  COMPLETED
-  CANCELLED
-}
-
 model Settlement {
   id String @id @default(cuid())
 
@@ -884,8 +710,9 @@ model Settlement {
   pendingAmount   Decimal @default(0) @db.Decimal(12, 2)
   availableAmount Decimal @default(0) @db.Decimal(12, 2)
 
-  currency String           @default("CNY")
-  status   SettlementStatus @default(PENDING)
+  currency String @default("CNY")
+  // Status: PENDING, CALCULATING, COMPLETED, CANCELLED
+  status   String @default("PENDING")
 
   breakdown Json?
 
@@ -904,15 +731,6 @@ model Settlement {
 // AuditLog
 // ============================================================
 
-enum AuditAction {
-  WITHDRAWAL_APPROVE
-  WITHDRAWAL_REJECT
-  SETTLEMENT_GENERATE
-  SETTLEMENT_APPROVE
-  USER_BALANCE_ADJUST
-  TRANSACTION_FLAG
-}
-
 model AuditLog {
   id String @id @default(cuid())
 
@@ -920,7 +738,8 @@ model AuditLog {
   admin      User        @relation("AuditAdmin", fields: [adminId], references: [id])
   targetType String
   targetId   String
-  action     AuditAction
+  // Action: WITHDRAWAL_APPROVE, WITHDRAWAL_REJECT, SETTLEMENT_GENERATE, SETTLEMENT_APPROVE, USER_BALANCE_ADJUST, TRANSACTION_FLAG
+  action     String
   before     Json?
   after      Json?
   reason     String?
@@ -935,32 +754,23 @@ model AuditLog {
 // Notification
 // ============================================================
 
-enum NotificationType {
-  SYSTEM
-  AUTHORIZATION
-  EARNING
-  INFRINGEMENT
-  KYC
-  SETTLEMENT
-  WITHDRAWAL
-}
-
 model Notification {
   id String @id @default(cuid())
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  type  NotificationType @default(SYSTEM)
+  // Type: SYSTEM, AUTHORIZATION, EARNING, INFRINGEMENT, KYC, SETTLEMENT, WITHDRAWAL
+  type  String @default("SYSTEM")
   title String
   body  String           @db.Text
-  data  Json? // { portraitId, authorizationId, reportId, etc. }
+  data  Json?
 
   isRead Boolean   @default(false)
   readAt DateTime?
 
-  // Push channel
-  channel String @default("IN_APP") // IN_APP | WEBSOCKET | EMAIL | SMS
+  // Channel: IN_APP, WEBSOCKET, EMAIL, SMS
+  channel String @default("IN_APP")
 
   createdAt DateTime @default(now())
 
@@ -969,51 +779,8 @@ model Notification {
 }
 
 // ============================================================
-// UserAuditLog — User-side operation audit trail
+// UserAuditLog
 // ============================================================
-
-enum UserAuditAction {
-  // Auth
-  LOGIN
-  LOGIN_FAILED
-  LOGOUT
-  OTP_SENT
-  OTP_VERIFIED
-  OTP_FAILED
-  // Profile
-  PROFILE_UPDATE
-  PHONE_BIND
-  PHONE_UNBIND
-  WALLET_BIND
-  WALLET_UNBIND
-  // KYC
-  KYC_SUBMITTED
-  KYC_APPROVED
-  KYC_REJECTED
-  KYC_EXPIRED
-  // Portrait
-  PORTRAIT_REGISTERED
-  PORTRAIT_UPDATED
-  PORTRAIT_SUSPENDED
-  PORTRAIT_DELETED
-  // Authorization
-  AUTH_REQUEST_SENT
-  AUTH_APPROVED
-  AUTH_REJECTED
-  AUTH_REVOKED
-  AUTH_CERTIFICATE_DOWNLOADED
-  // Earnings
-  EARNINGS_WITHDRAWN
-  EARNINGS_EXPORTED
-  SETTLEMENT_VIEWED
-  // Settings
-  NOTIFICATION_SETTINGS_UPDATED
-  MONITOR_CONFIG_UPDATED
-  // API Key
-  API_KEY_CREATED
-  API_KEY_DELETED
-  API_KEY_ROTATED
-}
 
 model UserAuditLog {
   id String @id @default(cuid())
@@ -1021,18 +788,17 @@ model UserAuditLog {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  action    UserAuditAction
+  // Action: LOGIN, LOGIN_FAILED, LOGOUT, OTP_SENT, OTP_VERIFIED, OTP_FAILED, PROFILE_UPDATE, PHONE_BIND, PHONE_UNBIND, WALLET_BIND, WALLET_UNBIND, KYC_SUBMITTED, KYC_APPROVED, KYC_REJECTED, KYC_EXPIRED, PORTRAIT_REGISTERED, PORTRAIT_UPDATED, PORTRAIT_SUSPENDED, PORTRAIT_DELETED, AUTH_REQUEST_SENT, AUTH_APPROVED, AUTH_REJECTED, AUTH_REVOKED, AUTH_CERTIFICATE_DOWNLOADED, EARNINGS_WITHDRAWN, EARNINGS_EXPORTED, SETTLEMENT_VIEWED, NOTIFICATION_SETTINGS_UPDATED, MONITOR_CONFIG_UPDATED, API_KEY_CREATED, API_KEY_DELETED, API_KEY_ROTATED
+  action    String
   ipAddress String?
   userAgent String?
 
-  // Target of the action (for context)
-  targetType String? // "Portrait" | "Authorization" | "Withdrawal" | "ApiKey" | etc.
+  targetType String?
   targetId   String?
 
-  // Result
   success Boolean @default(true)
-  detail  String? @db.Text // human-readable description
-  meta    Json? // extra context: { deviceType, browser, os, errorCode, etc. }
+  detail  String? @db.Text
+  meta    Json?
 
   createdAt DateTime @default(now())
 
@@ -1042,43 +808,30 @@ model UserAuditLog {
 }
 
 // ============================================================
-// ApiKey — Third-party developer API keys
+// ApiKey
 // ============================================================
-
-enum ApiKeyStatus {
-  ACTIVE
-  SUSPENDED
-  EXPIRED
-  REVOKED
-}
 
 model ApiKey {
   id String @id @default(cuid())
 
-  name String // e.g. "Production App", "Test Key"
+  name String
 
-  // Hashed key (show once at creation, store hash)
   keyHash String @unique
-
-  // Prefix shown to user for identification (e.g. "ppk_live_abc123")
   keyPrefix String
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  status ApiKeyStatus @default(ACTIVE)
+  // Status: ACTIVE, SUSPENDED, EXPIRED, REVOKED
+  status String @default("ACTIVE")
 
-  // Permissions scope
-  scopes String[] @default([]) // "earnings:read" | "authorizations:read" | "portraits:read"
+  scopes String[] @default([])
 
-  // Rate limits
   rateLimitPerMinute Int @default(60)
 
-  // Usage tracking
   lastUsedAt   DateTime?
   requestCount BigInt    @default(0)
 
-  // Expiry
   expiresAt DateTime?
 
   createdAt DateTime @default(now())
@@ -1089,13 +842,13 @@ model ApiKey {
 }
 
 // ============================================================
-// RateLimitRecord — API rate limit tracking
+// RateLimitRecord
 // ============================================================
 
 model RateLimitRecord {
   id String @id @default(cuid())
 
-  identifier   String // "api_key_<hash>" or "ip_<address>"
+  identifier   String
   windowStart  DateTime
   requestCount Int      @default(1)
 
@@ -1142,76 +895,44 @@ model Session {
 }
 
 // ============================================================
-// AI Content & IP Registration
+// AIContent & IPRegistration
 // ============================================================
 
-enum AIContentType {
-  CHARACTER // AI-generated character/avatar
-  ARTWORK // AI-generated artwork/illustration
-  MUSIC // AI-generated music/audio
-  TEXT // AI-generated text/content
-  VIDEO // AI-generated video
-  MODEL_3D // AI-generated 3D model
-  OTHER
-}
-
-enum IPRegistrationStatus {
-  DRAFT
-  CERTIFIED // 版权已上链
-  ACTIVE
-  REVOKED
-  EXPIRED
-}
-
-enum CertificateType {
-  OWNERSHIP // 所有权证明
-  LICENSE // 授权许可
-  CREATION // 创作证明
-  DERIVATIVE // 衍生作品证明
-}
-
-// AIContent: AI-generated content asset
 model AIContent {
   id String @id @default(cuid())
 
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
 
-  // Content info
   title       String
   description String?       @db.Text
-  contentType AIContentType @default(CHARACTER)
+  // Content Type: CHARACTER, ARTWORK, MUSIC, TEXT, VIDEO, MODEL_3D, OTHER
+  contentType String @default("CHARACTER")
 
-  // AI generation metadata
-  generationTool   String // e.g. "Midjourney v6", "Stable Diffusion XL", "DALL-E 3"
+  generationTool   String
   generationPrompt String?   @db.Text
   generationDate   DateTime?
-  modelVersion     String? // e.g. "SDXL 1.0"
-  cfgScale         Float? // Diffusion params
+  modelVersion     String?
+  cfgScale         Float?
   seed             String?
   sampler          String?
 
-  // File URLs
   originalFileUrl String?
   thumbnailUrl    String?
-  fileSize        Int? // bytes
+  fileSize        Int?
   mimeType        String?
 
-  // Content hash
-  contentHash String? @unique // SHA-256 of original file
+  contentHash String? @unique
 
-  // IPFS storage
   ipfsCid String?
   ipfsUrl String?
 
-  // Tags
   tags String[] @default([])
 
-  // Rights metadata
   copyrightNotice  String?  @db.Text
-  licenseScope     String[] @default([]) // e.g. ["commercial", "editorial"]
+  licenseScope     String[] @default([])
   isPublicDomain   Boolean  @default(false)
-  thirdPartyRights Boolean  @default(false) // 是否有第三方权利
+  thirdPartyRights Boolean  @default(false)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -1224,7 +945,6 @@ model AIContent {
   @@index([contentHash])
 }
 
-// IPRegistration: Blockchain copyright certificate
 model IPRegistration {
   id String @id @default(cuid())
 
@@ -1234,48 +954,40 @@ model IPRegistration {
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
 
-  // Registration metadata
   title         String
   description   String? @db.Text
-  certificateNo String  @unique // 证书编号 PP-IP-YYYYMMDD-XXXX
+  certificateNo String  @unique
 
-  // Certificate type
-  certificateType CertificateType @default(OWNERSHIP)
+  // Certificate Type: OWNERSHIP, LICENSE, CREATION, DERIVATIVE
+  certificateType String @default("OWNERSHIP")
 
-  // Rights declared
-  rightsDeclared   String[] @default([]) // e.g. ["reproduction", "distribution", "public_display"]
+  rightsDeclared   String[] @default([])
   territorialScope String   @default("global")
   exclusivity      Boolean  @default(false)
-  usageDuration    Int? // 天数，null = 永久
+  usageDuration    Int?
 
-  // Blockchain certification
   blockchainNetwork  String  @default("sepolia")
   blockchainTxHash   String? @unique
   blockchainBlockNum Int?
   contractAddress    String?
 
-  // IPFS
   certificateIpfsCid String?
   metadataIpfsCid    String?
 
-  // Certificate fields
   certifiedAt DateTime?
   expiresAt   DateTime?
-  status      IPRegistrationStatus @default(DRAFT)
+  // Status: DRAFT, CERTIFIED, ACTIVE, REVOKED, EXPIRED
+  status      String @default("DRAFT")
 
-  // Originality declaration
   originalityDeclaration String? @db.Text
-  generationToolConfirm  Boolean @default(false) // 确认使用了该AI工具
+  generationToolConfirm  Boolean @default(false)
 
-  // Third-party IP clearance
   thirdPartyClearance Boolean  @default(false)
   thirdPartyRefs      String[] @default([])
 
-  // Revision history
   version       Int     @default(1)
   previousRegId String?
 
-  // Additional metadata
   metadata Json?
 
   createdAt DateTime  @default(now())
@@ -1289,55 +1001,37 @@ model IPRegistration {
 }
 
 // ============================================================
-// ContactSubmission — 联系表单提交
+// ContactSubmission
 // ============================================================
-
-enum ContactType {
-  GENERAL // 普通联系表单
-  ENTERPRISE // 企业入驻咨询
-}
-
-enum ContactStatus {
-  NEW // 新提交
-  READ // 已读
-  PROCESSING // 处理中
-  REPLIED // 已回复
-  RESOLVED // 已解决
-  CLOSED // 已关闭
-}
 
 model ContactSubmission {
   id String @id @default(cuid())
 
-  type ContactType @default(GENERAL)
+  // Type: GENERAL, ENTERPRISE
+  type String @default("GENERAL")
 
-  // 基本信息
   name    String
   email   String
   company String?
 
-  // 留言内容
   subject String?
   message String  @db.Text
 
-  // 企业入驻额外字段
-  enterpriseName String? // 企业名称
-  intendedUse    String? // 用途说明 @db.Text
-  expectedScale  String? // 预期规模
-  contactPhone   String? // 联系电话
+  enterpriseName String?
+  intendedUse    String? @db.Text
+  expectedScale  String?
+  contactPhone   String?
 
-  // 状态管理
-  status     ContactStatus @default(NEW)
-  adminNotes String?       @db.Text // 管理员备注
-  handledBy  String? // 管理员 ID
+  // Status: NEW, READ, PROCESSING, REPLIED, RESOLVED, CLOSED
+  status     String @default("NEW")
+  adminNotes String? @db.Text
+  handledBy  String?
   handledAt  DateTime?
 
-  // 邮件通知状态
   emailSent   Boolean   @default(false)
   emailSentAt DateTime?
   emailError  String?
 
-  // 管理员处理时更新的字段
   repliedAt      DateTime?
   repliedMessage String?   @db.Text
 

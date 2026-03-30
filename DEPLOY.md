@@ -318,7 +318,82 @@ DATABASE_URL=postgresql://user:password@ep-cool-name-123456.us-east-2.aws.neon.t
 
 ---
 
-## 🗄️ 云数据库配置
+## 🗄️ 数据库配置（Neon — 推荐用于 Vercel）
+
+### 为什么选择 Neon？
+- Serverless PostgreSQL，与 Vercel 无缝集成
+- 免费额度：0.5 GB 存储，50 万请求/月
+- Prisma 原生支持，`sslmode=require` 即可
+- 自动扩缩容，无需管理实例
+
+### 步骤 1：创建 Neon 项目
+
+1. 访问 https://neon.tech，注册并登录
+2. 点击 **New Project**：
+   - Project Name: `portraitpay`
+   - Region: `US East (Ohio)` 或 `Asia Pacific (Singapore)`（按需选择）
+   - Postgres Version: `16`
+3. 创建完成后，进入 **Dashboard → Connection Details**
+4. 复制 **Connection string**（格式如下）：
+   ```
+   postgresql://USER:PASSWORD@ep-xxx-123456.us-east-2.aws.neon.tech/portraitpay?sslmode=require
+   ```
+
+### 步骤 2：在 Vercel 配置 DATABASE_URL
+
+1. 进入 Vercel Dashboard → portraitpay 项目 → **Settings → Environment Variables**
+2. 添加变量：
+   ```
+   DATABASE_URL = postgresql://USER:PASSWORD@ep-xxx.../portraitpay?sslmode=require
+   ```
+   勾选 **Production** 和 **Preview**，不勾选 **Development**
+
+### 步骤 3：生成 AUTH_SECRET
+
+本地运行以下命令生成密钥：
+
+```bash
+openssl rand -base64 32
+```
+
+在 Vercel Environment Variables 中添加：
+```
+AUTH_SECRET = [粘贴生成的密钥]
+```
+
+### 步骤 4：运行数据库迁移
+
+**方式 A — 本地（推荐）**：
+```bash
+# 1. 复制 .env.production.example 为 .env，填入 DATABASE_URL 和 AUTH_SECRET
+cp .env.production.example .env
+
+# 2. 运行数据库迁移
+npm run db:migrate
+
+# 3. 验证迁移状态
+npx prisma migrate status
+```
+
+**方式 B — Vercel CLI（部署后自动执行）**：
+- `vercel.json` 中的 `buildCommand: "npx prisma generate && next build"` 已包含 Prisma Client 生成
+- 首次部署后，Vercel Build 时会自动执行迁移（如在 build 命令中加了 `prisma migrate deploy`）
+- **建议**：在 GitHub Actions 或 Vercel 的 Deploy Hook 中手动触发首次迁移
+
+**方式 C — 使用 Vercel Postgres（备选）**：
+如果使用 Vercel 内置 Postgres（通过 `vercel add postgres` 创建），连接串格式为：
+```
+postgres://default_user:xxx@aws.connect.psdb.cloud/verceldb?sslmode=require
+```
+注意：Vercel Postgres 使用 `@vercel/postgres`，Prisma 需要 `pg` 驱动，直接使用 Neon 更简单。
+
+### 步骤 5：验证数据库连接
+
+部署完成后，访问 `/api/health` 或查看 Vercel 函数日志，确认数据库连接正常。
+
+---
+
+## 🗄️ 云数据库配置（旧版 — Supabase）
 
 ### Supabase
 
