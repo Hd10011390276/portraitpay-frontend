@@ -12,9 +12,19 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { calculateSplit } from "@/lib/revenue/service";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-  apiVersion: "2025-02-24.acacia",
-});
+// Lazy initialization to avoid build-time errors
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("STRIPE_SECRET_KEY environment variable is not set");
+    }
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-02-24.acacia",
+    });
+  }
+  return _stripe;
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,7 +96,7 @@ export async function createPaymentIntent(
     // params.transfer_data = { destination: owner.stripeCustomerId };
   }
 
-  const paymentIntent = await stripe.paymentIntents.create(params);
+  const paymentIntent = await getStripe().paymentIntents.create(params);
 
   return {
     clientSecret: paymentIntent.client_secret!,
@@ -101,7 +111,7 @@ export async function createPaymentIntent(
  * Records the transaction and royalty payout
  */
 export async function onPaymentSuccess(paymentIntentId: string) {
-  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId);
 
   if (paymentIntent.status !== "succeeded") {
     throw new Error(`Payment not succeeded: ${paymentIntent.status}`);
@@ -179,7 +189,7 @@ export async function handleStripeWebhook(
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    event = getStripe().webhooks.constructEvent(payload, signature, webhookSecret);
   } catch (err) {
     return { received: false, error: "Invalid webhook signature" };
   }
@@ -270,7 +280,7 @@ export async function initiateStripePayout(
 
   try {
     // Create a Stripe payout
-    const payout = await stripe.payouts.create(
+    const payout = await getStripe().payouts.create(
       {
         amount,
         currency,
@@ -307,7 +317,7 @@ export async function refundPayment(
   paymentIntentId: string,
   amount?: number // partial refund amount in cents
 ): Promise<{ refundId: string }> {
-  const refund = await stripe.refunds.create({
+  const refund = await getStripe().refunds.create({
     payment_intent: paymentIntentId,
     amount, // undefined = full refund
   });
@@ -323,7 +333,7 @@ export async function refundPayment(
 // ─── Create Stripe Customer (for Connect payouts) ────────────────────────────
 
 export async function createStripeCustomer(userId: string, email: string) {
-  const customer = await stripe.customers.create({
+  const customer = await getStripe().customers.create({
     email,
     metadata: { userId },
   });
@@ -339,7 +349,7 @@ export async function createStripeCustomer(userId: string, email: string) {
 // ─── Generate Stripe Account Link (for KYC/Connect onboarding) ──────────────
 
 export async function createAccountLink(stripeCustomerId: string, returnUrl: string) {
-  const accountLink = await stripe.accountLinks.create({
+  const accountLink = await getStripe().accountLinks.create({
     account: stripeCustomerId,
     refresh_url: returnUrl,
     return_url: returnUrl,
