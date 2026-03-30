@@ -2,7 +2,7 @@
 // Records user-side operation audit trail (login, profile change, authorization, etc.)
 
 import { prisma } from "@/lib/prisma";
-import type { UserAuditAction } from "@prisma/client";
+import type { UserAuditAction } from "@/types/enums";
 import { headers } from "next/headers";
 
 export type AuditMeta = {

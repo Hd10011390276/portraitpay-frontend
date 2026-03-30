@@ -3,7 +3,7 @@
  * 经纪公司代理授权管理
  */
 import { prisma } from "@/lib/prisma";
-import { EntAuthStatus, LicenseType } from "@prisma/client";
+import type { EntAuthStatus, LicenseType } from "@/types/enums";
 import { addDays } from "date-fns";
 
 export interface AddArtistInput {

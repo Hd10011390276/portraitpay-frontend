@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { listAuditLogs, AUDIT_ACTION_LABELS } from "@/lib/audit/service";
-import type { UserAuditAction } from "@prisma/client";
+import type { UserAuditAction } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { RegisterSchema } from "@/lib/auth/schemas";
 import { signTokenPair } from "@/lib/auth/jwt";
 import { setTokenCookies } from "@/lib/auth/session";
-import { UserRole } from "@prisma/client";
+type UserRole = string;
 
 export async function POST(req: NextRequest) {
   try {

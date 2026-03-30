@@ -3,7 +3,7 @@
  * 企业授权申请、审批工作流
  */
 import { prisma } from "@/lib/prisma";
-import { EntAuthStatus, LicenseType } from "@prisma/client";
+import type { EntAuthStatus, LicenseType } from "@/types/enums";
 import { addDays } from "date-fns";
 import { generateAuthorizationContract } from "./contract";
 import { generateCertificatePDF } from "./certificate";
