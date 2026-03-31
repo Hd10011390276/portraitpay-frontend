@@ -28,6 +28,22 @@ const EnterpriseContactSchema = z.object({
   message: z.string().max(5000).optional(),
 });
 
+const CelebrityContactSchema = z.object({
+  type: z.literal("CELEBRITY"),
+  name: z.string().min(1, "姓名不能为空").max(100),
+  email: z.string().email("邮箱格式不正确"),
+  contactPhone: z.string().max(30).optional(),
+  // stage name / 艺名
+  subject: z.string().min(1, "请填写艺名/艺名").max(200),
+  // category: celebrity | artist | influencer
+  enterpriseName: z.string().min(1, "请选择艺人类型").max(50),
+  // social media handles
+  intendedUse: z.string().max(1000).optional(),
+  // agency info
+  company: z.string().max(200).optional(),
+  message: z.string().max(5000).optional(),
+});
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -46,6 +62,20 @@ export async function POST(req: NextRequest) {
         intendedUse: data.intendedUse,
         expectedScale: data.expectedScale,
         contactPhone: data.contactPhone,
+        status: "NEW",
+      };
+    } else if (body.type === "CELEBRITY") {
+      const data = CelebrityContactSchema.parse(body);
+      dbData = {
+        type: "CELEBRITY",
+        name: data.name,
+        email: data.email,
+        contactPhone: data.contactPhone,
+        subject: data.subject, // stage name
+        enterpriseName: data.enterpriseName, // category
+        intendedUse: data.intendedUse, // social media
+        company: data.company, // agency
+        message: data.message ?? "",
         status: "NEW",
       };
     } else {
@@ -67,7 +97,7 @@ export async function POST(req: NextRequest) {
     // Send email notification (non-blocking — errors don't fail the request)
     try {
       const emailData: ContactEmailData = {
-        type: dbData.type as "GENERAL" | "ENTERPRISE",
+        type: dbData.type as "GENERAL" | "ENTERPRISE" | "CELEBRITY",
         name: dbData.name,
         email: dbData.email,
         company: dbData.company ?? undefined,
@@ -76,6 +106,11 @@ export async function POST(req: NextRequest) {
           enterpriseName: dbData.enterpriseName ?? undefined,
           intendedUse: dbData.intendedUse ?? undefined,
           expectedScale: dbData.expectedScale ?? undefined,
+          contactPhone: dbData.contactPhone ?? undefined,
+        } : {}),
+        ...(dbData.type === "CELEBRITY" ? {
+          enterpriseName: dbData.enterpriseName ?? undefined, // category
+          intendedUse: dbData.intendedUse ?? undefined,      // social media
           contactPhone: dbData.contactPhone ?? undefined,
         } : {}),
       };
