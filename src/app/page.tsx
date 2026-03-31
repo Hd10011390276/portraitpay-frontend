@@ -50,7 +50,7 @@ export default function HomePage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
               </span>
-              Now live on Ethereum Sepolia Testnet
+              Now live on Ethereum Sepolia Testnet (Beta)
             </div>
 
             {/* Headline */}
@@ -66,9 +66,9 @@ export default function HomePage() {
 
             {/* Sub */}
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Register your portrait rights on the Ethereum blockchain with
-              immutable timestamps, IPFS storage, and smart-contract licensing.
-              Own your image identity — once and for all.
+              Register your portrait rights on the Ethereum blockchain (Sepolia testnet) with
+              immutable timestamps, IPFS storage, and smart-contract licensing. Own your image identity — once and for all.{/* beta */}
+              <span className="ml-2 inline-flex items-center rounded bg-yellow-100 dark:bg-yellow-900/30 px-1.5 py-0.5 text-xs font-medium text-yellow-700 dark:text-yellow-300 align-middle">Beta</span>
             </p>
 
             {/* CTAs */}
@@ -164,42 +164,42 @@ export default function HomePage() {
               {
                 icon: "🔗",
                 title: "Blockchain Certification",
-                desc: "Mint your portrait as an on-chain asset on Ethereum Sepolia. Immutable timestamps, tamper-proof records.",
+                desc: "Mint your portrait as an on-chain asset on Ethereum Sepolia testnet. Immutable timestamps, tamper-proof records.",
                 color: "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20",
                 border: "border-purple-200 dark:border-purple-800",
               },
               {
                 icon: "🖼️",
                 title: "IPFS Storage",
-                desc: "Your portrait and metadata stored on IPFS — decentralized, redundant, and censorship-resistant forever.",
+                desc: "Your portrait and metadata stored on IPFS via Pinata — decentralized and redundant. Beta feature.",
                 color: "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
                 border: "border-blue-200 dark:border-blue-800",
               },
               {
                 icon: "📋",
                 title: "Smart Licensing",
-                desc: "Define who can use your portrait, for how long, and at what price. Enforced automatically by smart contract.",
+                desc: "Define usage terms — who can use your portrait, for how long, and at what price. Coming soon.",
                 color: "from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
                 border: "border-green-200 dark:border-green-800",
               },
               {
                 icon: "💰",
                 title: "Royalty Collection",
-                desc: "Earn automatically when your portrait is licensed. Every transaction routed through smart contract with split ratios.",
+                desc: "Earn automatically when your portrait is licensed. 99% of licensing revenue goes to you, 1% platform fee.",
                 color: "from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20",
                 border: "border-yellow-200 dark:border-yellow-800",
               },
               {
                 icon: "👁️",
                 title: "Infringement Detection",
-                desc: "AI-powered image scanning monitors the web for unauthorized use of your certified portraits 24/7.",
+                desc: "AI-powered image scanning monitors the web for unauthorized use of your certified portraits. Beta — platforms in development.",
                 color: "from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20",
                 border: "border-red-200 dark:border-red-800",
               },
               {
                 icon: "🔐",
                 title: "KYC Verified Profiles",
-                desc: "Enterprise-grade identity verification for celebrities, artists, and public figures. Whitelisted on-chain.",
+                desc: "Enterprise-grade identity verification for celebrities, artists, and public figures. Beta feature.",
                 color: "from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20",
                 border: "border-indigo-200 dark:border-indigo-800",
                 cta: "Get Verified",
@@ -239,8 +239,8 @@ export default function HomePage() {
             {[
               { step: "01", icon: "📤", title: "Upload Portrait", desc: "Upload a clear, high-resolution portrait. We detect faces automatically and crop for you." },
               { step: "02", icon: "🔍", title: "Complete KYC", desc: "Verify your identity to unlock enterprise licensing and increase your profile trust score." },
-              { step: "03", icon: "🔗", title: "Certify On-Chain", desc: "One click to mint on Ethereum Sepolia. Your portrait hash, metadata, and timestamp permanently recorded." },
-              { step: "04", icon: "💎", title: "License & Earn", desc: "Set your terms. Accept license requests, collect royalties, withdraw earnings — all from your dashboard." },
+              { step: "03", icon: "🔗", title: "Certify On-Chain", desc: "One click to mint on Ethereum Sepolia testnet (Beta). Your portrait hash, metadata, and timestamp permanently recorded." },
+              { step: "04", icon: "💎", title: "License & Earn", desc: "Set your licensing terms. Accept requests, collect royalties, withdraw earnings — all from your dashboard." },
             ].map((item, i) => (
               <div key={item.step} className="relative">
                 {i < 3 && (
@@ -367,7 +367,7 @@ export default function HomePage() {
               },
               {
                 q: "How does the AI infringement detection work?",
-                a: "Our AI scans websites, social media, and stock photo platforms using face recognition + visual similarity. When a match is found above your threshold, you receive an alert and evidence package.",
+                a: "Our AI scanning infrastructure uses face recognition + visual similarity to detect potential unauthorized use. Platform coverage is being expanded. When a match is found above your threshold, you receive an alert and evidence package. Beta.",
               },
               {
                 q: "What is KYC and why do I need it?",
@@ -404,7 +404,7 @@ export default function HomePage() {
           <div className="relative">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Ready to own your portrait rights?</h2>
             <p className="text-blue-100 text-lg mb-8 max-w-xl mx-auto">
-              Join thousands of creators protecting their image identity on the blockchain today.
+              Join creators protecting their image identity on the blockchain. Beta — your feedback shapes the product.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/register"
@@ -441,6 +441,11 @@ export default function HomePage() {
               Contact
             </Link>
           </div>
+        </div>
+        <div className="max-w-7xl mx-auto mt-4 pt-6 border-t border-gray-100 dark:border-gray-800">
+          <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
+            ⚠️ Beta features are for testing purposes only. Mainnet launch TBD. Blockchain certification is on Ethereum Sepolia <strong>testnet</strong> — not mainnet. All transaction data shown is for demonstration purposes.
+          </p>
         </div>
       </footer>
     </div>
