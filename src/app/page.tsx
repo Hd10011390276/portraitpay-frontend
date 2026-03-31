@@ -13,16 +13,20 @@ export default function HomePage() {
       <header className="fixed inset-x-0 top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              {/* Light mode: logo with dark bg + white text; dark mode: logo with white bg + black text */}
-              <img src="/logo-light.svg" alt="PortraitPay AI" className="block dark:hidden w-auto h-8" style={{minHeight:'24px'}} />
-              <img src="/logo-dark.svg" alt="PortraitPay AI" className="hidden dark:block w-auto h-8" style={{minHeight:'24px'}} />
-            </div>
+            <a href="/" className="flex items-center gap-3">
+              <img src="/logo.png" alt="PortraitPay AI" width="32" height="32" className="w-10 h-10 object-contain" />
+              <span className="text-base font-bold text-gray-900 dark:text-white select-none">PortraitPay AI</span>
+            </a>
             <nav className="hidden md:flex items-center gap-8">
-              {Object.values(t.nav).map((item) => (
-                <a key={item} href={`#${item.toLowerCase().replace(" ", "-")}`}
+              {[
+                { href: "#features", label: t.nav.features },
+                { href: "#how-it-works", label: t.nav.howItWorks },
+                { href: "#pricing", label: t.nav.pricing },
+                { href: "#faq", label: t.nav.faq },
+              ].map((item) => (
+                <a key={item.label} href={item.href}
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                  {item}
+                  {item.label}
                 </a>
               ))}
             </nav>
@@ -43,14 +47,11 @@ export default function HomePage() {
 
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-950 dark:to-purple-950/20 -z-10" />
         <div className="absolute top-20 right-0 w-96 h-96 bg-purple-200 dark:bg-purple-900/10 rounded-full blur-3xl -z-10 opacity-40" />
         <div className="absolute top-40 left-10 w-72 h-72 bg-blue-200 dark:bg-blue-900/10 rounded-full blur-3xl -z-10 opacity-40" />
-
         <div className="max-w-7xl mx-auto">
           <div className="max-w-3xl mx-auto text-center space-y-8">
-            {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-sm font-medium">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
@@ -58,34 +59,22 @@ export default function HomePage() {
               </span>
               {t.hero.badge}
             </div>
-
-            {/* Headline */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight whitespace-pre-line">
               {t.hero.headline}
             </h1>
-
-            {/* Sub */}
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
               {t.hero.sub}
-              <span className="ml-2 inline-flex items-center rounded bg-yellow-100 dark:bg-yellow-900/30 px-1.5 py-0.5 text-xs font-medium text-yellow-700 dark:text-yellow-300 align-middle">Beta</span>
             </p>
-
-            {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/register"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5">
                 {t.hero.cta1}
-                <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
               </Link>
               <Link href="#how-it-works"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700 hover:-translate-y-0.5">
                 {t.hero.cta2}
               </Link>
             </div>
-
-            {/* Social proof */}
             <div className="flex flex-col items-center gap-3 pt-4">
               <div className="flex -space-x-2">
                 {["JD", "MW", "SK", "AL", "RK"].map((initials, i) => (
@@ -108,34 +97,23 @@ export default function HomePage() {
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-yellow-400" />
                 <div className="w-3 h-3 rounded-full bg-green-400" />
-                <div className="flex-1 text-center text-xs text-gray-400">{t.dashboard.title}</div>
+                <div className="flex-1 text-center text-xs text-gray-400">PortraitPay Dashboard</div>
               </div>
               <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: t.dashboard.certified, value: "24", delta: "+3" },
-                  { label: t.dashboard.earnings, value: "¥12,840", delta: "+¥1,200" },
-                  { label: t.dashboard.pending, value: "5", delta: "" },
-                  { label: t.dashboard.blockchain, value: t.dashboard.live, delta: "" },
-                ].map((stat) => (
-                  <div key={stat.label} className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{stat.label}</p>
-                    <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                    {stat.delta && <p className="text-xs text-green-600 mt-0.5">{stat.delta}</p>}
+                {["已认证: 24", "总收入: ¥12,840", "待处理: 5", "● 链上状态"].map((stat, i) => (
+                  <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{stat.split(": ")[0]}</p>
+                    <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.split(": ")[1]}</p>
                   </div>
                 ))}
               </div>
               <div className="p-6 pt-0 grid grid-cols-3 gap-4">
-                {[
-                  { title: t.dashboard.sample1, status: t.dashboard.certifiedOnchain, tx: "0x7a3f...c9e2" },
-                  { title: t.dashboard.sample2, status: t.dashboard.review, tx: "" },
-                  { title: t.dashboard.sample3, status: t.dashboard.certifiedOnchain, tx: "0xb2d1...f8a0" },
-                ].map((card) => (
-                  <div key={card.title} className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div className="h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center text-3xl">👤</div>
                     <div className="p-3">
-                      <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{card.title}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{card.status}</p>
-                      {card.tx && <p className="text-xs font-mono text-gray-400 mt-1">{card.tx}</p>}
+                      <p className="text-xs font-medium text-gray-900 dark:text-white truncate">样本 {i}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">已认证上链</p>
                     </div>
                   </div>
                 ))}
@@ -159,62 +137,24 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              {
-                icon: "🔗",
-                title: t.features.blockchain,
-                desc: t.features.blockchainDesc,
-                color: "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20",
-                border: "border-purple-200 dark:border-purple-800",
-              },
-              {
-                icon: "🖼️",
-                title: t.features.ipfs,
-                desc: t.features.ipfsDesc,
-                color: "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
-                border: "border-blue-200 dark:border-blue-800",
-              },
-              {
-                icon: "📋",
-                title: t.features.smartLicensing,
-                desc: t.features.smartLicensingDesc,
-                color: "from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
-                border: "border-green-200 dark:border-green-800",
-              },
-              {
-                icon: "💰",
-                title: t.features.royalty,
-                desc: t.features.royaltyDesc,
-                color: "from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20",
-                border: "border-yellow-200 dark:border-yellow-800",
-              },
-              {
-                icon: "👁️",
-                title: t.features.infringement,
-                desc: t.features.infringementDesc,
-                color: "from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20",
-                border: "border-red-200 dark:border-red-800",
-              },
-              {
-                icon: "🔐",
-                title: t.features.kyc,
-                desc: t.features.kycDesc,
-                color: "from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20",
-                border: "border-indigo-200 dark:border-indigo-800",
-                cta: t.features.kycLink,
-                ctaHref: "/kyc",
-              },
-            ].map((feature) => (
-              <div key={feature.title}
+              { icon: "🔗", color: "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20", border: "border-purple-200 dark:border-purple-800" },
+              { icon: "🖼️", color: "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20", border: "border-blue-200 dark:border-blue-800" },
+              { icon: "📋", color: "from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20", border: "border-green-200 dark:border-green-800" },
+              { icon: "💰", color: "from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20", border: "border-yellow-200 dark:border-yellow-800" },
+              { icon: "👁️", color: "from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20", border: "border-red-200 dark:border-red-800" },
+              { icon: "🔐", color: "from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20", border: "border-indigo-200 dark:border-indigo-800" },
+            ].map((feature, i) => (
+              <div key={i}
                 className={`bg-gradient-to-br ${feature.color} rounded-2xl p-6 border ${feature.border} hover:shadow-lg transition-shadow`}>
                 <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">{feature.desc}</p>
-                {feature.cta && (
-                  <Link href={feature.ctaHref!}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors">
-                    {feature.cta} →
-                  </Link>
-                )}
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  {["区块链时间戳 + IPFS 存储，确保证书不可篡改。智能合约自动执行授权和分成。", 
+                    "上传肖像，系统自动生成哈希并存储到 IPFS。分布式存储，永不丢失。", 
+                    "可定制的授权模板，支持多种商业场景。灵活调整授权范围和期限。",
+                    "每次使用肖像获得实时分成。区块链透明记录，无需中间商。",
+                    "AI 侵权检测 + 自动取证。7×24小时监控，侵权证据即时固化。",
+                    "企业级 KYC 认证。符合法规要求，支持批量授权管理。"][i]}
+                </p>
               </div>
             ))}
           </div>
@@ -234,28 +174,15 @@ export default function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { step: "01", icon: "📤", title: t.howItWorks.upload, desc: t.howItWorks.uploadDesc },
-              { step: "02", icon: "🔍", title: t.howItWorks.kyc, desc: t.howItWorks.kycDesc },
-              { step: "03", icon: "🔗", title: t.howItWorks.certify, desc: t.howItWorks.certifyDesc },
-              { step: "04", icon: "💎", title: t.howItWorks.license, desc: t.howItWorks.licenseDesc },
-            ].map((item, i) => (
-              <div key={item.step} className="relative">
-                {i < 3 && (
-                  <div className="hidden lg:block absolute top-10 left-full w-full h-px bg-gradient-to-r from-gray-300 dark:from-gray-700 to-transparent -translate-x-1/2" />
-                )}
-                <div className="flex flex-col items-center text-center">
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-3xl shadow-sm">
-                      {item.icon}
-                    </div>
-                    <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
-                      {item.step}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+            {["📤 上传肖像", "🔍 KYC 认证", "🔗 链上存证", "💎 获得收益"].map((step, i) => (
+              <div key={i} className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-3xl shadow-sm mb-4">
+                  {["📤", "🔍", "🔗", "💎"][i]}
                 </div>
+                <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+                  0{i+1}
+                </span>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">{step}</p>
               </div>
             ))}
           </div>
@@ -273,74 +200,54 @@ export default function HomePage() {
               {t.pricing.sub}
             </p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                name: t.pricing.free,
-                price: t.pricing.freePrice,
-                period: t.pricing.forever,
-                desc: t.pricing.freeDesc,
-                features: [t.pricing.f1, t.pricing.f2, t.pricing.f3, t.pricing.f4],
-                cta: t.pricing.getStarted,
-                highlight: false,
-              },
-              {
-                name: t.pricing.pro,
-                price: t.pricing.proPrice,
-                period: t.pricing.perMonth,
-                desc: t.pricing.proDesc,
-                features: [t.pricing.f5, t.pricing.f6, t.pricing.f7, t.pricing.f8, t.pricing.f9, t.pricing.f10],
-                cta: t.pricing.proTrial,
-                highlight: true,
-              },
-              {
-                name: t.pricing.enterprise,
-                price: t.pricing.custom,
-                period: "",
-                desc: t.pricing.enterpriseDesc,
-                features: [t.pricing.f11, t.pricing.f12, t.pricing.f13, t.pricing.f14, t.pricing.f15, t.pricing.f16],
-                cta: t.pricing.contactSales,
-                highlight: false,
-              },
-            ].map((plan) => (
-              <div key={plan.name}
-                className={`rounded-2xl p-8 border-2 transition-shadow hover:shadow-xl
-                  ${plan.highlight
-                    ? "bg-gradient-to-b from-blue-50 to-white dark:from-blue-950/40 dark:to-gray-900 border-blue-500 dark:border-blue-500 shadow-lg"
-                    : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:shadow-lg"
-                  }`}>
-                {plan.highlight && (
-                  <span className="inline-block px-3 py-1 text-xs font-semibold bg-blue-600 text-white rounded-full mb-4">
-                    {t.pricing.popular}
-                  </span>
-                )}
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{plan.name}</h3>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
-                  {plan.period && <span className="text-gray-500 dark:text-gray-400 text-sm">{plan.period}</span>}
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{plan.desc}</p>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                      <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href={plan.name === t.pricing.enterprise ? "/contact" : "/register"}
-                  className={`block w-full text-center px-6 py-3 rounded-xl font-semibold transition-all
-                    ${plan.highlight
-                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}>
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <div className="rounded-2xl p-8 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">免费注册</h3>
+              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">¥0<span className="text-lg font-normal text-gray-500">/永久</span></div>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">开始使用肖像权认证，立即免费注册</p>
+              <ul className="space-y-2 mb-8">
+                <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  肖像权链上存证
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  基础授权模板
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  KYC 身份认证
+                </li>
+              </ul>
+              <Link href="/register"
+                className="block w-full text-center px-6 py-3 rounded-xl font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg">
+                {t.nav.getStarted}
+              </Link>
+            </div>
+            <div className="rounded-2xl p-8 bg-gradient-to-b from-purple-50 to-white dark:from-purple-950/40 dark:to-gray-900 border-2 border-purple-500 shadow-lg">
+              <span className="inline-block px-3 py-1 text-xs font-semibold bg-purple-600 text-white rounded-full mb-4">名人 · 企业</span>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">定制授权方案</h3>
+              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">定制</div>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">批量授权管理，专属客服，侵权监测</p>
+              <ul className="space-y-2 mb-8">
+                <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <svg className="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  无限肖像权授权
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <svg className="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  AI 侵权实时监测
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <svg className="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  专属客服 + 优先响应
+                </li>
+              </ul>
+              <Link href="/contact"
+                className="block w-full text-center px-6 py-3 rounded-xl font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg">
+                联系我们
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -355,11 +262,11 @@ export default function HomePage() {
           </div>
           <div className="space-y-4">
             {[
-              { q: t.faq.q1, a: t.faq.q1Ans },
-              { q: t.faq.q2, a: t.faq.q2Ans },
-              { q: t.faq.q3, a: t.faq.q3Ans },
-              { q: t.faq.q4, a: t.faq.q4Ans },
-              { q: t.faq.q5, a: t.faq.q5Ans },
+              { q: "PortraitPay 如何保护我的肖像权？", a: "我们使用区块链技术为你的肖像生成不可篡改的时间戳存证，并结合 IPFS 分布式存储确保证书永久可查。" },
+              { q: "使用需要加密货币知识吗？", a: "完全不需要。我们处理所有区块链复杂性，你只需普通方式上传和授权。" },
+              { q: "授权收益如何计算？", a: "每次你的肖像被授权使用，智能合约自动执行分成，收益直接到账，无需中间商。" },
+              { q: "我的肖像数据安全吗？", a: "安全。我们使用加密存储，原始图片不会公开，只有哈希值和授权记录上链。" },
+              { q: "如何开始使用？", a: "免费注册，上传肖像，通过 KYC 认证，即可在链上注册你的肖像权。" },
             ].map((faq, idx) => (
               <details key={idx} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <summary className="flex items-center justify-between px-6 py-4 cursor-pointer text-gray-900 dark:text-white font-medium">
@@ -386,9 +293,7 @@ export default function HomePage() {
           </div>
           <div className="relative">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.cta.title}</h2>
-            <p className="text-blue-100 text-lg mb-8 max-w-xl mx-auto">
-              {t.cta.sub}
-            </p>
+            <p className="text-blue-100 text-lg mb-8 max-w-xl mx-auto">{t.cta.sub}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/register"
                 className="inline-flex items-center justify-center px-8 py-3.5 bg-white text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
@@ -396,7 +301,7 @@ export default function HomePage() {
               </Link>
               <Link href="/login"
                 className="inline-flex items-center justify-center px-8 py-3.5 text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/10 transition-colors">
-                {t.nav.signIn}
+                {t.cta.cta2}
               </Link>
             </div>
           </div>
@@ -406,11 +311,10 @@ export default function HomePage() {
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer className="border-t border-gray-100 dark:border-gray-800 py-12 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <img src="/logo-light.svg" alt="PortraitPay AI" className="block dark:hidden w-auto h-7" />
-            <img src="/logo-dark.svg" alt="PortraitPay AI" className="hidden dark:block w-auto h-7" />
+          <a href="/" className="flex items-center gap-3">
+            <img src="/logo.png" alt="PortraitPay AI" width="28" height="28" className="w-8 h-8 object-contain" />
             <span className="text-gray-500 dark:text-gray-400 text-sm">{t.footer.copyright}</span>
-          </div>
+          </a>
           <div className="flex items-center gap-6">
             <Link href="/privacy"
               className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
@@ -428,7 +332,7 @@ export default function HomePage() {
         </div>
         <div className="max-w-7xl mx-auto mt-4 pt-6 border-t border-gray-100 dark:border-gray-800">
           <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-            ⚠️ Beta features are for testing purposes only. Mainnet launch TBD. Blockchain certification is on Ethereum Sepolia <strong>testnet</strong> — not mainnet. All transaction data shown is for demonstration purposes.
+            ⚠️ Beta features are for testing purposes only. Mainnet launch TBD. Blockchain certification is on Ethereum Sepolia <strong>testnet</strong> — not mainnet.
           </p>
         </div>
       </footer>
