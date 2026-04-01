@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface User {
   id: string;
@@ -54,6 +55,9 @@ export function Header({ user, title, subtitle, action }: HeaderProps) {
         {/* Right side */}
         <div className="flex items-center gap-3">
           {action && <div className="hidden sm:block">{action}</div>}
+
+          {/* Theme toggle */}
+          <ThemeToggle />
 
           {/* Notifications bell */}
           <button className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">

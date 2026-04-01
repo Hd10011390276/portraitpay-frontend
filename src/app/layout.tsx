@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              const theme = localStorage.getItem('theme') || 'light';
+              document.documentElement.setAttribute('data-theme', theme);
+            })();
+          `
+        }} />
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   );
