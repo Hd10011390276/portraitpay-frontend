@@ -4,23 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortraitPay AI - 肖像版权数据库</title>
+    <meta name="description" content="为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。">
+    <meta property="og:title" content="PortraitPay AI - 肖像版权数据库">
+    <meta property="og:description" content="为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portraitpayai.com">
+    <meta name="twitter:card" content="summary_large_image">
     <style>
         :root {
             --primary: #0066CC;
             --primary-dark: #004499;
-            --secondary: #86868b;
-            --bg: #000000;
-            --bg-secondary: #1d1d1f;
-            --card: #2d2d2f;
-            --text: #f5f5f7;
-            --text-secondary: #86868b;
-            --accent: #2997ff;
+            --secondary: #6e6e73;
+            --bg: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --card: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --accent: #0066CC;
             --success: #30d158;
             --gradient: linear-gradient(135deg, #2997ff 0%, #0066CC 100%);
+            --nav-bg: rgba(255,255,255,0.9);
+            --nav-border: rgba(0,0,0,0.1);
+            --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --card-border: rgba(0,0,0,0.08);
         }
-        
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
             background: var(--bg);
@@ -28,7 +38,18 @@
             min-height: 100vh;
             line-height: 1.5;
         }
-        
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: -1;
+        }
+
         /* Language Selector */
         .lang-selector {
             position: fixed;
@@ -38,7 +59,7 @@
             display: flex;
             gap: 8px;
         }
-        
+
         .lang-btn {
             padding: 6px 12px;
             background: rgba(255,255,255,0.1);
@@ -49,13 +70,13 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .lang-btn:hover, .lang-btn.active {
             background: var(--accent);
             color: white;
             border-color: var(--accent);
         }
-        
+
         /* Apple Hero */
         .hero {
             height: 100vh;
@@ -68,7 +89,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .hero::before {
             content: '';
             position: absolute;
@@ -76,42 +97,39 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(ellipse at center, rgba(41,151,255,0.15) 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, rgba(0,102,204,0.08) 0%, transparent 70%);
             pointer-events: none;
         }
-        
+
         .hero h1 {
             font-size: clamp(48px, 10vw, 80px);
             font-weight: 700;
             letter-spacing: -0.02em;
             margin-bottom: 16px;
-            background: linear-gradient(180deg, #fff 0%, #86868b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #1d1d1f;
         }
-        
+
         .hero h2 {
             font-size: clamp(24px, 5vw, 40px);
             font-weight: 600;
             margin-bottom: 24px;
             color: var(--text);
         }
-        
+
         .hero p {
             font-size: 21px;
             color: var(--text-secondary);
             max-width: 600px;
             margin-bottom: 40px;
         }
-        
+
         .hero-btns {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         .btn {
             padding: 18px 36px;
             border-radius: 980px;
@@ -124,36 +142,36 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .btn-primary {
             background: var(--accent);
             color: white;
             border: none;
         }
-        
+
         .btn-primary:hover {
             background: #0077ed;
             transform: scale(1.02);
         }
-        
+
         .btn-outline {
             background: transparent;
             color: var(--accent);
             border: 1px solid var(--accent);
         }
-        
+
         .btn-outline:hover {
             background: rgba(41, 151, 255, 0.1);
         }
-        
+
         /* Nav */
         .nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 48px;
-            background: rgba(0,0,0,0.8);
+            height: 52px;
+            background: var(--nav-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             display: flex;
@@ -161,46 +179,47 @@
             justify-content: space-between;
             padding: 0 48px;
             z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--nav-border);
+            box-shadow: 0 1px 8px rgba(0,0,0,0.04);
         }
-        
+
         .nav-logo {
             font-size: 20px;
             font-weight: 700;
-            color: var(--text);
+            color: #000;
             text-decoration: none;
         }
-        
+
         .nav-links {
             display: flex;
             gap: 32px;
         }
-        
+
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 12px;
             transition: color 0.3s;
         }
-        
+
         .nav-links a:hover {
             color: var(--text);
         }
-        
+
         /* Features Section */
         .section {
             padding: 120px 20px;
             max-width: 1200px;
             margin: 0 auto;
         }
-        
+
         .section-title {
             font-size: 56px;
             font-weight: 700;
             text-align: center;
             margin-bottom: 24px;
         }
-        
+
         .section-desc {
             font-size: 21px;
             color: var(--text-secondary);
@@ -208,7 +227,7 @@
             max-width: 700px;
             margin: 0 auto 80px;
         }
-        
+
         .features {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -216,7 +235,7 @@
             margin: 0 auto;
             gap: 40px;
         }
-        
+
         .feature-card {
             background: var(--card);
             border-radius: 24px;
@@ -224,27 +243,27 @@
             text-align: center;
             transition: transform 0.3s;
         }
-        
+
         .feature-card:hover {
             transform: translateY(-8px);
         }
-        
+
         .feature-icon {
             font-size: 64px;
             margin-bottom: 24px;
         }
-        
+
         .feature-card h3 {
             font-size: 24px;
             font-weight: 600;
             margin-bottom: 16px;
         }
-        
+
         .feature-card p {
             color: var(--text-secondary);
             font-size: 15px;
         }
-        
+
         /* Stats */
         .stats-bar {
             background: var(--bg-secondary);
@@ -254,23 +273,23 @@
             gap: 80px;
             flex-wrap: wrap;
         }
-        
+
         .stat-item {
             text-align: center;
         }
-        
+
         .stat-value {
             font-size: 48px;
             font-weight: 700;
             color: var(--accent);
         }
-        
+
         .stat-label {
             font-size: 14px;
             color: var(--text-secondary);
             margin-top: 8px;
         }
-        
+
         /* Modal */
         .modal {
             display: none;
@@ -285,9 +304,9 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
         .modal.active { display: flex; }
-        
+
         .modal-content {
             background: var(--card);
             border-radius: 24px;
@@ -296,27 +315,27 @@
             padding: 48px 40px;
             animation: modalIn 0.3s ease;
         }
-        
+
         @keyframes modalIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-        
+
         .modal-title {
             font-size: 28px;
             font-weight: 700;
             text-align: center;
             margin-bottom: 8px;
         }
-        
+
         .modal-subtitle {
             text-align: center;
             color: var(--text-secondary);
             margin-bottom: 32px;
         }
-        
+
         .form-group { margin-bottom: 20px; }
-        
+
         .form-input {
             width: 100%;
             padding: 16px;
@@ -326,12 +345,12 @@
             color: var(--text);
             font-size: 16px;
         }
-        
+
         .form-input:focus {
             outline: none;
             border-color: var(--accent);
         }
-        
+
         .form-btn {
             width: 100%;
             padding: 16px;
@@ -344,9 +363,9 @@
             cursor: pointer;
             margin-top: 12px;
         }
-        
+
         .form-btn:hover { background: #0077ed; }
-        
+
         .form-link {
             display: block;
             text-align: center;
@@ -355,7 +374,7 @@
             text-decoration: none;
             font-size: 14px;
         }
-        
+
         /* Declaration */
         .declaration {
             background: var(--bg-secondary);
@@ -364,7 +383,7 @@
             margin-top: 24px;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .declaration label {
             display: flex;
             align-items: flex-start;
@@ -373,13 +392,13 @@
             font-size: 14px;
             color: var(--text-secondary);
         }
-        
+
         .declaration input[type="checkbox"] {
             width: 20px;
             height: 20px;
             margin-top: 2px;
         }
-        
+
         /* Faces List */
         .faces-grid {
             display: grid;
@@ -387,16 +406,16 @@
             gap: 24px;
             padding: 40px 0;
         }
-        
+
         .face-card {
             background: var(--card);
             border-radius: 20px;
             overflow: hidden;
             transition: transform 0.3s;
         }
-        
+
         .face-card:hover { transform: scale(1.02); }
-        
+
         .face-avatar {
             width: 100%;
             aspect-ratio: 1;
@@ -406,20 +425,20 @@
             justify-content: center;
             font-size: 64px;
         }
-        
+
         .face-info { padding: 20px; }
-        
+
         .face-name {
             font-size: 17px;
             font-weight: 600;
             margin-bottom: 4px;
         }
-        
+
         .face-price {
             color: var(--success);
             font-size: 14px;
         }
-        
+
         .face-tag {
             display: inline-block;
             padding: 4px 10px;
@@ -428,12 +447,114 @@
             font-size: 12px;
             margin-top: 8px;
         }
-        
+
         .face-tag.celebrity {
             background: rgba(255,149,0,0.2);
             color: #FF9500;
         }
-        
+
+        /* Faces Controls */
+        .faces-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .faces-search-wrap {
+            display: flex;
+            align-items: center;
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            flex: 1;
+            min-width: 200px;
+            max-width: 360px;
+        }
+
+        .faces-search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 10px 16px;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .faces-search-input::placeholder { color: var(--text-secondary); }
+
+        .faces-search-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .faces-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .faces-tab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .faces-tab.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Faces Pagination */
+        .faces-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .faces-page-btn {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            padding: 8px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .faces-page-btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .faces-page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .faces-page-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
         /* Footer */
         footer {
             background: var(--bg-secondary);
@@ -442,7 +563,7 @@
             color: var(--text-secondary);
             font-size: 12px;
         }
-        
+
         /* Toast */
         .toast {
             position: fixed;
@@ -459,12 +580,12 @@
             opacity: 0;
             transition: all 0.3s;
         }
-        
+
         .toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav { padding: 0 20px; }
@@ -489,14 +610,14 @@
             .btn { width: 100%; justify-content: center; }
             .contact-card { padding: 32px 24px; }
         }
-        
+
         @media (max-width: 480px) {
             .hero h1 { font-size: 36px; }
             .faces-grid { grid-template-columns: 1fr !important; }
             .stat-value { font-size: 28px; }
             .section-title { font-size: 28px; }
         }
-        
+
         /* Mobile Nav Toggle */
         .nav-toggle {
             display: none;
@@ -507,7 +628,7 @@
             cursor: pointer;
             padding: 8px;
         }
-        
+
         @media (max-width: 768px) {
             .nav-toggle { display: block; }
             .nav-links {
@@ -530,31 +651,31 @@
                 font-size: 16px;
             }
         }
-        
+
         /* Contact Section */
         .contact-section {
             padding: 80px 20px;
             max-width: 800px;
             margin: 0 auto;
         }
-        
+
         .contact-card {
             background: var(--card);
             border-radius: 24px;
             padding: 48px;
             text-align: center;
         }
-        
+
         .contact-card h2 {
             font-size: 32px;
             margin-bottom: 12px;
         }
-        
+
         .contact-card p {
             color: var(--text-secondary);
             margin-bottom: 32px;
         }
-        
+
         .contact-email {
             display: inline-flex;
             align-items: center;
@@ -568,16 +689,16 @@
             transition: all 0.3s;
             margin-bottom: 32px;
         }
-        
+
         .contact-email:hover {
             background: var(--accent);
         }
-        
+
         .contact-form {
             max-width: 400px;
             margin: 0 auto;
         }
-        
+
         .form-textarea {
             width: 100%;
             padding: 16px;
@@ -590,12 +711,12 @@
             min-height: 100px;
             font-family: inherit;
         }
-        
+
         .form-textarea:focus {
             outline: none;
             border-color: var(--accent);
         }
-        
+
         @media (max-width: 768px) {
             .contact-section { padding: 60px 16px; }
             .contact-card { padding: 32px 24px; border-radius: 20px; }
@@ -610,27 +731,27 @@
         <button class="lang-btn active" onclick="setLang('zh')">简体中文</button>
         <button class="lang-btn" onclick="setLang('en')">English</button>
     </div>
-    
+
     <!-- Nav -->
     <nav class="nav">
-        <a href="#" class="nav-logo">PortraitPay AI</a>
+        <a href="#" class="nav-logo"><svg width="32" height="32" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="64" cy="64" r="60" fill="url(#logoGrad)"/><path d="M40 50c0-13.3 10.7-24 24-24s24 10.7 24 24v8c0 8.8-4.8 16.5-12 20.7L64 86l-12-7.3C46.8 74.5 42 66.8 42 58v-8z" fill="white"/><defs><linearGradient id="logoGrad" x1="0" y1="0" x2="128" y2="128"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs></svg> PortraitPay AI</a>
         <button class="nav-toggle" onclick="toggleNav()">☰</button>
         <div class="nav-links" id="navLinks">
             <a href="#features" data-i18n="nav_features">功能</a>
             <a href="#faces" data-i18n="nav_faces">肖像库</a>
-            <a href="demo.html">演示</a>
-            <a href="#contact">联系我们</a>
-            <a href="celebrity.html" style="color: #FFD700;">明星入驻</a>
+            <a href="demo.html" data-i18n="nav_demo">演示</a>
+            <a href="#contact" data-i18n="nav_contact">联系我们</a>
+            <a href="celebrity.html" data-i18n="nav_celeb" style="color: #FFD700;">明星入驻</a>
             <a href="#" onclick="openModal('register')" style="background: var(--accent); border-radius: 8px; padding: 8px 16px;" data-i18n="nav_register">注册</a>
             <a href="#" onclick="openModal('login')" data-i18n="nav_login">登录</a>
         </div>
     </nav>
-    
+
     <!-- Hero -->
     <section class="hero">
         <h1>PortraitPay AI</h1>
         <h2 data-i18n="hero_title">肖像版权数据库</h2>
-        <p data-i18n="hero_desc">为AI时代构建可信的肖像权保护体系。<br>明星名人的肖像，值得更好的尊重。</p>
+        <p data-i18n="hero_desc">为AI时代构建可信的肖像权保护体系。<br>明星名人的肖像,值得更好的尊重。</p>
         <div class="hero-btns">
             <button class="btn btn-primary" onclick="openModal('register')">
                 <span data-i18n="btn_register">免费注册</span>
@@ -641,7 +762,7 @@
             </button>
         </div>
     </section>
-    
+
     <!-- Stats -->
     <div class="stats-bar">
         <div class="stat-item">
@@ -657,27 +778,27 @@
             <div class="stat-label" data-i18n="stat_earnings">肖像收益</div>
         </div>
     </div>
-    
+
     <!-- Features -->
     <section class="section" id="features">
         <h2 class="section-title" data-i18n="features_title">为什么选择PortraitPay AI</h2>
-        <p class="section-desc" data-i18n="features_desc">在这里，每一位明星的肖像权都能得到尊重和保护</p>
-        
+        <p class="section-desc" data-i18n="features_desc">在这里,每一位明星的肖像权都能得到尊重和保护</p>
+
         <div class="features">
             <div class="feature-card">
                 <div class="feature-icon">🔒</div>
                 <h3 data-i18n="feature1_title">版权保护</h3>
-                <p data-i18n="feature1_desc">区块链时间戳技术，确保每一次授权都可追溯</p>
+                <p data-i18n="feature1_desc">区块链时间戳技术,确保每一次授权都可追溯</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">💰</div>
                 <h3 data-i18n="feature2_title">收益分成</h3>
-                <p data-i18n="feature2_desc">AI调用您的肖像，您获得收益。1%平台服务费</p>
+                <p data-i18n="feature2_desc">AI调用您的肖像,您获得收益。1%平台服务费</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🤖</div>
                 <h3 data-i18n="feature3_title">全模型适配</h3>
-                <p data-i18n="feature3_desc">标准API接口，适配ChatGPT、Claude、Midjourney等所有AI</p>
+                <p data-i18n="feature3_desc">标准API接口,适配ChatGPT、Claude、Midjourney等所有AI</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📱</div>
@@ -686,19 +807,39 @@
             </div>
         </div>
     </section>
-    
+
     <!-- Faces -->
     <section class="section" id="faces">
-        <h2 class="section-title" data-i18n="faces_title">热门肖像</h2>
-        <p class="section-desc" data-i18n="faces_desc">已加入的明星名人肖像</p>
-        
+        <h2 class="section-title" data-i18n="faces_title">肖像库</h2>
+        <p class="section-desc" data-i18n="faces_desc">浏览所有已登记的肖像</p>
+
+        <!-- Search & Filter Bar -->
+        <div class="faces-controls">
+            <div class="faces-search-wrap">
+                <input type="text" id="facesSearchInput" class="faces-search-input" placeholder="搜索肖像名称..." onkeydown="if(event.key==='Enter')searchFaces()">
+                <button class="faces-search-btn" onclick="searchFaces()">🔍</button>
+            </div>
+            <div class="faces-tabs">
+                <button class="faces-tab active" data-category="all" onclick="setFaceCategory('all')">全部</button>
+                <button class="faces-tab" data-category="celebrity" onclick="setFaceCategory('celebrity')">⭐ 名人</button>
+                <button class="faces-tab" data-category="normal" onclick="setFaceCategory('normal')">👤 普通</button>
+            </div>
+        </div>
+
         <div class="faces-grid" id="facesGrid">
             <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
                 <span data-i18n="no_data">暂无数据</span>
             </div>
         </div>
+
+        <!-- Pagination -->
+        <div class="faces-pagination" id="facesPagination">
+            <button class="faces-page-btn" id="facesPrevBtn" onclick="facesPageChange(-1)" disabled>‹ 上一页</button>
+            <span class="faces-page-info" id="facesPageInfo">1 / 1</span>
+            <button class="faces-page-btn" id="facesNextBtn" onclick="facesPageChange(1)" disabled>下一页 ›</button>
+        </div>
     </section>
-    
+
     <!-- CTA -->
     <section class="section" style="text-align: center;">
         <h2 class="section-title" data-i18n="cta_title">加入我们</h2>
@@ -707,18 +848,18 @@
             <span data-i18n="btn_join">立即免费注册</span>
         </button>
     </section>
-    
+
     <!-- Contact -->
     <section id="contact" class="contact-section">
         <div class="contact-card">
             <h2 data-i18n="contact_title">联系我们</h2>
-            <p data-i18n="contact_desc">有疑问或建议？我们随时为您服务</p>
-            
+            <p data-i18n="contact_desc">有疑问或建议?我们随时为您服务</p>
+
             <a href="mailto:contact@portraitpayai.com" class="contact-email">
                 <span>✉️</span>
                 contact@portraitpayai.com
             </a>
-            
+
             <form class="contact-form" onsubmit="return handleContact(event)" id="contactForm">
                 <div class="form-group">
                     <input type="email" class="form-input" id="contactEmail" placeholder="您的邮箱" required>
@@ -733,11 +874,11 @@
             </form>
         </div>
     </section>
-    
+
     <!-- Footer -->
     <footer>
         <p>© 2026 PortraitPay AI. <span data-i18n="footer_rights">肖像版权数据库</span></p>
-        <p style="margin-top: 8px;" data-i18n="footer_motto">让AI创作更有序，让肖像权更有价</p>
+        <p style="margin-top: 8px;" data-i18n="footer_motto">让AI创作更有序,让肖像权更有价</p>
         <p style="margin-top: 12px;">
             <a href="terms.html" style="color: var(--accent); font-size: 13px;">用户协议</a>
             &nbsp;·&nbsp;
@@ -746,13 +887,13 @@
             <a href="celebrity.html" style="color: var(--accent); font-size: 13px;">明星入驻</a>
         </p>
     </footer>
-    
+
     <!-- Login Modal -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <div class="modal-title" data-i18n="login_title">欢迎回来</div>
             <div class="modal-subtitle" data-i18n="login_subtitle">登录您的账户</div>
-            
+
             <form onsubmit="return handleLogin(event)">
                 <div class="form-group">
                     <input type="text" class="form-input" id="loginUsername" data-i18n-placeholder="username" placeholder="用户名" required>
@@ -762,18 +903,18 @@
                 </div>
                 <button type="submit" class="form-btn" data-i18n="btn_login">登录</button>
             </form>
-            
-            <a href="#" class="form-link" onclick="openModal('register')" data-i18n="link_noaccount">还没有账户？免费注册</a>
+
+            <a href="#" class="form-link" onclick="openModal('register')" data-i18n="link_noaccount">还没有账户?免费注册</a>
             <a href="#" class="form-link" style="margin-top: 12px;" onclick="closeModal('login')" data-i18n="link_close">关闭</a>
         </div>
     </div>
-    
+
     <!-- Register Modal -->
     <div class="modal" id="registerModal">
         <div class="modal-content">
             <div class="modal-title" data-i18n="register_title">创建账户</div>
-            <div class="modal-subtitle" data-i18n="register_subtitle">免费注册，开始保护您的肖像权</div>
-            
+            <div class="modal-subtitle" data-i18n="register_subtitle">免费注册,开始保护您的肖像权</div>
+
             <form onsubmit="return handleRegister(event)">
                 <div class="form-group">
                     <input type="text" class="form-input" id="regUsername" data-i18n-placeholder="username" placeholder="用户名" required>
@@ -782,27 +923,27 @@
                     <input type="password" class="form-input" id="regPassword" data-i18n-placeholder="password_set" placeholder="设置密码" required minlength="6">
                 </div>
                 <div class="form-group">
-                    <input type="email" class="form-input" id="regEmail" style="margin-top:20px" data-i18n-placeholder="email_opt" placeholder="邮箱（可选）">
+                    <input type="email" class="form-input" id="regEmail" style="margin-top:20px" data-i18n-placeholder="email_opt" placeholder="邮箱(可选)">
                 </div>
-                
+
                 <div class="declaration">
                     <label>
                         <input type="checkbox" id="aiDeclaration" required>
-                        <span data-i18n="declaration_text">我确认上传内容为本人真实肖像或已获得合法授权，非AI生成。如有侵权，愿承担法律责任。</span>
+                        <span data-i18n="declaration_text">我确认上传内容为本人真实肖像或已获得合法授权,非AI生成。如有侵权,愿承担法律责任。</span>
                     </label>
                 </div>
-                
+
                 <button type="submit" class="form-btn" data-i18n="btn_create">创建账户</button>
             </form>
-            
-            <a href="#" class="form-link" onclick="openModal('login')" data-i18n="link_hasaccount">已有账户？登录</a>
+
+            <a href="#" class="form-link" onclick="openModal('login')" data-i18n="link_hasaccount">已有账户?登录</a>
             <a href="#" class="form-link" style="margin-top: 12px;" onclick="closeModal('register')" data-i18n="link_close">关闭</a>
         </div>
     </div>
-    
+
     <!-- Toast -->
     <div class="toast" id="toast"></div>
-    
+
     <script>
         // i18n Translations
         const i18n = {
@@ -812,48 +953,55 @@
                 nav_pricing: '定价',
                 nav_register: '注册',
                 nav_login: '登录',
+                nav_demo: '演示',
+                nav_contact: '联系我们',
+                nav_celeb: '明星入驻',
                 hero_title: '肖像版权数据库',
-                hero_desc: '为AI时代构建可信的肖像权保护体系。<br>明星名人的肖像，值得更好的尊重。',
+                hero_desc: '为AI时代构建可信的肖像权保护体系。<br>明星名人的肖像,值得更好的尊重。',
                 btn_register: '免费注册',
                 btn_browse: '浏览肖像库',
                 stat_faces: '已注册肖像',
                 stat_uses: '调用次数',
                 stat_earnings: '肖像收益',
                 features_title: '为什么选择PortraitPay AI',
-                features_desc: '在这里，每一位明星的肖像权都能得到尊重和保护',
+                features_desc: '在这里,每一位明星的肖像权都能得到尊重和保护',
                 feature1_title: '版权保护',
-                feature1_desc: '区块链时间戳技术，确保每一次授权都可追溯',
+                feature1_desc: '区块链时间戳技术,确保每一次授权都可追溯',
                 feature2_title: '收益分成',
-                feature2_desc: 'AI调用您的肖像，您获得收益。1%平台服务费',
+                feature2_desc: 'AI调用您的肖像,您获得收益。1%平台服务费',
                 feature3_title: '全模型适配',
-                feature3_desc: '标准API接口，适配ChatGPT、Claude、Midjourney等所有AI',
+                feature3_desc: '标准API接口,适配ChatGPT、Claude、Midjourney等所有AI',
                 feature4_title: '多端支持',
                 feature4_desc: '网页、iOS、Android多端同步管理',
-                faces_title: '热门肖像',
-                faces_desc: '已加入的明星名人肖像',
+                faces_title: '肖像库',
+                faces_desc: '浏览所有已登记的肖像',
                 no_data: '暂无数据',
+                faces_search_placeholder: '搜索肖像名称...',
+                faces_normal: '普通',
                 cta_title: '加入我们',
                 cta_desc: '让AI时代尊重每一位肖像权',
                 btn_join: '立即免费注册',
                 footer_rights: '肖像版权数据库',
-                footer_motto: '让AI创作更有序，让肖像权更有价',
+                footer_motto: '让AI创作更有序,让肖像权更有价',
                 login_title: '欢迎回来',
                 login_subtitle: '登录您的账户',
                 username: '用户名',
                 password: '密码',
                 btn_login: '登录',
-                link_noaccount: '还没有账户？免费注册',
+                link_noaccount: '还没有账户?免费注册',
                 link_close: '关闭',
                 register_title: '创建账户',
-                register_subtitle: '免费注册，开始保护您的肖像权',
+                register_subtitle: '免费注册,开始保护您的肖像权',
                 password_set: '设置密码',
-                email_opt: '邮箱（可选）',
-                declaration_text: '我确认上传内容为本人真实肖像或已获得合法授权，非AI生成。如有侵权，愿承担法律责任。',
+                email_opt: '邮箱(可选)',
+                declaration_text: '我确认上传内容为本人真实肖像或已获得合法授权,非AI生成。如有侵权,愿承担法律责任。',
                 btn_create: '创建账户',
-                link_hasaccount: '已有账户？登录',
+                link_hasaccount: '已有账户?登录',
                 contact_title: '联系我们',
-                contact_desc: '有疑问或建议？我们随时为您服务',
-                btn_send: '发送消息'
+                contact_desc: '有疑问或建议?我们随时为您服务',
+                btn_send: '发送消息',
+                page_title: 'PortraitPay AI - 肖像版权数据库',
+                page_desc: '为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。'
             },
             en: {
                 nav_features: 'Features',
@@ -861,6 +1009,9 @@
                 nav_pricing: 'Pricing',
                 nav_register: 'Register',
                 nav_login: 'Login',
+                nav_demo: 'Demo',
+                nav_contact: 'Contact',
+                nav_celeb: 'Celebrity Access',
                 hero_title: 'Portrait Rights Database',
                 hero_desc: 'Building trusted portrait rights protection for the AI era.<br>Celebrity portraits deserve better respect.',
                 btn_register: 'Sign Up Free',
@@ -878,9 +1029,11 @@
                 feature3_desc: 'Standard API works with ChatGPT, Claude, Midjourney and all AI',
                 feature4_title: 'Multi-Platform',
                 feature4_desc: 'Web, iOS, Android - manage from anywhere',
-                faces_title: 'Featured Portraits',
-                faces_desc: 'Celebrity portraits already joined',
+                faces_title: 'Portrait Library',
+                faces_desc: 'Browse all registered portraits',
                 no_data: 'No data yet',
+                faces_search_placeholder: 'Search portrait name...',
+                faces_normal: 'Normal',
                 cta_title: 'Join Us',
                 cta_desc: 'Making AI respect every portrait rights',
                 btn_join: 'Sign Up Free Now',
@@ -902,25 +1055,27 @@
                 link_hasaccount: 'Already have an account? Sign in',
                 contact_title: 'Contact Us',
                 contact_desc: 'Questions or suggestions? We are here to help',
-                btn_send: 'Send Message'
+                btn_send: 'Send Message',
+                page_title: 'PortraitPay AI - Portrait Rights Database',
+                page_desc: 'Building trusted portrait rights protection for the AI era. Celebrity portraits deserve better respect.'
             }
         };
-        
+
         let currentLang = localStorage.getItem('portrait_lang') || 'zh';
-        
+
         function setLang(lang) {
             currentLang = lang;
             localStorage.setItem('portrait_lang', lang);
-            
+
             // Update buttons
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.textContent.includes('简体') && lang === 'zh' || 
+                if (btn.textContent.includes('简体') && lang === 'zh' ||
                     btn.textContent === 'English' && lang === 'en') {
                     btn.classList.add('active');
                 }
             });
-            
+
             // Update text
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -928,7 +1083,7 @@
                     el.textContent = i18n[lang][key];
                 }
             });
-            
+
             // Update placeholders
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
@@ -936,11 +1091,18 @@
                     el.placeholder = i18n[lang][key];
                 }
             });
+
+            // Update page title & meta
+            document.title = i18n[lang].page_title || document.title;
+            const descMeta = document.querySelector('meta[name="description"]');
+            if (descMeta) descMeta.setAttribute('content', i18n[lang].page_desc || '');
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.setAttribute('content', i18n[lang].page_desc || '');
         }
-        
+
         const API = window.location.hostname === 'localhost' ? 'http://127.0.0.1:5000/api' : 'https://web-production-2757f.up.railway.app/api';
         let token = localStorage.getItem('portrait_token') || '';
-        
+
         // Load stats
         async function loadStats() {
             try {
@@ -950,19 +1112,50 @@
                 document.getElementById('usesCount').textContent = d.uses || 0;
             } catch(e) {}
         }
-        
+
+        // Face search & pagination state
+        let facesState = { category: 'all', query: '', offset: 0, limit: 12, total: 0 };
+
+        function setFaceCategory(cat) {
+            facesState.category = cat;
+            facesState.offset = 0;
+            document.querySelectorAll('.faces-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.category === cat);
+            });
+            loadFaces();
+        }
+
+        function searchFaces() {
+            facesState.query = document.getElementById('facesSearchInput').value.trim();
+            facesState.offset = 0;
+            loadFaces();
+        }
+
+        function facesPageChange(delta) {
+            facesState.offset = Math.max(0, facesState.offset + delta * facesState.limit);
+            loadFaces();
+        }
+
         // Load faces
         async function loadFaces() {
             try {
-                const res = await fetch(`${API}/faces`);
-                const faces = await res.json();
+                let url = `${API}/faces?category=${facesState.category}&limit=${facesState.limit}&offset=${facesState.offset}`;
+                if (facesState.query) {
+                    url = `${API}/faces/search?q=${encodeURIComponent(facesState.query)}&limit=${facesState.limit}&offset=${facesState.offset}`;
+                }
+                const res = await fetch(url);
+                const data = await res.json();
+                const faces = data.faces || [];
+                facesState.total = data.total || 0;
+
                 const grid = document.getElementById('facesGrid');
-                
+
                 if (!faces.length) {
-                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary)">${i18n[currentLang].no_data}</div>`;
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary)">${i18n[currentLang].no_data || '暂无数据'}</div>`;
+                    document.getElementById('facesPagination').style.display = 'none';
                     return;
                 }
-                
+
                 grid.innerHTML = faces.map(f => `
                     <div class="face-card">
                         <div class="face-avatar">${f.is_celebrity ? '⭐' : '👤'}</div>
@@ -973,20 +1166,28 @@
                         </div>
                     </div>
                 `).join('');
+
+                // Update pagination
+                const totalPages = Math.max(1, Math.ceil(facesState.total / facesState.limit));
+                const currentPage = Math.floor(facesState.offset / facesState.limit) + 1;
+                document.getElementById('facesPageInfo').textContent = `${currentPage} / ${totalPages}`;
+                document.getElementById('facesPrevBtn').disabled = facesState.offset === 0;
+                document.getElementById('facesNextBtn').disabled = facesState.offset + faces.length >= facesState.total;
+                document.getElementById('facesPagination').style.display = 'flex';
             } catch(e) {
                 console.log(e);
             }
         }
-        
+
         // Modal
         function openModal(id) {
             document.getElementById(id + 'Modal').classList.add('active');
         }
-        
+
         function closeModal(id) {
             document.getElementById(id + 'Modal').classList.remove('active');
         }
-        
+
         // Toast
         function showToast(msg) {
             const t = document.getElementById('toast');
@@ -994,32 +1195,34 @@
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
-        
+
         // Register
         async function handleRegister(e) {
             e.preventDefault();
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
+            const email = document.getElementById('regEmail').value;
             const declaration = document.getElementById('aiDeclaration').checked;
-            
+
             if (!declaration) {
                 showToast(currentLang === 'zh' ? '请先确认肖像权声明' : 'Please confirm the portrait rights declaration');
                 return;
             }
-            
+
             try {
                 const res = await fetch(`${API}/register`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username, password})
+                    body: JSON.stringify({username, password, email})
                 });
                 const d = await res.json();
-                
+
                 if (d.success) {
                     localStorage.setItem('portrait_token', d.api_key);
                     localStorage.setItem('portrait_user', username);
-                    showToast(currentLang === 'zh' ? '注册成功！' : 'Registered successfully!');
+                    showToast(currentLang === 'zh' ? '注册成功!' : 'Registered successfully!');
                     closeModal('register');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
                 } else {
                     showToast(d.error || (currentLang === 'zh' ? '注册失败' : 'Registration failed'));
                 }
@@ -1028,13 +1231,13 @@
             }
             return false;
         }
-        
+
         // Login
         async function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
-            
+
             try {
                 const res = await fetch(`${API}/login`, {
                     method: 'POST',
@@ -1042,12 +1245,13 @@
                     body: JSON.stringify({username, password})
                 });
                 const d = await res.json();
-                
+
                 if (d.success) {
                     localStorage.setItem('portrait_token', d.api_key);
                     localStorage.setItem('portrait_user', username);
-                    showToast(currentLang === 'zh' ? '登录成功！' : 'Signed in successfully!');
+                    showToast(currentLang === 'zh' ? '登录成功!' : 'Signed in successfully!');
                     closeModal('login');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
                 } else {
                     showToast(d.error || (currentLang === 'zh' ? '登录失败' : 'Login failed'));
                 }
@@ -1056,27 +1260,27 @@
             }
             return false;
         }
-        
+
         // Contact Form - sends via mailto
         function handleContact(e) {
             e.preventDefault();
             const email = document.getElementById('contactEmail').value;
             const subject = document.getElementById('contactSubject').value;
             const message = document.getElementById('contactMessage').value;
-            
+
             const mailtoLink = `mailto:contact@portraitpayai.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('发件人: ' + email + '\n\n' + message)}`;
             window.location.href = mailtoLink;
-            
-            showToast(currentLang === 'zh' ? '已打开邮件客户端，请发送邮件' : 'Email client opened. Please send the email.');
+
+            showToast(currentLang === 'zh' ? '已打开邮件客户端,请发送邮件' : 'Email client opened. Please send the email.');
             document.getElementById('contactForm').reset();
             return false;
         }
-        
+
         // Mobile Nav Toggle
         function toggleNav() {
             document.getElementById('navLinks').classList.toggle('show');
         }
-        
+
         // Init
         setLang(currentLang);
         loadStats();
