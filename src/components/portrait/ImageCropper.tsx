@@ -22,7 +22,7 @@ export default function ImageCropper({
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [isReady, setIsReady] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null!);
 
   // Draw image and crop overlay
   const draw = useCallback(() => {

@@ -2,7 +2,8 @@
  * NextAuth configuration
  */
 
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthConfig } from "next-auth";
+import type { Session } from "@auth/core/types";
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
@@ -10,7 +11,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 
 const credentialsOptions = {
-  adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
@@ -44,7 +45,6 @@ const credentialsOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // Also fetch role from DB if user object is available
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
           select: { role: true },
@@ -53,16 +53,16 @@ const credentialsOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: { id?: string; role?: string } }) {
       if (session.user) {
-        (session.user as { id?: string; role?: string }).id = token.id as string;
-        if (token.role) (session.user as { role?: string }).role = token.role as string;
+        (session.user as { id?: string; role?: string }).id = token.id;
+        if (token.role) (session.user as { role?: string }).role = token.role;
       }
       return session;
     },
   },
   pages: { signIn: "/auth/login" },
-} satisfies NextAuthOptions;
+} satisfies NextAuthConfig;
 
 // NextAuth v5: capture both auth and handlers from the same instance
 const nextAuthInstance = NextAuth(credentialsOptions);
@@ -74,4 +74,4 @@ export async function getServerSession(_options?: unknown) {
 }
 
 // Legacy authOptions (kept for code that references it)
-export const authOptions: NextAuthOptions = credentialsOptions;
+export const authOptions = credentialsOptions;

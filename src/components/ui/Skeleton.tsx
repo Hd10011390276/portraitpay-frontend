@@ -8,13 +8,15 @@ interface SkeletonProps {
   avatar?: boolean;
   card?: boolean;
   cardCount?: number;
+  style?: React.CSSProperties;
 }
 
 /** Single line skeleton */
-export function Skeleton({ className = "" }: { className?: string }) {
+export function Skeleton({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <div
       className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`}
+      style={style}
       aria-hidden="true"
     />
   );
