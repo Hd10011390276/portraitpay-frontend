@@ -35,7 +35,7 @@ export async function checkKYC(
 ): Promise<KYCGuardResult> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { kycStatus: true, kycLevel: true, kycExpiredAt: true, role: true },
+    select: { kycStatus: true, kycExpiredAt: true, role: true },
   });
 
   if (!user) {
@@ -47,17 +47,27 @@ export async function checkKYC(
     return { allowed: true, status: "ADMIN_EXEMPT" };
   }
 
+  // Derive kycLevel from kycStatus (schema has no kycLevel field)
+  const kycLevelMap: Record<string, number> = {
+    NOT_STARTED: 0,
+    PENDING: 1,
+    APPROVED: 2,
+    REJECTED: 0,
+    EXPIRED: 0,
+  };
+  const kycLevel = kycLevelMap[user.kycStatus] ?? 0;
+
   // CELEBRITY 角色必须有 Level 2+
-  if (user.role === "CELEBRITY" && user.kycLevel < 2) {
+  if (user.role === "CELEBRITY" && kycLevel < 2) {
     return { allowed: false, status: user.kycStatus, reason: "名人需完成身份认证" };
   }
 
   // 检查 KYC 级别
-  if (user.kycLevel < minLevel) {
+  if (kycLevel < minLevel) {
     return {
       allowed: false,
       status: user.kycStatus,
-      reason: `需要 KYC Level ${minLevel}，当前 ${user.kycLevel}`,
+      reason: `需要 KYC Level ${minLevel}，当前 ${kycLevel}`,
     };
   }
 

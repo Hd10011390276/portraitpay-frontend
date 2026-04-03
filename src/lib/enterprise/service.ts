@@ -3,7 +3,7 @@
  * 企业认证与资质管理
  */
 import { prisma } from "@/lib/prisma";
-import { ENTERPRISE_STATUSES } from "@/types/enums";
+import { ENTERPRISE_STATUSES, EnterpriseStatus } from "@/types/enums";
 import { addYears } from "date-fns";
 
 export interface EnterpriseProfile {

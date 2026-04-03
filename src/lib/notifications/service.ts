@@ -103,10 +103,10 @@ export async function createNotification(input: CreateNotificationInput) {
   return prisma.notification.create({
     data: {
       userId,
-      type: type as Prisma.NotificationType,
+      type: type as string,
       title: title ?? resolved?.title ?? "系统通知",
       body: body ?? resolved?.body ?? "",
-      data: (data ?? undefined) as Record<string, unknown> | undefined,
+      data: (data ?? undefined) as Prisma.InputJsonValue | undefined,
       channel: channel ?? "IN_APP",
     },
   });
@@ -120,10 +120,10 @@ export async function createBulkNotifications(
 ) {
   const records = userIds.map((userId) => ({
     userId,
-    type: input.type as Prisma.NotificationType,
+    type: input.type as string,
     title: input.title ?? TEMPLATES[input.templateKey ?? ""]?.title ?? "系统通知",
     body: input.body ?? TEMPLATES[input.templateKey ?? ""]?.body ?? "",
-    data: (input.data ?? undefined) as Record<string, unknown> | undefined,
+    data: (input.data ?? undefined) as Prisma.InputJsonValue | undefined,
     channel: input.channel ?? "IN_APP",
   }));
 

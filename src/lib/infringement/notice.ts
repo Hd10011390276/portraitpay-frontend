@@ -354,8 +354,8 @@ export function renderNoticeHtml(notice: RenderedNotice, data: NoticeTemplateDat
 <body>
 <div class="container">
   <div class="header">
-    <h1>PortraitPay AI — ${type === "TAKEDOWN" ? "侵权投诉通知" : type === "WARNING" ? "正式警告函" : "律师函"}</h1>
-    <div class="subtitle">编号：PP-${type}-${data.reportId.slice(-8).toUpperCase()} &nbsp;|&nbsp; ${data.platformName} &nbsp;|&nbsp; ${formatDate(data.issuedAt)}</div>
+    <h1>PortraitPay AI — ${notice.type === "TAKEDOWN" ? "侵权投诉通知" : notice.type === "WARNING" ? "正式警告函" : "律师函"}</h1>
+    <div class="subtitle">编号：PP-${notice.type}-${data.reportId.slice(-8).toUpperCase()} &nbsp;|&nbsp; ${data.platformName} &nbsp;|&nbsp; ${formatDate(data.issuedAt)}</div>
   </div>
   <pre>${escapedBody}</pre>
   <div class="footer">

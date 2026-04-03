@@ -10,6 +10,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { AliyunKYCProvider } from "./providers/aliyun";
 import { TencentKYCProvider } from "./providers/tencent";
 import type {
@@ -91,8 +92,8 @@ async function writeKYLog(data: {
       idCardAddress: data.ocrResult ? data.ocrResult.address.slice(0, 20) + "..." : null,
       idCardExpire: data.ocrResult?.expireDate ?? null,
       faceMatchScore: data.faceResult?.verifyScore ?? null,
-      ocrRawData: data.ocrResult ?? undefined,
-      faceRawData: data.faceResult ?? undefined,
+      ocrRawData: (data.ocrResult ?? undefined) as Prisma.InputJsonValue | undefined,
+      faceRawData: (data.faceResult ?? undefined) as Prisma.InputJsonValue | undefined,
       rejectReason: data.rejectReason ?? null,
       verifierId: data.verifierId ?? null,
     },
@@ -258,7 +259,7 @@ export class KYCService {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error("User not found");
 
-    let status: KYCState = user.kycStatus;
+    let status: KYCState = user.kycStatus as KYCState;
 
     // 检查是否过期
     if (status === "APPROVED" && isKYCExpired(user.kycExpiredAt)) {
@@ -281,7 +282,7 @@ export class KYCService {
 
     return {
       status,
-      level: user.kycLevel,
+      level: user.kycLevel ?? 0,
       verifiedAt: user.kycVerifiedAt?.toISOString() ?? null,
       expiredAt: user.kycExpiredAt?.toISOString() ?? null,
       provider: user.kycProviderRef ? (process.env.KYC_PROVIDER ?? "aliyun") : null,
@@ -479,9 +480,9 @@ export class KYCService {
       where: { id: applicationId },
       data: {
         status: decision,
-        reviewedBy: reviewerId,
+        reviewerId: reviewerId,
         reviewedAt: new Date(),
-        rejectReason: reason,
+        rejectionReason: reason,
       },
     });
 
@@ -534,7 +535,7 @@ export class KYCService {
         userId: u.id,
         provider: "internal",
         action: "expire_check",
-        level: u.kycLevel,
+        level: u.kycLevel ?? 0,
       });
     }
 
