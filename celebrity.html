@@ -2,6 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortraitPay AI - 名人入驻计划</title>
     <style>
@@ -418,6 +421,13 @@
             border-color: var(--accent);
         }
         
+        /* Active nav indicator */
+        .nav-links a.active-nav, .nav a.active-nav {
+            color: #0066CC !important;
+            border-bottom: 2px solid #0066CC;
+            padding-bottom: 2px;
+        }
+
         /* Footer */
         footer {
             background: var(--bg);
@@ -439,6 +449,17 @@
     </style>
 </head>
 <body>
+    <!-- Minimal Nav -->
+    <nav style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; background:rgba(0,0,0,0.8); border-bottom:1px solid rgba(255,255,255,0.1);">
+        <a href="index.html" style="color:#fff; font-weight:700; font-size:18px; text-decoration:none;">PortraitPay AI</a>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <a href="index.html" style="color:rgba(255,255,255,0.7); font-size:14px; text-decoration:none;">首页</a>
+            <a href="demo.html" style="color:rgba(255,255,255,0.7); font-size:14px; text-decoration:none;">演示</a>
+            <a href="#contact" style="color:rgba(255,255,255,0.7); font-size:14px; text-decoration:none;">联系我们</a>
+            <a href="dashboard.html" style="color:#fff; font-size:14px; text-decoration:none;">登录</a>
+        </div>
+    </nav>
+
     <!-- Hero Section -->
     <div class="hero">
         <div class="hero-content">
@@ -719,6 +740,16 @@
                 form.reset();
             }, 3000);
         }
+
+        // Active nav indicator - on celebrity page, highlight logo/home link
+        (function() {
+            document.querySelectorAll('a').forEach(a => {
+                const href = a.getAttribute('href') || '';
+                if (href === 'index.html' && a.textContent.includes('PortraitPay')) {
+                    a.classList.add('active-nav');
+                }
+            });
+        })();
     </script>
 </body>
 </html>

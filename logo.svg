@@ -1,0 +1,17 @@
+<svg width="32" height="32" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Frame: top-left bracket -->
+  <path d="M20 20 L20 48 L52 48" stroke="black" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Frame: bottom-left bracket -->
+  <path d="M20 108 L20 80 L52 80" stroke="black" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Frame: top-right bracket -->
+  <path d="M108 20 L108 48" stroke="black" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <path d="M76 20 L108 20" stroke="black" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <!-- Vertical center divider -->
+  <line x1="64" y1="16" x2="64" y2="112" stroke="black" stroke-width="5" stroke-linecap="round"/>
+  <!-- Left eye: vertical line -->
+  <line x1="40" y1="52" x2="40" y2="68" stroke="black" stroke-width="6" stroke-linecap="round"/>
+  <!-- Right eye: horizontal winking line -->
+  <line x1="80" y1="60" x2="92" stroke="black" stroke-width="6" stroke-linecap="round"/>
+  <!-- Smile: curved at bottom -->
+  <path d="M28 84 Q64 104 100 84" stroke="black" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

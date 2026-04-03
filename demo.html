@@ -2,6 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>快速体验 - PortraitPay AI</title>
     <style>
@@ -62,6 +65,12 @@
             transition: color 0.3s;
         }
         .nav-links a:hover { color: var(--text); }
+
+        .nav-links a.active-nav {
+            color: #0066CC !important;
+            border-bottom: 2px solid #0066CC;
+            padding-bottom: 2px;
+        }
         .nav-links .btn-nav {
             background: var(--accent);
             color: white !important;
@@ -477,6 +486,93 @@
             .demo-btn { width: 100%; margin-right: 0; }
             .quick-links { grid-template-columns: 1fr; }
         }
+
+        /* Segmented Control - Toggle Buttons */
+        .segmented-control {
+            display: flex;
+            justify-content: center;
+            margin: 40px auto;
+            max-width: 360px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .segmented-control .pill {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            width: calc(50% - 4px);
+            background: #fff;
+            border-radius: 50px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .segmented-control .pill.right {
+            transform: translateX(calc(100% + 4px));
+        }
+
+        .segmented-control button {
+            flex: 1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            background: transparent;
+            color: rgba(255,255,255,0.85);
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        .segmented-control button.active {
+            color: #111;
+            font-weight: 600;
+        }
+
+        .segmented-control button:hover:not(.active) {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* API tab content */
+        #apiContent { display: none; }
+        #apiContent .api-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        #apiContent .api-card h3 { color: #fff; margin-bottom: 16px; font-size: 18px; }
+        #apiContent .api-card pre {
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 13px;
+            color: #e0e0e0;
+            margin: 12px 0;
+        }
+        #apiContent .api-card .method {
+            display: inline-block;
+            background: #30d158;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+        #apiContent .api-card .method.post { background: #0066CC; }
+        #apiContent .api-card .method.get { background: #667eea; }
+        #apiContent .api-card .endpoint { color: rgba(255,255,255,0.6); font-size: 13px; }
     </style>
 </head>
 <body>
@@ -500,7 +596,14 @@
     </section>
     
     <!-- Steps -->
-    <div class="steps-container">
+    <!-- Demo toggle: 界面 vs API -->
+    <div class="segmented-control" id="demoTabControl">
+        <div class="pill" id="demoTabPill"></div>
+        <button id="tabVisual" class="active" onclick="switchDemoTab('visual')">🎨 界面演示</button>
+        <button id="tabApi" onclick="switchDemoTab('api')">💻 API文档</button>
+    </div>
+
+    <div class="steps-container" id="visualContent">
         
         <!-- Step 1: Register/Login -->
         <div class="step-card">
@@ -690,9 +793,43 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
-    
+
+    <!-- API Docs Tab Content -->
+    <div id="apiContent" style="max-width: 800px; margin: 0 auto; padding: 0 20px 60px;">
+        <div class="api-card">
+            <h3>🔐 注册账户</h3>
+            <div><span class="method post">POST</span><span class="endpoint">/api/register</span></div>
+            <pre>{
+  "username": "your_name",
+  "password": "your_password",
+  "email": "you@example.com"
+}</pre>
+            <div style="margin-top:12px"><span class="method get">GET</span><span class="endpoint">/api/my</span></div>
+            <pre>Headers: { "X-API-Key": "your_api_key" }</pre>
+        </div>
+        <div class="api-card">
+            <h3>📤 上传肖像</h3>
+            <div><span class="method post">POST</span><span class="endpoint">/api/faces</span></div>
+            <pre>Headers: { "X-API-Key": "your_api_key" }
+FormData: { name: "刘德华", image: file }</pre>
+        </div>
+        <div class="api-card">
+            <h3>✅ 验证肖像权</h3>
+            <div><span class="method post">POST</span><span class="endpoint">/api/llm/portrait-check</span></div>
+            <pre>{
+  "image_url": "https://example.com/photo.jpg",
+  "celebrity_name": "刘德华"
+}</pre>
+            <div style="margin-top:12px"><span class="method get">GET</span><span class="endpoint">/api/faces</span></div>
+            <pre>Query: ?category=celebrity&limit=20&offset=0</pre>
+        </div>
+        <div style="text-align:center; margin-top: 32px;">
+            <a href="index.html" class="btn btn-primary">免费注册获取 API Key →</a>
+        </div>
+    </div>
+
     <!-- CTA -->
     <div class="cta-section">
         <h2>准备好开始了？</h2>
@@ -714,7 +851,28 @@
     
     <script>
         const API = window.location.hostname === 'localhost' ? 'http://127.0.0.1:5000/api' : 'https://web-production-2757f.up.railway.app/api';
-        
+
+        function switchDemoTab(tab) {
+            const visual = document.getElementById('visualContent');
+            const api = document.getElementById('apiContent');
+            const tabV = document.getElementById('tabVisual');
+            const tabA = document.getElementById('tabApi');
+            const pill = document.getElementById('demoTabPill');
+            if (tab === 'visual') {
+                visual.style.display = '';
+                api.style.display = 'none';
+                tabV.classList.add('active');
+                tabA.classList.remove('active');
+                pill.classList.remove('right');
+            } else {
+                visual.style.display = 'none';
+                api.style.display = 'block';
+                tabA.classList.add('active');
+                tabV.classList.remove('active');
+                pill.classList.add('right');
+            }
+        }
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -778,6 +936,26 @@
             result.classList.add('success');
         }
         
+        // Active nav indicator
+        // On demo page, mark "首页" as active
+        (function() {
+            document.querySelectorAll(".nav-links a").forEach(a => {
+                if (a.getAttribute("href") === "index.html" && a.textContent.includes("首页")) {
+                    a.classList.add("active-nav");
+                }
+            });
+        })();
+        (function() {
+            const path = window.location.pathname;
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                if (a.getAttribute('href') === path || 
+                    (path === '/' && a.getAttribute('href') === 'index.html') ||
+                    (path === '/index.html' && a.getAttribute('href') === 'index.html')) {
+                    a.classList.add('active-nav');
+                }
+            });
+        })();
+
         // Check for modal param from index
         const params = new URLSearchParams(window.location.search);
         if (params.get('modal') === 'register') {

@@ -2,6 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortraitPay AI - 控制台</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -25,7 +28,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -446,6 +449,26 @@
             .main { margin-left: 0; padding: 16px; }
             .stats-grid { grid-template-columns: 1fr; }
         }
+
+        /* Active nav indicator */
+        .nav-links a.active-nav {
+            color: #0066CC !important;
+            border-bottom: 2px solid #0066CC;
+            padding-bottom: 2px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg);
+            border-top: 1px solid var(--card-border);
+            padding: 24px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 40px;
+        }
+        footer a { color: var(--accent); text-decoration: none; font-size: 13px; }
+        footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -491,7 +514,31 @@
         
         <!-- Dashboard Page -->
         <div id="page-dashboard">
-            <div class="stats-grid">
+            <!-- Onboarding empty state - shown when no data -->
+            <div id="onboardingEmpty" style="display: none; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 24px; padding: 48px 40px; text-align: center; margin-bottom: 32px; color: #fff;">
+                <div style="font-size: 48px; margin-bottom: 16px;">👋</div>
+                <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">欢迎开始保护您的肖像！</h2>
+                <p style="font-size: 16px; opacity: 0.85; margin-bottom: 32px;">只需3步，开始您的肖像权保护之旅</p>
+                <div style="display: flex; justify-content: center; gap: 32px; margin-bottom: 36px; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 8px;">1</div>
+                        <div style="font-size: 14px; font-weight: 500;">上传肖像照片</div>
+                    </div>
+                    <div style="font-size: 24px; opacity: 0.5; align-self: center;">→</div>
+                    <div style="text-align: center;">
+                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 8px;">2</div>
+                        <div style="font-size: 14px; font-weight: 500;">设置授权价格</div>
+                    </div>
+                    <div style="font-size: 24px; opacity: 0.5; align-self: center;">→</div>
+                    <div style="text-align: center;">
+                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 8px;">3</div>
+                        <div style="font-size: 14px; font-weight: 500;">开始接收收益</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('uploadFace')" style="background: #fff; color: #667eea; border: none; font-size: 16px; padding: 14px 32px; border-radius: 12px; font-weight: 700; cursor: pointer;">立即上传第一张肖像 →</button>
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
                     <div class="stat-icon">👤</div>
                     <div class="stat-value" id="totalFaces">0</div>
@@ -819,9 +866,15 @@
                 
                 document.getElementById('userBalance').textContent = '¥' + (d.balance || 0);
                 
+                // Toggle welcome banner when no data
+                const hasFaces = d.faces?.length > 0;
+                const hasWorks = d.works?.length > 0;
+                document.getElementById('onboardingEmpty').style.display = (!hasFaces && !hasWorks) ? 'block' : 'none';
+                document.getElementById('statsGrid').style.display = (hasFaces || hasWorks) ? 'grid' : 'none';
+
                 // Load revenue chart
                 loadRevenueChart();
-                
+
                 // Load transaction history
                 loadTransactionHistory();
             } catch(e) {
@@ -1230,8 +1283,29 @@
             window.location.href = 'index.html';
         }
         
+        // Active nav indicator - on dashboard page, highlight logo/home link
+        (function() {
+            document.querySelectorAll('a').forEach(a => {
+                const href = a.getAttribute('href') || '';
+                if (href === 'index.html' && a.textContent.includes('PortraitPay')) {
+                    a.classList.add('active-nav');
+                }
+            });
+        })();
+
         // Init
         loadDashboard();
     </script>
+    <footer>
+        <p>© 2026 PortraitPay AI. 肖像版权数据库</p>
+        <p style="margin-top: 8px;">让AI创作更有序,让肖像权更有价</p>
+        <p style="margin-top: 12px;">
+            <a href="terms.html">用户协议</a>
+            &nbsp;·&nbsp;
+            <a href="terms.html#privacy">隐私政策</a>
+            &nbsp;·&nbsp;
+            <a href="celebrity.html">明星入驻</a>
+        </p>
+    </footer>
 </body>
 </html>

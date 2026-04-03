@@ -2,6 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>上传肖像 - PortraitPay AI</title>
     <style>
@@ -112,6 +115,19 @@
             opacity: 0; transition: opacity 0.3s; z-index: 2000;
         }
         .toast.show { opacity: 1; }
+
+        /* Footer */
+        footer {
+            background: #f5f5f7;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            padding: 24px 20px;
+            text-align: center;
+            color: #6e6e73;
+            font-size: 13px;
+            margin-top: 40px;
+        }
+        footer a { color: #0066CC; text-decoration: none; font-size: 13px; }
+        footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -286,5 +302,16 @@
             location.href = 'index.html';
         }
     </script>
+    <footer>
+        <p>© 2026 PortraitPay AI. 肖像版权数据库</p>
+        <p style="margin-top: 8px;">让AI创作更有序,让肖像权更有价</p>
+        <p style="margin-top: 12px;">
+            <a href="terms.html">用户协议</a>
+            &nbsp;·&nbsp;
+            <a href="terms.html#privacy">隐私政策</a>
+            &nbsp;·&nbsp;
+            <a href="celebrity.html">明星入驻</a>
+        </p>
+    </footer>
 </body>
 </html>

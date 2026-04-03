@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortraitPay AI - 肖像版权数据库</title>
-    <meta name="description" content="为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。">
+    <meta name="description" content="为AI时代构建可信的肖像权保护体系。您的肖像值得尊重。">
     <meta property="og:title" content="PortraitPay AI - 肖像版权数据库">
     <meta property="og:description" content="为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。">
     <meta property="og:type" content="website">
@@ -32,7 +37,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -170,7 +175,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 52px;
+            height: 60px;
             background: var(--nav-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -179,7 +184,6 @@
             justify-content: space-between;
             padding: 0 48px;
             z-index: 1000;
-            border-bottom: 1px solid var(--nav-border);
             box-shadow: 0 1px 8px rgba(0,0,0,0.04);
         }
 
@@ -188,7 +192,12 @@
             font-weight: 700;
             color: #000;
             text-decoration: none;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            line-height: 1;
         }
+        .nav-logo img { width: 32px; height: 32px; }
 
         .nav-links {
             display: flex;
@@ -204,6 +213,15 @@
 
         .nav-links a:hover {
             color: var(--text);
+        }
+
+        .nav-links a.active-nav {
+            color: #0066CC !important;
+            border-bottom: 2px solid #0066CC;
+            padding-bottom: 2px;
+        }
+        .nav-logo.active-nav {
+            color: #0066CC !important;
         }
 
         /* Features Section */
@@ -262,6 +280,62 @@
         .feature-card p {
             color: var(--text-secondary);
             font-size: 15px;
+        }
+
+        /* Trust Section */
+        .trust-section {
+            padding: 80px 20px;
+            text-align: center;
+            background: var(--bg);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .trust-subtitle {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 40px;
+        }
+
+        .trust-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .trust-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 28px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            transition: all 0.3s;
+        }
+
+        .trust-badge:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,102,204,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .trust-section { padding: 60px 16px; }
+            .trust-subtitle { font-size: 12px; margin-bottom: 28px; }
+            .trust-badge { font-size: 13px; padding: 10px 20px; }
+            .trust-logos { gap: 10px; }
         }
 
         /* Stats */
@@ -734,16 +808,15 @@
 
     <!-- Nav -->
     <nav class="nav">
-        <a href="#" class="nav-logo"><svg width="32" height="32" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="64" cy="64" r="60" fill="url(#logoGrad)"/><path d="M40 50c0-13.3 10.7-24 24-24s24 10.7 24 24v8c0 8.8-4.8 16.5-12 20.7L64 86l-12-7.3C46.8 74.5 42 66.8 42 58v-8z" fill="white"/><defs><linearGradient id="logoGrad" x1="0" y1="0" x2="128" y2="128"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs></svg> PortraitPay AI</a>
+        <a href="#" class="nav-logo"><img src="logo.png" alt="PortraitPay AI"> PortraitPay AI</a>
         <button class="nav-toggle" onclick="toggleNav()">☰</button>
         <div class="nav-links" id="navLinks">
             <a href="#features" data-i18n="nav_features">功能</a>
-            <a href="#faces" data-i18n="nav_faces">肖像库</a>
             <a href="demo.html" data-i18n="nav_demo">演示</a>
             <a href="#contact" data-i18n="nav_contact">联系我们</a>
-            <a href="celebrity.html" data-i18n="nav_celeb" style="color: #FFD700;">明星入驻</a>
-            <a href="#" onclick="openModal('register')" style="background: var(--accent); border-radius: 8px; padding: 8px 16px;" data-i18n="nav_register">注册</a>
-            <a href="#" onclick="openModal('login')" data-i18n="nav_login">登录</a>
+            <a href="celebrity.html" data-i18n="nav_celeb" style="color: #0066CC; font-weight: 600;">明星入驻</a>
+            <a href="#" onclick="openModal('register')" style="background: var(--accent); color: #fff; border-radius: 8px; padding: 8px 16px; font-weight: 600;" data-i18n="nav_register">注册</a>
+            <a href="#" onclick="openModal('login')" style="color: var(--text); font-weight: 500;" data-i18n="nav_login">登录</a>
         </div>
     </nav>
 
@@ -751,14 +824,11 @@
     <section class="hero">
         <h1>PortraitPay AI</h1>
         <h2 data-i18n="hero_title">肖像版权数据库</h2>
-        <p data-i18n="hero_desc">为AI时代构建可信的肖像权保护体系。<br>明星名人的肖像,值得更好的尊重。</p>
+        <p data-i18n="hero_desc">为AI时代构建可信的肖像权保护体系。<br>您的肖像值得尊重。</p>
         <div class="hero-btns">
             <button class="btn btn-primary" onclick="openModal('register')">
                 <span data-i18n="btn_register">免费注册</span>
                 <span>→</span>
-            </button>
-            <button class="btn btn-outline" onclick="document.getElementById('faces').scrollIntoView({behavior:'smooth'})">
-                <span data-i18n="btn_browse">浏览肖像库</span>
             </button>
         </div>
     </section>
@@ -808,35 +878,16 @@
         </div>
     </section>
 
-    <!-- Faces -->
-    <section class="section" id="faces">
-        <h2 class="section-title" data-i18n="faces_title">肖像库</h2>
-        <p class="section-desc" data-i18n="faces_desc">浏览所有已登记的肖像</p>
-
-        <!-- Search & Filter Bar -->
-        <div class="faces-controls">
-            <div class="faces-search-wrap">
-                <input type="text" id="facesSearchInput" class="faces-search-input" placeholder="搜索肖像名称..." onkeydown="if(event.key==='Enter')searchFaces()">
-                <button class="faces-search-btn" onclick="searchFaces()">🔍</button>
-            </div>
-            <div class="faces-tabs">
-                <button class="faces-tab active" data-category="all" onclick="setFaceCategory('all')">全部</button>
-                <button class="faces-tab" data-category="celebrity" onclick="setFaceCategory('celebrity')">⭐ 名人</button>
-                <button class="faces-tab" data-category="normal" onclick="setFaceCategory('normal')">👤 普通</button>
-            </div>
-        </div>
-
-        <div class="faces-grid" id="facesGrid">
-            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
-                <span data-i18n="no_data">暂无数据</span>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="faces-pagination" id="facesPagination">
-            <button class="faces-page-btn" id="facesPrevBtn" onclick="facesPageChange(-1)" disabled>‹ 上一页</button>
-            <span class="faces-page-info" id="facesPageInfo">1 / 1</span>
-            <button class="faces-page-btn" id="facesNextBtn" onclick="facesPageChange(1)" disabled>下一页 ›</button>
+    <!-- Trust Section -->
+    <section class="trust-section">
+        <p class="trust-subtitle" data-i18n="trust_subtitle">Why leading AI platforms trust us</p>
+        <div class="trust-logos">
+            <span class="trust-badge">ChatGPT</span>
+            <span class="trust-badge">Claude</span>
+            <span class="trust-badge">Midjourney</span>
+            <span class="trust-badge">Stable Diffusion</span>
+            <span class="trust-badge">ERNIE Bot</span>
+            <span class="trust-badge">Doubao</span>
         </div>
     </section>
 
@@ -957,13 +1008,14 @@
                 nav_contact: '联系我们',
                 nav_celeb: '明星入驻',
                 hero_title: '肖像版权数据库',
-                hero_desc: '为AI时代构建可信的肖像权保护体系。<br>明星名人的肖像,值得更好的尊重。',
+                hero_desc: '为AI时代构建可信的肖像权保护体系。<br>您的肖像值得尊重。',
                 btn_register: '免费注册',
                 btn_browse: '浏览肖像库',
                 stat_faces: '已注册肖像',
                 stat_uses: '调用次数',
                 stat_earnings: '肖像收益',
                 features_title: '为什么选择PortraitPay AI',
+                trust_subtitle: '为什么领先的AI平台信赖我们',
                 features_desc: '在这里,每一位明星的肖像权都能得到尊重和保护',
                 feature1_title: '版权保护',
                 feature1_desc: '区块链时间戳技术,确保每一次授权都可追溯',
@@ -1020,6 +1072,7 @@
                 stat_uses: 'API Calls',
                 stat_earnings: 'Earnings',
                 features_title: 'Why PortraitPay AI',
+                trust_subtitle: 'Why leading AI platforms trust us',
                 features_desc: 'Where every celebrity portrait rights are respected and protected',
                 feature1_title: 'Rights Protection',
                 feature1_desc: 'Blockchain timestamp technology ensures every authorization is traceable',
@@ -1080,7 +1133,7 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (i18n[lang][key]) {
-                    el.textContent = i18n[lang][key];
+                    el.innerHTML = i18n[lang][key];
                 }
             });
 
@@ -1136,6 +1189,35 @@
             loadFaces();
         }
 
+        // DEMO DATA: Replace with real API data
+        const DEMO_FACES = [
+            { name: '刘德华', is_celebrity: true, original_price: 2.50 },
+            { name: '杨幂', is_celebrity: true, original_price: 1.80 },
+            { name: '肖战', is_celebrity: true, original_price: 2.20 },
+            { name: '迪丽热巴', is_celebrity: true, original_price: 1.90 },
+            { name: '周杰伦', is_celebrity: true, original_price: 3.00 },
+            { name: '刘亦菲', is_celebrity: true, original_price: 2.10 }
+        ];
+
+        function renderFaces(faces) {
+            const grid = document.getElementById('facesGrid');
+            if (!faces.length) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary)">${i18n[currentLang].no_data || '暂无数据'}</div>`;
+                document.getElementById('facesPagination').style.display = 'none';
+                return;
+            }
+            grid.innerHTML = faces.map(f => `
+                <div class="face-card">
+                    <div class="face-avatar">${f.is_celebrity ? '⭐' : '👤'}</div>
+                    <div class="face-info">
+                        <div class="face-name">${f.name}</div>
+                        <div class="face-price">${f.original_price > 0 ? '$' + f.original_price + '/call' : 'Free'}</div>
+                        <span class="face-tag ${f.is_celebrity ? 'celebrity' : ''}">${f.is_celebrity ? (currentLang === 'zh' ? '明星' : 'Celebrity') : (currentLang === 'zh' ? '已认证' : 'Verified')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         // Load faces
         async function loadFaces() {
             try {
@@ -1148,24 +1230,14 @@
                 const faces = data.faces || [];
                 facesState.total = data.total || 0;
 
-                const grid = document.getElementById('facesGrid');
-
                 if (!faces.length) {
-                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary)">${i18n[currentLang].no_data || '暂无数据'}</div>`;
+                    // DEMO DATA: Replace with real API data
+                    renderFaces(DEMO_FACES);
                     document.getElementById('facesPagination').style.display = 'none';
                     return;
                 }
 
-                grid.innerHTML = faces.map(f => `
-                    <div class="face-card">
-                        <div class="face-avatar">${f.is_celebrity ? '⭐' : '👤'}</div>
-                        <div class="face-info">
-                            <div class="face-name">${f.name}</div>
-                            <div class="face-price">${f.original_price > 0 ? '$' + f.original_price + '/call' : 'Free'}</div>
-                            <span class="face-tag ${f.is_celebrity ? 'celebrity' : ''}">${f.is_celebrity ? (currentLang === 'zh' ? '公众人物' : 'Celebrity') : (currentLang === 'zh' ? '已认证' : 'Verified')}</span>
-                        </div>
-                    </div>
-                `).join('');
+                renderFaces(faces);
 
                 // Update pagination
                 const totalPages = Math.max(1, Math.ceil(facesState.total / facesState.limit));
@@ -1175,7 +1247,10 @@
                 document.getElementById('facesNextBtn').disabled = facesState.offset + faces.length >= facesState.total;
                 document.getElementById('facesPagination').style.display = 'flex';
             } catch(e) {
-                console.log(e);
+                console.log('API unavailable, showing demo data:', e);
+                // DEMO DATA: Replace with real API data
+                renderFaces(DEMO_FACES);
+                document.getElementById('facesPagination').style.display = 'none';
             }
         }
 
@@ -1280,6 +1355,22 @@
         function toggleNav() {
             document.getElementById('navLinks').classList.toggle('show');
         }
+
+        // Active nav indicator
+        (function() {
+            const path = window.location.pathname;
+            document.querySelectorAll('.nav-links a, .nav-logo').forEach(a => {
+                const href = a.getAttribute('href') || '';
+                // On homepage (/), highlight the logo
+                if ((path === '/' || path === '/index.html') && a.classList.contains('nav-logo')) {
+                    a.classList.add('active-nav');
+                }
+                // On other pages, highlight matching nav link
+                if (href && !href.startsWith('#') && !href.startsWith('mailto') && path.endsWith(href)) {
+                    a.classList.add('active-nav');
+                }
+            });
+        })();
 
         // Init
         setLang(currentLang);
