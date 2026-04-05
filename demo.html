@@ -881,8 +881,7 @@ FormData: { name: "刘德华", image: file }</pre>
         }
         
         function showModal(type) {
-            // Store return path so index.html can redirect back after modal closes
-            sessionStorage.setItem('returnTo', 'demo.html');
+            // Redirect to index for modal
             window.location.href = 'index.html?modal=' + type;
         }
         

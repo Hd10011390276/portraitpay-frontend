@@ -1321,22 +1321,11 @@
 
         // Modal
         function openModal(id) {
-            const modal = document.getElementById(id + 'Modal');
-            modal.classList.add('active');
-            // Click backdrop to close
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) closeModal(id);
-            });
+            document.getElementById(id + 'Modal').classList.add('active');
         }
 
         function closeModal(id) {
             document.getElementById(id + 'Modal').classList.remove('active');
-            // Check if we should redirect back to another page
-            const returnTo = sessionStorage.getItem('returnTo');
-            if (returnTo) {
-                sessionStorage.removeItem('returnTo');
-                setTimeout(() => { window.location.href = returnTo; }, 300);
-            }
         }
 
         // Toast
