@@ -39,9 +39,6 @@ export default function FaceTraceUploader({
   const [progress, setProgress] = useState(0);
   const [statusMsg, setStatusMsg] = useState("");
   const [detectedFaceCount, setDetectedFaceCount] = useState(0);
-  const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
-  const [imageUrl, setImageUrl] = useState("");
-  const [urlLoading, setUrlLoading] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -240,53 +237,6 @@ export default function FaceTraceUploader({
     if (file) handleFile(file);
   };
 
-  const handleUrlSubmit = useCallback(async () => {
-    const trimmed = imageUrl.trim();
-    if (!trimmed) {
-      onError("Please enter an image URL");
-      return;
-    }
-
-    let normalizedUrl = trimmed;
-    if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
-      normalizedUrl = "https://" + trimmed;
-    }
-
-    setUrlLoading(true);
-    setStage_("detecting");
-    setStatusMsg("Fetching image from URL…");
-    setProgress(5);
-
-    try {
-      const response = await fetch(normalizedUrl);
-      if (!response.ok) throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
-
-      const contentType = response.headers.get("content-type") || "image/jpeg";
-      const blob = await response.blob();
-
-      if (!contentType.startsWith("image/")) {
-        throw new Error("URL does not point to an image");
-      }
-
-      const file = new File([blob], "url-image." + (contentType.split("/")[1] || "jpeg"), { type: contentType });
-
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setImageLoaded(false);
-      setDetectedFaceCount(0);
-      setStage_("detecting");
-      setStatusMsg("Analyzing face…");
-      setProgress(10);
-      setImageUrl("");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to load image from URL";
-      setStage_("error");
-      onError(msg + " (CORS may block cross-origin images)");
-    } finally {
-      setUrlLoading(false);
-    }
-  }, [imageUrl, setStage_, onError]);
-
   const handleReset = () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
@@ -304,147 +254,60 @@ export default function FaceTraceUploader({
     <div className="flex flex-col gap-5">
       {/* Drop Zone — only show when idle */}
       {stage === "idle" && (
-        <div className="flex flex-col gap-4">
-          {/* Tab switcher */}
-          <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl w-fit mx-auto">
-            <button
-              onClick={() => setInputMode("upload")}
-              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                inputMode === "upload"
-                  ? "bg-white text-gray-800 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              📁 上传图片
-            </button>
-            <button
-              onClick={() => setInputMode("url")}
-              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                inputMode === "url"
-                  ? "bg-white text-gray-800 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              🔗 网络图片 URL
-            </button>
+        <div
+          className={`
+            relative flex flex-col items-center justify-center
+            border-2 border-dashed rounded-2xl transition-all cursor-pointer select-none
+            ${isDragOver
+              ? "border-indigo-500 bg-indigo-50/60 scale-[1.01]"
+              : "border-gray-300 bg-gray-50/50 hover:border-indigo-400 hover:bg-gray-100/60"
+            }
+          `}
+          style={{ minHeight: "300px" }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragOver(true);
+          }}
+          onDragLeave={() => setIsDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById("facetrace-input")?.click()}
+        >
+          {/* Animated gradient background */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-50 via-transparent to-purple-50 opacity-60 pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col items-center gap-3 text-center px-6">
+            <div className="text-5xl">🔍</div>
+            <p className="text-base font-semibold text-gray-700">
+              {isDragOver ? "Drop image here" : "Upload AI-generated face"}
+            </p>
+            <p className="text-sm text-gray-400">
+              Drag & drop or click to browse
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              JPG · PNG · WebP · max 10 MB
+            </p>
+            {/* Feature pills */}
+            <div className="flex flex-wrap gap-2 mt-2 justify-center">
+              {["face-api.js vector extraction", "cosine similarity matching", "celebrity DB search"].map(
+                (feat) => (
+                  <span
+                    key={feat}
+                    className="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-600 font-medium"
+                  >
+                    {feat}
+                  </span>
+                )
+              )}
+            </div>
           </div>
 
-          {/* Upload mode */}
-          {inputMode === "upload" && (
-            <div
-              className={`
-                relative flex flex-col items-center justify-center
-                border-2 border-dashed rounded-2xl transition-all cursor-pointer select-none
-                ${isDragOver
-                  ? "border-indigo-500 bg-indigo-50/60 scale-[1.01]"
-                  : "border-gray-300 bg-gray-50/50 hover:border-indigo-400 hover:bg-gray-100/60"
-                }
-              `}
-              style={{ minHeight: "260px" }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragOver(true);
-              }}
-              onDragLeave={() => setIsDragOver(false)}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById("facetrace-input")?.click()}
-            >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-50 via-transparent to-purple-50 opacity-60 pointer-events-none" />
-              <div className="relative z-10 flex flex-col items-center gap-3 text-center px-6">
-                <div className="text-5xl">🔍</div>
-                <p className="text-base font-semibold text-gray-700">
-                  {isDragOver ? "Drop image here" : "Upload AI-generated face"}
-                </p>
-                <p className="text-sm text-gray-400">
-                  Drag & drop or click to browse
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  JPG · PNG · WebP · max 10 MB
-                </p>
-                <div className="flex flex-wrap gap-2 mt-2 justify-center">
-                  {["face-api.js vector extraction", "cosine similarity matching", "celebrity DB search"].map(
-                    (feat) => (
-                      <span
-                        key={feat}
-                        className="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-600 font-medium"
-                      >
-                        {feat}
-                      </span>
-                    )
-                  )}
-                </div>
-              </div>
-              <input
-                id="facetrace-input"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={handleInputChange}
-              />
-            </div>
-          )}
-
-          {/* URL mode */}
-          {inputMode === "url" && (
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-gray-700" htmlFor="face-url-input">
-                  输入网络图片地址
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    id="face-url-input"
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !urlLoading) handleUrlSubmit();
-                    }}
-                    placeholder="https://example.com/face.jpg"
-                    className="flex-1 px-3 py-2.5 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    disabled={urlLoading}
-                  />
-                  <button
-                    onClick={handleUrlSubmit}
-                    disabled={urlLoading || !imageUrl.trim()}
-                    className="px-5 py-2.5 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {urlLoading ? (
-                      <span className="flex items-center gap-2">
-                        <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                        Loading
-                      </span>
-                    ) : (
-                      "检测"
-                    )}
-                  </button>
-                </div>
-                <p className="text-xs text-gray-400">
-                  支持 JPG · PNG · WebP。建议使用公开可访问的图片地址（CORS 可能限制部分图片）
-                </p>
-              </div>
-
-              {/* Quick test links */}
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs text-gray-400 self-center">快速测试:</span>
-                {[
-                  { label: "Taylor Swift", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Taylor_Swift_at_the_2019_American_Music_Awards_%28cropped%29.jpg/440px-Taylor_Swift_at_the_2019_American_Music_Awards_%28cropped%29.jpg" },
-                  { label: "Messi", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Lionel_Messi_2018.jpg/440px-Lionel_Messi_2018.jpg" },
-                  { label: "Ronaldo", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/440px-Cristiano_Ronaldo_2018.jpg" },
-                ].map(({ label, url }) => (
-                  <button
-                    key={label}
-                    onClick={() => {
-                      setImageUrl(url);
-                    }}
-                    className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors"
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <input
+            id="facetrace-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleInputChange}
+          />
         </div>
       )}
 
