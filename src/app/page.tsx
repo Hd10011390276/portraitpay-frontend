@@ -6,7 +6,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -102,10 +102,15 @@ export default function HomePage() {
                 <div className="flex-1 text-center text-xs text-gray-400">PortraitPay Dashboard</div>
               </div>
               <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                {["已认证: 24", "总收入: ¥12,840", "待处理: 5", "认证状态"].map((stat, i) => (
+                {[
+                  { label: t.heroStats.certified, value: "24" },
+                  { label: t.heroStats.totalRevenue, value: locale === "zh-CN" ? "¥12,840" : "$1,760" },
+                  { label: t.heroStats.pending, value: "5" },
+                  { label: t.heroStats.chainStatus, value: t.heroStats.onChain },
+                ].map((stat, i) => (
                   <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{stat.split(": ")[0]}</p>
-                    <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.split(": ")[1]}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{stat.label}</p>
+                    <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
                   </div>
                 ))}
               </div>
@@ -114,8 +119,8 @@ export default function HomePage() {
                   <div key={i} className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div className="h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center text-3xl">👤</div>
                     <div className="p-3">
-                      <p className="text-xs font-medium text-gray-900 dark:text-white truncate">样本 {i}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">已认证注册</p>
+                      <p className="text-xs font-medium text-gray-900 dark:text-white truncate">Sample {i}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.heroStats.certified}</p>
                     </div>
                   </div>
                 ))}
@@ -139,23 +144,21 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: "🔗", color: "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20", border: "border-purple-200 dark:border-purple-800" },
-              { icon: "🖼️", color: "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20", border: "border-blue-200 dark:border-blue-800" },
-              { icon: "📋", color: "from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20", border: "border-green-200 dark:border-green-800" },
-              { icon: "💰", color: "from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20", border: "border-yellow-200 dark:border-yellow-800" },
-              { icon: "👁️", color: "from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20", border: "border-red-200 dark:border-red-800" },
-              { icon: "🔐", color: "from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20", border: "border-indigo-200 dark:border-indigo-800" },
+              { icon: "🔗", color: "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20", border: "border-purple-200 dark:border-purple-800", titleKey: "feature1Title", descKey: "feature1Desc" },
+              { icon: "🖼️", color: "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20", border: "border-blue-200 dark:border-blue-800", titleKey: "feature2Title", descKey: "feature2Desc" },
+              { icon: "📋", color: "from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20", border: "border-green-200 dark:border-green-800", titleKey: "feature3Title", descKey: "feature3Desc" },
+              { icon: "💰", color: "from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20", border: "border-yellow-200 dark:border-yellow-800", titleKey: "feature4Title", descKey: "feature4Desc" },
+              { icon: "👁️", color: "from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20", border: "border-red-200 dark:border-red-800", titleKey: "feature5Title", descKey: "feature5Desc" },
+              { icon: "🔐", color: "from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20", border: "border-indigo-200 dark:border-indigo-800", titleKey: "feature6Title", descKey: "feature6Desc" },
             ].map((feature, i) => (
               <div key={i}
                 className={`bg-gradient-to-br ${feature.color} rounded-2xl p-6 border ${feature.border} hover:shadow-lg transition-shadow`}>
                 <div className="text-4xl mb-4">{feature.icon}</div>
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                  {[i === 0 ? "[DEMO] 区块链时间戳 + IPFS 存储，确保证书不可篡改。智能合约自动执行授权和分成。" :
-                    i === 1 ? "[DEMO] 上传肖像，系统自动生成哈希并存储到 IPFS。分布式存储，永不丢失。" :
-                    i === 2 ? "可定制的授权模板，支持多种商业场景。灵活调整授权范围和期限。" :
-                    i === 3 ? "[DEMO] 每次使用肖像获得实时分成。区块链透明记录，无需中间商。" :
-                    i === 4 ? "[DEMO] AI 侵权检测 + 自动取证。7×24小时监控，侵权证据即时固化。" :
-                    "企业级 KYC 认证。符合法规要求，支持批量授权管理。"][i]}
+                  {t.features[feature.titleKey as keyof typeof t.features] as string}
+                </p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mt-2">
+                  {t.features[feature.descKey as keyof typeof t.features] as string}
                 </p>
               </div>
             ))}
@@ -176,7 +179,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {["📤 上传肖像", "🔍 KYC 认证", "📋 注册存证", "💎 获得收益"].map((step, i) => (
+            {[t.howItWorks.step1, t.howItWorks.step2, t.howItWorks.step3, t.howItWorks.step4].map((step, i) => (
               <div key={i} className="flex flex-col items-center text-center">
                 <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-3xl shadow-sm mb-4">
                   {["📤", "🔍", "🔗", "💎"][i]}
@@ -204,21 +207,21 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             <div className="rounded-2xl p-8 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">免费注册</h3>
-              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">¥0<span className="text-lg font-normal text-gray-500">/永久</span></div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">开始使用肖像权认证，立即免费注册</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{t.pricing.freeTitle}</h3>
+              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t.pricing.freePrice}<span className="text-lg font-normal text-gray-500">/{t.pricing.freePeriod}</span></div>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{t.pricing.freeDesc}</p>
               <ul className="space-y-2 mb-8">
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  肖像权注册存证 (Beta)
+                  {t.pricing.freeLi1}
                 </li>
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  基础授权模板
+                  {t.pricing.freeLi2}
                 </li>
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  KYC 身份认证
+                  {t.pricing.freeLi3}
                 </li>
               </ul>
               <Link href="/register"
@@ -227,27 +230,27 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="rounded-2xl p-8 bg-gradient-to-b from-purple-50 to-white dark:from-purple-950/40 dark:to-gray-900 border-2 border-purple-500 shadow-lg">
-              <span className="inline-block px-3 py-1 text-xs font-semibold bg-purple-600 text-white rounded-full mb-4">名人 · 企业</span>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">定制授权方案</h3>
-              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">定制</div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">批量授权管理，专属客服，侵权监测</p>
+              <span className="inline-block px-3 py-1 text-xs font-semibold bg-purple-600 text-white rounded-full mb-4">{t.pricing.proBadge}</span>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{t.pricing.proTitle}</h3>
+              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t.pricing.proPrice}</div>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{t.pricing.proDesc}</p>
               <ul className="space-y-2 mb-8">
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  无限肖像权授权
+                  {t.pricing.proLi1}
                 </li>
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  AI 侵权实时监测
+                  {t.pricing.proLi2}
                 </li>
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  专属客服 + 优先响应
+                  {t.pricing.proLi3}
                 </li>
               </ul>
               <Link href="/contact"
                 className="block w-full text-center px-6 py-3 rounded-xl font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg">
-                联系我们
+                {t.pricing.contactUs}
               </Link>
             </div>
           </div>
@@ -264,11 +267,11 @@ export default function HomePage() {
           </div>
           <div className="space-y-4">
             {[
-              { q: "PortraitPay 如何保护我的肖像权？", a: "我们为你的肖像生成防篡改的时间戳存证，结合分布式存储确保证书可查可控。" },
-              { q: "使用需要加密货币知识吗？", a: "完全不需要。上传和授权就像普通应用一样简单，无需任何区块链知识。" },
-              { q: "授权收益如何计算？", a: "每次你的肖像被授权使用，收益自动结算并直接到账，无需中间商。" },
-              { q: "我的肖像数据安全吗？", a: "安全。我们使用加密存储，原始图片不会公开，只有授权记录在链上可查。" },
-              { q: "如何开始使用？", a: "免费注册，上传肖像，通过 KYC 认证，完成肖像权注册。" },
+              { q: t.faq.q1, a: t.faq.a1 },
+              { q: t.faq.q2, a: t.faq.a2 },
+              { q: t.faq.q3, a: t.faq.a3 },
+              { q: t.faq.q4, a: t.faq.a4 },
+              { q: t.faq.q5, a: t.faq.a5 },
             ].map((faq, idx) => (
               <details key={idx} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <summary className="flex items-center justify-between px-6 py-4 cursor-pointer text-gray-900 dark:text-white font-medium">
