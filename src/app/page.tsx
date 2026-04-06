@@ -102,7 +102,7 @@ export default function HomePage() {
                 <div className="flex-1 text-center text-xs text-gray-400">PortraitPay Dashboard</div>
               </div>
               <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                {["已认证: 24", "总收入: ¥12,840", "待处理: 5", "● 链上状态"].map((stat, i) => (
+                {["已认证: 24", "总收入: ¥12,840", "待处理: 5", "认证状态"].map((stat, i) => (
                   <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{stat.split(": ")[0]}</p>
                     <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.split(": ")[1]}</p>
@@ -115,7 +115,7 @@ export default function HomePage() {
                     <div className="h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center text-3xl">👤</div>
                     <div className="p-3">
                       <p className="text-xs font-medium text-gray-900 dark:text-white truncate">样本 {i}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">已认证上链</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">已认证注册</p>
                     </div>
                   </div>
                 ))}
@@ -150,11 +150,11 @@ export default function HomePage() {
                 className={`bg-gradient-to-br ${feature.color} rounded-2xl p-6 border ${feature.border} hover:shadow-lg transition-shadow`}>
                 <div className="text-4xl mb-4">{feature.icon}</div>
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                  {["区块链时间戳 + IPFS 存储，确保证书不可篡改。智能合约自动执行授权和分成。", 
-                    "上传肖像，系统自动生成哈希并存储到 IPFS。分布式存储，永不丢失。", 
-                    "可定制的授权模板，支持多种商业场景。灵活调整授权范围和期限。",
-                    "每次使用肖像获得实时分成。区块链透明记录，无需中间商。",
-                    "AI 侵权检测 + 自动取证。7×24小时监控，侵权证据即时固化。",
+                  {[i === 0 ? "[DEMO] 区块链时间戳 + IPFS 存储，确保证书不可篡改。智能合约自动执行授权和分成。" :
+                    i === 1 ? "[DEMO] 上传肖像，系统自动生成哈希并存储到 IPFS。分布式存储，永不丢失。" :
+                    i === 2 ? "可定制的授权模板，支持多种商业场景。灵活调整授权范围和期限。" :
+                    i === 3 ? "[DEMO] 每次使用肖像获得实时分成。区块链透明记录，无需中间商。" :
+                    i === 4 ? "[DEMO] AI 侵权检测 + 自动取证。7×24小时监控，侵权证据即时固化。" :
                     "企业级 KYC 认证。符合法规要求，支持批量授权管理。"][i]}
                 </p>
               </div>
@@ -176,7 +176,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {["📤 上传肖像", "🔍 KYC 认证", "🔗 链上存证", "💎 获得收益"].map((step, i) => (
+            {["📤 上传肖像", "🔍 KYC 认证", "📋 注册存证", "💎 获得收益"].map((step, i) => (
               <div key={i} className="flex flex-col items-center text-center">
                 <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-3xl shadow-sm mb-4">
                   {["📤", "🔍", "🔗", "💎"][i]}
@@ -210,7 +210,7 @@ export default function HomePage() {
               <ul className="space-y-2 mb-8">
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  肖像权链上存证
+                  肖像权注册存证 (Beta)
                 </li>
                 <li className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -264,11 +264,11 @@ export default function HomePage() {
           </div>
           <div className="space-y-4">
             {[
-              { q: "PortraitPay 如何保护我的肖像权？", a: "我们使用区块链技术为你的肖像生成不可篡改的时间戳存证，并结合 IPFS 分布式存储确保证书永久可查。" },
-              { q: "使用需要加密货币知识吗？", a: "完全不需要。我们处理所有区块链复杂性，你只需普通方式上传和授权。" },
-              { q: "授权收益如何计算？", a: "每次你的肖像被授权使用，智能合约自动执行分成，收益直接到账，无需中间商。" },
-              { q: "我的肖像数据安全吗？", a: "安全。我们使用加密存储，原始图片不会公开，只有哈希值和授权记录上链。" },
-              { q: "如何开始使用？", a: "免费注册，上传肖像，通过 KYC 认证，即可在链上注册你的肖像权。" },
+              { q: "PortraitPay 如何保护我的肖像权？", a: "我们为你的肖像生成防篡改的时间戳存证，结合分布式存储确保证书可查可控。" },
+              { q: "使用需要加密货币知识吗？", a: "完全不需要。上传和授权就像普通应用一样简单，无需任何区块链知识。" },
+              { q: "授权收益如何计算？", a: "每次你的肖像被授权使用，收益自动结算并直接到账，无需中间商。" },
+              { q: "我的肖像数据安全吗？", a: "安全。我们使用加密存储，原始图片不会公开，只有授权记录在链上可查。" },
+              { q: "如何开始使用？", a: "免费注册，上传肖像，通过 KYC 认证，完成肖像权注册。" },
             ].map((faq, idx) => (
               <details key={idx} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <summary className="flex items-center justify-between px-6 py-4 cursor-pointer text-gray-900 dark:text-white font-medium">
