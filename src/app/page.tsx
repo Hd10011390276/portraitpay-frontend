@@ -15,7 +15,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <a href="/" className="flex items-center gap-3">
-              <img src="/logo.png" alt="PortraitPay AI" width="32" height="32" className="w-10 h-10 object-contain" />
+              <img src="/logo.png" alt="PortraitPay AI" width="32" height="32" className="w-10 h-10 object-contain dark:hidden" />
+              <img src="/logo-light.svg" alt="PortraitPay AI" width="32" height="32" className="w-10 h-10 object-contain hidden dark:block" />
               <span className="text-base font-bold text-gray-900 dark:text-white select-none">PortraitPay AI</span>
             </a>
             <nav className="hidden md:flex items-center gap-8">
@@ -317,7 +318,8 @@ export default function HomePage() {
       <footer className="border-t border-gray-100 dark:border-gray-800 py-12 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <a href="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="PortraitPay AI" width="28" height="28" className="w-8 h-8 object-contain" />
+            <img src="/logo.png" alt="PortraitPay AI" width="28" height="28" className="w-8 h-8 object-contain dark:hidden" />
+            <img src="/logo-light.svg" alt="PortraitPay AI" width="28" height="28" className="w-8 h-8 object-contain hidden dark:block" />
             <span className="text-gray-500 dark:text-gray-400 text-sm">{t.footer.copyright}</span>
           </a>
           <div className="flex items-center gap-6">
