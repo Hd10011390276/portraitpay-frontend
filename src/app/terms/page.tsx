@@ -15,7 +15,8 @@ export default function TermsPage() {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold text-purple-600">
-            <img src="/logo.png" alt="PortraitPay AI" className="w-7 h-7 rounded-lg" />
+            <img src="/logo.png" alt="PortraitPay AI" className="w-7 h-7 rounded-lg dark:hidden" />
+            <img src="/logo-dark.svg" alt="PortraitPay AI" className="w-7 h-7 rounded-lg hidden dark:block" />
             PortraitPay AI
           </Link>
           <Link
@@ -317,7 +318,8 @@ export default function TermsPage() {
       <footer className="border-t border-gray-100 dark:border-gray-800 py-8 px-4 mt-16">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="PortraitPay AI" className="w-5 h-5 rounded" />
+            <img src="/logo.png" alt="PortraitPay AI" className="w-5 h-5 rounded dark:hidden" />
+            <img src="/logo-dark.svg" alt="PortraitPay AI" className="w-5 h-5 rounded hidden dark:block" />
             <span className="text-gray-400 text-sm">© 2026 PortraitPay AI</span>
           </div>
           <div className="flex items-center gap-5">
