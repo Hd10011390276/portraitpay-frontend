@@ -106,19 +106,126 @@
             pointer-events: none;
         }
 
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Hash flow light effect */
+        .hash-flow {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 0;
+        }
+        .hash-flow.active {
+            opacity: 1;
+        }
+        .hash-flow::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(41,151,255,0.15), rgba(0,102,204,0.25), rgba(41,151,255,0.15), transparent);
+            animation: hashRotate 2s linear infinite;
+        }
+        @keyframes hashRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hash preview card */
+        .hash-preview {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 32px;
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        .hash-preview.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .hash-preview-inner {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,102,204,0.2);
+            border-radius: 20px;
+            padding: 20px 32px;
+            min-width: 320px;
+            box-shadow: 0 8px 32px rgba(0,102,204,0.12);
+        }
+        .hash-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .hash-value {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            color: var(--text);
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .hash-bar-wrap {
+            height: 3px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .hash-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #2997ff, #0066CC);
+            border-radius: 2px;
+            transition: width 0.05s linear;
+        }
+        .hash-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
         .hero h1 {
             font-size: clamp(48px, 10vw, 80px);
             font-weight: 700;
             letter-spacing: -0.02em;
             margin-bottom: 16px;
             color: #1d1d1f;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
         }
 
         .hero h2 {
-            font-size: clamp(24px, 5vw, 40px);
+            font-size: clamp(22px, 4.5vw, 36px);
             font-weight: 600;
             margin-bottom: 24px;
             color: var(--text);
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            line-height: 1.3;
+            transition: all 0.3s ease;
         }
 
         .hero p {
@@ -126,6 +233,9 @@
             color: var(--text-secondary);
             max-width: 600px;
             margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
         }
 
         .hero-btns {
@@ -133,6 +243,25 @@
             gap: 20px;
             flex-wrap: wrap;
             justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-upload-btn {
+            background: linear-gradient(135deg, #004499 0%, #0066CC 50%, #2997ff 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+        .hero-upload-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.5s ease;
+        }
+        .hero-upload-btn:hover::before {
+            left: 100%;
         }
 
         .btn {
@@ -249,37 +378,295 @@
         .features {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            gap: 40px;
+            gap: 24px;
         }
 
         .feature-card {
-            background: var(--card);
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
             border-radius: 24px;
-            padding: 48px 32px;
+            padding: 40px 32px;
             text-align: center;
-            transition: transform 0.3s;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+            transform: translateY(30px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+
+        .feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .feature-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-8px) !important;
+            box-shadow: 0 16px 48px rgba(0,102,204,0.15);
+            border-color: rgba(0,102,204,0.2);
+            background: rgba(255,255,255,0.85);
         }
 
         .feature-icon {
-            font-size: 64px;
-            margin-bottom: 24px;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,102,204,0.08);
+            border-radius: 16px;
+        }
+
+        .feature-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--accent);
+            stroke-width: 1.75;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .feature-card h3 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .feature-card p {
             color: var(--text-secondary);
-            font-size: 15px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* Radar Section */
+        .radar-section {
+            padding: 100px 20px;
+            background: var(--bg);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .radar-section .section-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .radar-wrap {
+            display: flex;
+            gap: 48px;
+            align-items: flex-start;
+            margin-top: 48px;
+            flex-wrap: wrap;
+        }
+        .radar-left {
+            position: relative;
+            flex: 0 0 280px;
+        }
+        .radar-sweep {
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,102,204,0.06) 0%, transparent 70%);
+            border: 1px solid rgba(0,102,204,0.12);
+            position: relative;
+            overflow: hidden;
+        }
+        .radar-sweep::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 50%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,102,204,0.6));
+            transform-origin: left center;
+            animation: radarSweep 3s linear infinite;
+        }
+        @keyframes radarSweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .radar-center-dot {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 10px; height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 12px rgba(0,102,204,0.5);
+        }
+        .radar-urls {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .radar-url-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-family: 'SF Mono', monospace;
+            color: var(--text-secondary);
+            opacity: 0;
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+        .radar-url-item:nth-child(1) { animation-delay: 0.3s; }
+        .radar-url-item:nth-child(2) { animation-delay: 0.6s; }
+        .radar-url-item:nth-child(3) { animation-delay: 0.9s; }
+        .radar-url-item:nth-child(4) { animation-delay: 1.2s; opacity: 0.5; text-decoration: line-through; }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .radar-url-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #2997ff;
+            flex-shrink: 0;
+            animation: radarPulse 1.5s ease-in-out infinite;
+        }
+        .radar-url-dot-done { background: var(--success); animation: none; }
+        @keyframes radarPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .radar-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 280px;
+        }
+        .radar-stat {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .radar-stat-num {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent);
+            transition: all 0.3s ease;
+        }
+        .radar-stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .radar-alerts {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .radar-alert {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+        .radar-alert-new {
+            border-color: rgba(255,59,48,0.3);
+            background: rgba(255,59,48,0.05);
+            animation: alertPulse 2s ease-in-out infinite;
+        }
+        @keyframes alertPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.2); }
+            50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
+        }
+        .alert-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #ff3b30;
+            flex-shrink: 0;
+        }
+        .radar-alert:not(.radar-alert-new) .alert-dot { background: #ff9500; animation: none; }
+        .alert-content { flex: 1; }
+        .alert-title { font-size: 13px; font-weight: 600; color: var(--text); }
+        .alert-url { font-size: 11px; color: var(--text-secondary); font-family: 'SF Mono', monospace; margin-top: 2px; }
+
+        /* Testnet Banner */
+        .testnet-banner {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 28px 20px;
+        }
+        .testnet-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .testnet-left { flex: 1; min-width: 260px; }
+        .testnet-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,149,0,0.2);
+            color: #FF9500;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .testnet-left p {
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .testnet-right { flex: 0 1 360px; }
+        .waitlist-form {
+            display: flex;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 6px;
+        }
+        .waitlist-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 10px 14px;
+            color: white;
+            font-size: 14px;
+        }
+        .waitlist-input::placeholder { color: rgba(255,255,255,0.35); }
+        .waitlist-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .waitlist-btn:hover { background: #0077ed; }
+        .waitlist-success {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--success);
+            font-size: 14px;
+            padding: 10px 0;
         }
 
         /* Trust Section */
@@ -678,34 +1065,173 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav { padding: 0 20px; }
+            /* Nav */
+            .nav { padding: 0 16px; height: 56px; }
+            .nav-logo { font-size: 15px; }
+            .nav-logo img { width: 28px; height: 28px; }
             .nav-links { display: none; }
-            .hero { padding: 80px 20px 40px; }
-            .hero h1 { font-size: 42px; }
-            .hero h2 { font-size: 28px; }
-            .hero p { font-size: 17px; }
-            .stats-bar { gap: 24px; padding: 40px 20px; }
-            .stat-value { font-size: 36px; }
-            .section { padding: 80px 20px; }
-            .section-title { font-size: 32px; }
-            .section-desc { font-size: 17px; margin-bottom: 40px; }
-            .features {
-                grid-template-columns: 1fr !important;
-                max-width: 100% !important;
+            .nav-toggle { display: block; font-size: 22px; padding: 6px; }
+
+            /* Nav mobile dropdown */
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                background: rgba(255,255,255,0.97);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 8px 0 16px;
+                gap: 0;
+                border-bottom: 1px solid var(--card-border);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+                z-index: 999;
             }
-            .feature-card { padding: 32px 24px; }
-            .faces-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px; }
-            .modal-content { padding: 32px 24px; margin: 20px; }
-            .hero-btns { flex-direction: column; gap: 12px; }
-            .btn { width: 100%; justify-content: center; }
-            .contact-card { padding: 32px 24px; }
+            .nav-links.show { display: flex; }
+            .nav-links a {
+                padding: 14px 20px;
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+                font-size: 15px;
+                color: var(--text);
+                text-align: left;
+            }
+            .nav-links a:last-child { border-bottom: none; }
+
+            /* Hero */
+            .hero { min-height: 100svh; height: auto; padding: 72px 20px 60px; }
+            .hero h1 { font-size: 40px; line-height: 1.15; }
+            .hero h2 { font-size: 24px; margin-top: 12px; }
+            .hero p { font-size: 16px; margin-top: 16px; }
+            .hero-btns { flex-direction: column; gap: 12px; margin-top: 32px; }
+            .btn { width: 100%; justify-content: center; min-height: 52px; font-size: 16px; padding: 14px 24px; }
+            .btn-primary { font-size: 16px; }
+            .hero-badge { font-size: 12px; padding: 6px 14px; margin-bottom: 20px; }
+
+            /* Stats */
+            .stats-bar { gap: 0; padding: 40px 16px; flex-direction: row; justify-content: space-around; }
+            .stat-item { flex: 1; min-width: 0; }
+            .stat-value { font-size: 30px; }
+            .stat-label { font-size: 12px; }
+
+            /* Sections */
+            .section { padding: 60px 16px; }
+            .section-title { font-size: 28px; line-height: 1.2; }
+            .section-desc { font-size: 15px; margin-bottom: 32px; line-height: 1.6; }
+
+            /* Features */
+            .features { grid-template-columns: 1fr !important; max-width: 100% !important; gap: 16px; }
+            .feature-card { padding: 24px 20px; border-radius: 16px; }
+            .feature-card h3 { font-size: 18px; }
+            .feature-card p { font-size: 14px; line-height: 1.6; }
+
+            /* Trust section */
+            .trust-section { padding: 40px 16px; }
+            .trust-subtitle { font-size: 12px; margin-bottom: 20px; }
+            .trust-badge { font-size: 12px; padding: 8px 16px; }
+            .trust-logos { gap: 8px; flex-wrap: wrap; justify-content: center; }
+            .trust-logos img { height: 20px; opacity: 0.7; }
+
+            /* Faces grid */
+            .faces-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
+            .face-card { border-radius: 12px; }
+            .face-card img { border-radius: 12px 12px 0 0; }
+
+            /* Modal */
+            .modal { padding: 0; align-items: flex-end; }
+            .modal-content {
+                padding: 28px 20px;
+                margin: 0;
+                border-radius: 20px 20px 0 0;
+                max-width: 100%;
+                width: 100%;
+                max-height: 92vh;
+                overflow-y: auto;
+            }
+            .modal-title { font-size: 22px; }
+            .modal-subtitle { font-size: 14px; margin-bottom: 24px; }
+
+            /* Forms */
+            .form-input { padding: 14px 16px; font-size: 16px; min-height: 48px; border-radius: 10px; }
+            .form-btn { min-height: 48px; font-size: 16px; border-radius: 10px; padding: 14px; }
+            .form-group { margin-bottom: 14px; }
+            .upload-zone { padding: 16px; }
+
+            /* CTA section */
+            .cta-section { padding: 60px 16px; }
+            .btn[style*="20px 48px"] { font-size: 17px !important; padding: 16px 32px !important; min-height: 52px; }
+
+            /* Contact */
+            .contact-section { padding: 60px 16px; }
+            .contact-card { padding: 28px 20px; border-radius: 20px; }
+            .contact-card h2 { font-size: 24px; }
+            .contact-card p { font-size: 14px; }
+            .contact-email { font-size: 15px; padding: 14px 20px; width: 100%; justify-content: center; border-radius: 10px; }
+            .form-textarea { font-size: 16px; min-height: 100px; border-radius: 10px; }
+
+            /* Tabs */
+            .auth-tabs { gap: 0; margin-bottom: 24px; }
+            .auth-tab { flex: 1; padding: 12px; font-size: 14px; border-radius: 0; }
+            .auth-tab:first-child { border-radius: 10px 0 0 10px; }
+            .auth-tab:last-child { border-radius: 0 10px 10px 0; }
+
+            /* Lang selector */
+            .lang-selector { top: 64px; right: 12px; gap: 6px; }
+            .lang-btn { padding: 5px 10px; font-size: 11px; }
+
+            /* Toast */
+            .toast { min-width: 200px; font-size: 14px; padding: 12px 20px; border-radius: 12px; }
+
+            /* Radar mobile */
+            .radar-section { padding: 60px 16px; }
+            .radar-wrap { flex-direction: column; gap: 24px; }
+            .radar-left { flex: none; width: 100%; display: flex; flex-direction: column; align-items: center; }
+            .radar-sweep { width: 200px; height: 200px; }
+            .radar-urls { width: 100%; }
+            .radar-right { width: 100%; }
+            .radar-stat { padding: 16px 20px; }
+            .radar-stat-num { font-size: 28px; }
+
+            /* Testnet banner mobile */
+            .testnet-banner { padding: 20px 16px; }
+            .testnet-inner { flex-direction: column; gap: 16px; }
+            .testnet-left { min-width: 0; }
+            .testnet-right { flex: none; width: 100%; }
+            .waitlist-form { flex-direction: column; }
+            .waitlist-btn { width: 100%; padding: 12px; }
+
+            /* Hash preview mobile */
+            .hash-preview-inner { min-width: 0; width: 100%; padding: 16px 20px; }
+            .hash-value { font-size: 12px; }
+
+            /* Features mobile */
+            .features { gap: 16px; }
+            .feature-card { padding: 24px 20px; }
+            .feature-icon { width: 48px; height: 48px; }
+            .feature-icon svg { width: 24px; height: 24px; }
         }
 
         @media (max-width: 480px) {
-            .hero h1 { font-size: 36px; }
-            .faces-grid { grid-template-columns: 1fr !important; }
-            .stat-value { font-size: 28px; }
-            .section-title { font-size: 28px; }
+            .hero { padding: 64px 16px 48px; }
+            .hero h1 { font-size: 34px; }
+            .hero h2 { font-size: 20px; }
+            .hero p { font-size: 15px; }
+            .hero-badge { font-size: 11px; }
+            .stats-bar { padding: 32px 8px; }
+            .stat-value { font-size: 26px; }
+            .stat-label { font-size: 11px; }
+            .section { padding: 48px 16px; }
+            .section-title { font-size: 24px; }
+            .section-desc { font-size: 14px; }
+            .feature-card { padding: 20px 16px; }
+            .feature-card h3 { font-size: 16px; }
+            .contact-card { padding: 24px 16px; }
+            .contact-card h2 { font-size: 22px; }
+            .modal-content { padding: 24px 16px; }
+            .modal-title { font-size: 20px; }
+            .btn { font-size: 15px; min-height: 48px; padding: 12px 20px; }
+            .btn[style*="20px 48px"] { font-size: 16px !important; padding: 14px 24px !important; }
         }
 
         /* Mobile Nav Toggle */
@@ -719,28 +1245,7 @@
             padding: 8px;
         }
 
-        @media (max-width: 768px) {
-            .nav-toggle { display: block; }
-            .nav-links {
-                display: none;
-                position: fixed;
-                top: 48px;
-                left: 0;
-                right: 0;
-                background: rgba(0,0,0,0.95);
-                backdrop-filter: blur(20px);
-                flex-direction: column;
-                padding: 20px;
-                gap: 0;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
-            .nav-links.show { display: flex; }
-            .nav-links a {
-                padding: 16px 0;
-                border-bottom: 1px solid rgba(255,255,255,0.05);
-                font-size: 16px;
-            }
-        }
+        /* Mobile Nav Toggle — merged into 768px block above */
 
         /* Contact Section */
         .contact-section {
@@ -807,12 +1312,6 @@
             border-color: var(--accent);
         }
 
-        @media (max-width: 768px) {
-            .contact-section { padding: 60px 16px; }
-            .contact-card { padding: 32px 24px; border-radius: 20px; }
-            .contact-card h2 { font-size: 26px; }
-            .contact-email { font-size: 16px; padding: 14px 24px; }
-        }
     </style>
 </head>
 <body>
@@ -837,12 +1336,26 @@
     </nav>
 
     <!-- Hero -->
-    <section class="hero">
+    <section class="hero" id="heroSection">
+        <!-- Hash flow light overlay -->
+        <div class="hash-flow" id="hashFlow"></div>
+        <div class="hash-preview" id="hashPreview">
+            <div class="hash-preview-inner">
+                <div class="hash-label" data-i18n="hash_label">哈希存证预览</div>
+                <div class="hash-value" id="hashValue">0x7f3d...a8c1</div>
+                <div class="hash-bar-wrap"><div class="hash-bar" id="hashBar"></div></div>
+                <div class="hash-status" id="hashStatus" data-i18n="hash_waiting">等待上传...</div>
+            </div>
+        </div>
         <h1>PortraitPay AI</h1>
-        <h2 data-i18n="hero_title">肖像版权数据库</h2>
+        <h2 data-i18n="hero_title">让你的每一张肖像，都成为受保护的数字资产</h2>
         <p data-i18n="hero_desc">为AI时代构建可信的肖像权保护体系。<br>您的肖像值得尊重。</p>
         <div class="hero-btns">
-            <button class="btn btn-primary" onclick="openModal('register')">
+            <button class="btn btn-primary hero-upload-btn" id="heroUploadBtn" onclick="triggerHashFlow()">
+                <span data-i18n="btn_upload_demo">体验上链演示</span>
+                <span>⚡</span>
+            </button>
+            <button class="btn btn-outline" onclick="openModal('register')">
                 <span data-i18n="btn_register">免费注册</span>
                 <span>→</span>
             </button>
@@ -871,25 +1384,114 @@
         <p class="section-desc" data-i18n="features_desc">在这里,每一位明星的肖像权都能得到尊重和保护</p>
 
         <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
+            <div class="feature-card" style="transition-delay: 0.05s">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
                 <h3 data-i18n="feature1_title">版权保护</h3>
                 <p data-i18n="feature1_desc">区块链时间戳技术,确保每一次授权都可追溯</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
+            <div class="feature-card" style="transition-delay: 0.1s">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
                 <h3 data-i18n="feature2_title">收益分成</h3>
                 <p data-i18n="feature2_desc">AI调用您的肖像,您获得收益。1%平台服务费</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
+            <div class="feature-card" style="transition-delay: 0.15s">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
                 <h3 data-i18n="feature3_title">全模型适配</h3>
                 <p data-i18n="feature3_desc">标准API接口,适配ChatGPT、Claude、Midjourney等所有AI</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
+            <div class="feature-card" style="transition-delay: 0.2s">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                </div>
                 <h3 data-i18n="feature4_title">多端支持</h3>
                 <p data-i18n="feature4_desc">网页、iOS、Android多端同步管理</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Radar Monitoring Demo -->
+    <section class="radar-section">
+        <div class="section-inner">
+            <h2 class="section-title" data-i18n="radar_title">实时侵权监测</h2>
+            <p class="section-desc" data-i18n="radar_desc">AI 正在全网扫描您的肖像使用情况，发现疑似侵权即刻预警</p>
+            <div class="radar-wrap">
+                <div class="radar-left">
+                    <div class="radar-sweep" id="radarSweep"></div>
+                    <div class="radar-center-dot"></div>
+                    <div class="radar-urls" id="radarUrls">
+                        <div class="radar-url-item radar-url-scanning">
+                            <span class="radar-url-dot"></span>
+                            <span class="radar-url-text">scanning://weibo.com/search...</span>
+                        </div>
+                        <div class="radar-url-item radar-url-scanning">
+                            <span class="radar-url-dot"></span>
+                            <span class="radar-url-text">scanning://xiaohongshu.com/...</span>
+                        </div>
+                        <div class="radar-url-item radar-url-scanning">
+                            <span class="radar-url-dot"></span>
+                            <span class="radar-url-text">scanning://twitter.com/...</span>
+                        </div>
+                        <div class="radar-url-item radar-url-done">
+                            <span class="radar-url-dot radar-url-dot-done"></span>
+                            <span class="radar-url-text">scanning://zhihu.com/...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="radar-right">
+                    <div class="radar-stat">
+                        <div class="radar-stat-num" id="radarScanned">0</div>
+                        <div class="radar-stat-label" data-i18n="radar_scanned">已扫描URL</div>
+                    </div>
+                    <div class="radar-stat">
+                        <div class="radar-stat-num" id="radarFound">0</div>
+                        <div class="radar-stat-label" data-i18n="radar_found">疑似侵权</div>
+                    </div>
+                    <div class="radar-stat">
+                        <div class="radar-stat-num" id="radarProtected">0</div>
+                        <div class="radar-stat-label" data-i18n="radar_protected">已保护肖像</div>
+                    </div>
+                    <div class="radar-alerts" id="radarAlerts">
+                        <div class="radar-alert radar-alert-new" id="radarAlert1">
+                            <span class="alert-dot"></span>
+                            <div class="alert-content">
+                                <div class="alert-title">疑似侵权发现</div>
+                                <div class="alert-url">weibo.com/post/12345</div>
+                            </div>
+                        </div>
+                        <div class="radar-alert" id="radarAlert2">
+                            <span class="alert-dot"></span>
+                            <div class="alert-content">
+                                <div class="alert-title">相似度 87%</div>
+                                <div class="alert-url">xiaohongshu.com/explore/abc</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testnet Warning Banner + Mainnet Waitlist -->
+    <section class="testnet-banner" id="testnetBanner">
+        <div class="testnet-inner">
+            <div class="testnet-left">
+                <div class="testnet-badge">⚠️ <span data-i18n="testnet_badge">测试阶段</span></div>
+                <p data-i18n="testnet_desc">当前运行于 Sepolia 测试网，所有存证数据仅供演示用途。如需正式保护，请预约主网上线。</p>
+            </div>
+            <div class="testnet-right">
+                <div class="waitlist-form" id="waitlistForm">
+                    <input type="email" class="waitlist-input" id="waitlistEmail" placeholder="输入邮箱，预约主网">
+                    <button class="waitlist-btn" onclick="submitWaitlist()" data-i18n="waitlist_btn">预约主网</button>
+                </div>
+                <div class="waitlist-success" id="waitlistSuccess" style="display:none">
+                    <span>✓</span> <span data-i18n="waitlist_success">预约成功！我们会在主网上线时通知您</span>
+                </div>
             </div>
         </div>
     </section>
@@ -1108,7 +1710,19 @@
                 contact_desc: '有疑问或建议?我们随时为您服务',
                 btn_send: '发送消息',
                 page_title: 'PortraitPay AI - 肖像版权数据库',
-                page_desc: '为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。'
+                page_desc: '为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。',
+                hash_label: '哈希存证预览',
+                hash_waiting: '等待上传...',
+                btn_upload_demo: '体验上链演示',
+                radar_title: '实时侵权监测',
+                radar_desc: 'AI 正在全网扫描您的肖像使用情况，发现疑似侵权即刻预警',
+                radar_scanned: '已扫描URL',
+                radar_found: '疑似侵权',
+                radar_protected: '已保护肖像',
+                testnet_badge: '测试阶段',
+                testnet_desc: '当前运行于 Sepolia 测试网，所有存证数据仅供演示用途。如需正式保护，请预约主网上线。',
+                waitlist_btn: '预约主网',
+                waitlist_success: '预约成功！我们会在主网上线时通知您'
             },
             en: {
                 nav_features: 'Features',
@@ -1175,7 +1789,19 @@
                 contact_desc: 'Questions or suggestions? We are here to help',
                 btn_send: 'Send Message',
                 page_title: 'PortraitPay AI - Portrait Rights Database',
-                page_desc: 'Building trusted portrait rights protection for the AI era. Celebrity portraits deserve better respect.'
+                page_desc: 'Building trusted portrait rights protection for the AI era. Celebrity portraits deserve better respect.',
+                hash_label: 'Hash Proof Preview',
+                hash_waiting: 'Waiting for upload...',
+                btn_upload_demo: 'Try On-Chain Demo',
+                radar_title: 'Real-Time Infringement Monitoring',
+                radar_desc: 'AI is scanning the web for unauthorized use of your portrait, alerting you instantly.',
+                radar_scanned: 'URLs Scanned',
+                radar_found: 'Suspected Infringements',
+                radar_protected: 'Portraits Protected',
+                testnet_badge: 'Test Phase',
+                testnet_desc: 'Currently running on Sepolia testnet. All proofs are for demo only. Sign up for mainnet access.',
+                waitlist_btn: 'Join Mainnet',
+                waitlist_success: 'You\'re on the list! We\'ll notify you when we go live.'
             }
         };
 
@@ -1513,6 +2139,126 @@
                 }
             });
         })();
+
+        // ====== Hash Flow Animation ======
+        function triggerHashFlow() {
+            const flow = document.getElementById('hashFlow');
+            const preview = document.getElementById('hashPreview');
+            const bar = document.getElementById('hashBar');
+            const hashVal = document.getElementById('hashValue');
+            const status = document.getElementById('hashStatus');
+            const statusTexts = {
+                zh: ['正在计算哈希...', '区块打包中...', '链上确认...', '存证完成 ✓'],
+                en: ['Computing hash...', 'Packing block...', 'On-chain confirm...', 'Sealed ✓']
+            };
+            const texts = statusTexts[currentLang] || statusTexts.zh;
+
+            flow.classList.add('active');
+            preview.classList.add('visible');
+
+            const chars = '0123456789abcdef';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 2;
+                bar.style.width = Math.min(progress, 100) + '%';
+
+                // Randomize hash
+                let h = '0x';
+                for (let i = 0; i < 12; i++) h += chars[Math.floor(Math.random() * chars.length)];
+                hashVal.textContent = h + '...';
+
+                // Status text
+                if (progress < 30) hashVal.style.color = 'var(--text)';
+                else if (progress < 60) hashVal.style.color = 'var(--accent)';
+                else hashVal.style.color = 'var(--success)';
+
+                const idx = Math.min(Math.floor(progress / 25), texts.length - 1);
+                status.textContent = texts[idx];
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    hashVal.textContent = '0x7f3d·a8c1·e9b4·2d5f';
+                    hashVal.style.color = 'var(--success)';
+                    status.textContent = texts[texts.length - 1];
+                    setTimeout(() => {
+                        flow.classList.remove('active');
+                        preview.classList.remove('visible');
+                        bar.style.width = '0%';
+                        setTimeout(() => { status.textContent = i18n[currentLang].hash_waiting || '等待上传...'; }, 500);
+                    }, 2500);
+                }
+            }, 40);
+        }
+
+        // ====== Feature Card Scroll Reveal ======
+        const featureObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    featureObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.feature-card').forEach((card, i) => {
+            featureObserver.observe(card);
+        });
+
+        // ====== Radar Counter Animation ======
+        const radarObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter('radarScanned', 0, 12847, 2000);
+                    animateCounter('radarFound', 0, 23, 2000);
+                    animateCounter('radarProtected', 0, 1842, 2000);
+                    radarObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        const radarSection = document.querySelector('.radar-section');
+        if (radarSection) radarObserver.observe(radarSection);
+
+        function animateCounter(id, from, to, duration) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const start = performance.now();
+            function step(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                el.textContent = Math.floor(from + (to - from) * eased).toLocaleString();
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // ====== Waitlist Form ======
+        function submitWaitlist() {
+            const email = document.getElementById('waitlistEmail').value.trim();
+            if (!email || !email.includes('@')) {
+                showToast(currentLang === 'zh' ? '请输入有效的邮箱地址' : 'Please enter a valid email');
+                return;
+            }
+            // Save to localStorage (demo)
+            const list = JSON.parse(localStorage.getItem('portrait_waitlist') || '[]');
+            if (list.includes(email)) {
+                showToast(currentLang === 'zh' ? '该邮箱已预约' : 'Already subscribed');
+                return;
+            }
+            list.push(email);
+            localStorage.setItem('portrait_waitlist', JSON.stringify(list));
+            document.getElementById('waitlistForm').style.display = 'none';
+            document.getElementById('waitlistSuccess').style.display = 'flex';
+            showToast(currentLang === 'zh' ? '预约成功！' : 'Subscribed!');
+        }
+
+        // ====== Scroll smooth for all transitions ======
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const target = document.querySelector(a.getAttribute('href'));
+                if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            });
+        });
 
         // Init
         setLang(currentLang);
