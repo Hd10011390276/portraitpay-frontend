@@ -19,7 +19,7 @@
         :root {
             --primary: #0066CC;
             --primary-dark: #004499;
-            --secondary: #6e6e73;
+            --secondary: #86868b;
             --bg: #ffffff;
             --bg-secondary: #f5f5f7;
             --card: #ffffff;
@@ -28,8 +28,8 @@
             --accent: #0066CC;
             --success: #30d158;
             --gradient: linear-gradient(135deg, #2997ff 0%, #0066CC 100%);
-            --nav-bg: rgba(255,255,255,0.9);
-            --nav-border: rgba(0,0,0,0.1);
+            --nav-bg: rgba(10,10,15,0.92);
+            --nav-border: rgba(255,255,255,0.08);
             --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
             --card-border: rgba(0,0,0,0.08);
         }
@@ -117,6 +117,7 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
+            background: linear-gradient(180deg, rgba(10,10,15,0.04) 0%, var(--bg) 30%);
         }
 
         /* Hash flow light effect */
@@ -161,34 +162,34 @@
             transform: translateY(0) scale(1);
         }
         .hash-preview-inner {
-            background: rgba(255,255,255,0.7);
+            background: rgba(10,10,15,0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(0,102,204,0.2);
+            border: 1px solid rgba(41,151,255,0.25);
             border-radius: 20px;
             padding: 20px 32px;
             min-width: 320px;
-            box-shadow: 0 8px 32px rgba(0,102,204,0.12);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         .hash-label {
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--accent);
+            color: #2997ff;
             margin-bottom: 8px;
         }
         .hash-value {
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
             font-size: 14px;
-            color: var(--text);
+            color: rgba(255,255,255,0.9);
             letter-spacing: 0.05em;
             margin-bottom: 10px;
             transition: all 0.3s ease;
         }
         .hash-bar-wrap {
             height: 3px;
-            background: rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.1);
             border-radius: 2px;
             overflow: hidden;
             margin-bottom: 8px;
@@ -202,7 +203,7 @@
         }
         .hash-status {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: rgba(255,255,255,0.5);
         }
 
         .hero h1 {
@@ -304,8 +305,7 @@
             top: 0;
             left: 0;
             right: 0;
-            
-            background: var(--nav-bg);
+            background: rgba(10,10,15,0.92);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             display: flex;
@@ -313,13 +313,13 @@
             justify-content: space-between;
             padding: 0 48px;
             z-index: 1000;
-            box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 8px rgba(0,0,0,0.2);
         }
 
         .nav-logo {
             font-size: 20px;
             font-weight: 700;
-            color: #000;
+            color: #fff;
             text-decoration: none;
             display: flex;
             align-items: flex-end;
@@ -334,23 +334,23 @@
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: rgba(255,255,255,0.65);
             text-decoration: none;
             font-size: 12px;
             transition: color 0.3s;
         }
 
         .nav-links a:hover {
-            color: var(--text);
+            color: rgba(255,255,255,0.95);
         }
 
         .nav-links a.active-nav {
-            color: #0066CC !important;
-            border-bottom: 2px solid #0066CC;
+            color: #2997ff !important;
+            border-bottom: 2px solid #2997ff;
             padding-bottom: 2px;
         }
         .nav-logo.active-nav {
-            color: #000 !important;
+            color: #fff !important;
         }
 
         /* Features Section */
@@ -1079,22 +1079,22 @@
                 top: 56px;
                 left: 0;
                 right: 0;
-                background: rgba(255,255,255,0.97);
+                background: rgba(10,10,15,0.97);
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
                 flex-direction: column;
                 padding: 8px 0 16px;
                 gap: 0;
-                border-bottom: 1px solid var(--card-border);
-                box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.4);
                 z-index: 999;
             }
             .nav-links.show { display: flex; }
             .nav-links a {
                 padding: 14px 20px;
-                border-bottom: 1px solid rgba(0,0,0,0.05);
+                border-bottom: 1px solid rgba(255,255,255,0.06);
                 font-size: 15px;
-                color: var(--text);
+                color: rgba(255,255,255,0.8);
                 text-align: left;
             }
             .nav-links a:last-child { border-bottom: none; }
