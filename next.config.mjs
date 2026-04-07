@@ -4,8 +4,6 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
 
-  // Standalone output required for Docker
-  output: 'standalone',
 
   // Image optimization
   images: {
