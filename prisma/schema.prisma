@@ -1,0 +1,1051 @@
+// ============================================================
+// PortraitPay AI — Schema (No Enums for Neon Free Tier)
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// User
+// ============================================================
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  passwordHash String?
+  phone        String? @unique
+
+  // Role: USER, ARTIST, AGENCY, ENTERPRISE, CELEBRITY, ADMIN, VERIFIER
+  role           String  @default("USER")
+  // KYC Status: NOT_STARTED, PENDING, APPROVED, REJECTED, EXPIRED
+  kycStatus      String  @default("NOT_STARTED")
+  kycProviderRef String?
+  kycVerifiedAt  DateTime?
+  kycExpiredAt   DateTime?
+
+  walletAddress    String? @unique
+  stripeCustomerId String?
+
+  displayName String?
+  bio         String?
+
+  // OTP fields
+  otpCode    String?
+  otpExpires DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  portraits             Portrait[]
+  authorizations        Authorization[]      @relation("AuthGranter")
+  granteeAuthorizations Authorization[]      @relation("AuthGrantee")
+  licenses              License[]
+  transactions          Transaction[]
+  infringementReports   InfringementReport[] @relation("ReportDefendant")
+  myReports             InfringementReport[] @relation("ReportPlaintiff")
+  kycLogs               KYCLog[]
+  celebrityApplications CelebrityApplication[]
+
+  withdrawals Withdrawal[]
+  settlements Settlement[]
+  auditLogs   AuditLog[]   @relation("AuditAdmin")
+
+  monitorConfig InfringementMonitorConfig?
+
+  accounts        Account[]
+  sessions        Session[]
+  name            String?
+  image           String?
+  emailVerified   DateTime?
+  notifications   Notification[]
+  userAuditLogs   UserAuditLog[]
+  apiKeys         ApiKey[]
+  aicontents      AIContent[]
+  ipregistrations IPRegistration[]
+
+  @@index([walletAddress])
+  @@index([kycStatus])
+}
+
+// ============================================================
+// Portrait
+// ============================================================
+
+model Portrait {
+  id String @id @default(cuid())
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  title       String
+  description String?
+  category    String   @default("general")
+  tags        String[] @default([])
+
+  originalImageUrl String?
+  thumbnailUrl     String?
+  imageHash        String? @unique
+
+  blockchainTxHash  String?   @unique
+  blockchainNetwork String?   @default("sepolia")
+  ipfsCid           String?
+  certifiedAt       DateTime?
+
+  // Status: DRAFT, UNDER_REVIEW, ACTIVE, SUSPENDED, ARCHIVED
+  status        String @default("DRAFT")
+  faceEmbedding Float[]
+
+  isPublic Boolean @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  authorizations Authorization[]
+  licenses       License[]
+  reports        InfringementReport[]
+  entAuthApplications EntAuthApplication[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([imageHash])
+}
+
+// ============================================================
+// Authorization
+// ============================================================
+
+model Authorization {
+  id String @id @default(cuid())
+
+  portraitId String
+  portrait   Portrait @relation(fields: [portraitId], references: [id])
+
+  granterId String
+  granteeId String
+  grantee   User   @relation("AuthGrantee", fields: [granteeId], references: [id])
+  granter   User   @relation("AuthGranter", fields: [granterId], references: [id])
+
+  // License Type: EXCLUSIVE, NON_EXCLUSIVE, SEMI_EXCLUSIVE, EDITORIAL, PERSONAL
+  licenseType      String
+  usageScope       String[]    @default([])
+  exclusivity      Boolean     @default(false)
+  territorialScope String      @default("global")
+
+  startDate DateTime
+  endDate   DateTime?
+
+  licenseFee Decimal @db.Decimal(12, 2)
+  currency   String  @default("USD")
+
+  terms String @db.Text
+
+  contractHash    String? @unique
+  contractIpfsCid String?
+
+  // Status: PENDING, ACTIVE, EXPIRED, REVOKED, REJECTED
+  status String @default("PENDING")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  licenses    License[]
+  transaction Transaction?
+  entAuthApplication EntAuthApplication?
+
+  @@index([portraitId])
+  @@index([granteeId])
+  @@index([status])
+}
+
+// ============================================================
+// Transaction
+// ============================================================
+
+model Transaction {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Type: LICENSE_PURCHASE, LICENSE_RENEWAL, ROYALTY_PAYOUT, KYC_REFUND, PLATFORM_FEE, WITHDRAWAL, SETTLEMENT, PLATFORM_COMMISSION
+  type   String
+  // Status: PENDING, COMPLETED, FAILED, REFUNDED, DISPUTED
+  status String @default("PENDING")
+
+  amount   Decimal @db.Decimal(12, 2)
+  currency String  @default("USD")
+
+  authorizationId String?        @unique
+  authorization   Authorization? @relation(fields: [authorizationId], references: [id])
+
+  stripePaymentIntentId String? @unique
+  stripeInvoiceId       String?
+
+  royaltyRecipient String?
+  royaltyPaid      Boolean @default(false)
+  royaltyTxHash    String?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([stripePaymentIntentId])
+}
+
+// ============================================================
+// InfringementReport
+// ============================================================
+
+model InfringementReport {
+  id String @id @default(cuid())
+
+  reporterId String
+  reporter   User   @relation("ReportPlaintiff", fields: [reporterId], references: [id])
+
+  defendantId String?
+  defendant   User?   @relation("ReportDefendant", fields: [defendantId], references: [id])
+
+  portraitId String
+  portrait   Portrait @relation(fields: [portraitId], references: [id])
+
+  // Type: UNAUTHORIZED_USE, EXPIRED_LICENSE, SCOPE_VIOLATION, RESALE, DEEPFAKE
+  type String
+
+  evidenceUrls     String[] @default([])
+  evidenceHash     String?
+  originalImageUrl String?
+
+  description String    @db.Text
+  detectedUrl String?
+  detectedAt  DateTime?
+
+  // Status: PENDING_REVIEW, VALIDATED, REJECTED, SETTLED, LEGAL_ACTION
+  status String @default("PENDING_REVIEW")
+
+  verifierId String?
+  verifiedAt DateTime?
+  resolution String?   @db.Text
+
+  reportHash    String? @unique
+  reportIpfsCid String?
+
+  // Source: MANUAL, AUTO
+  source String @default("MANUAL")
+
+  similarityScore Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  alertId String? @unique
+
+  notices InfringementNotice[]
+
+  @@index([portraitId])
+  @@index([reporterId])
+  @@index([status])
+  @@index([source])
+}
+
+// ============================================================
+// InfringementAlert
+// ============================================================
+
+model InfringementAlert {
+  id String @id @default(cuid())
+
+  portraitId String
+
+  sourceUrl  String
+  sourceName String
+  sourceType String
+
+  similarityScore  Float
+  matchedEmbedding Float[]
+
+  screenshotUrl  String?
+  screenshotHash String?
+
+  pageTitle       String?
+  pageDescription String?
+  authorName      String?
+  publishedAt     DateTime?
+
+  // Status: PENDING, CONFIRMED, FALSE_POSITIVE, EXPIRED
+  status String @default("PENDING")
+
+  ownerId          String?
+  ownerConfirmedAt DateTime?
+  ownerDecision    String?
+
+  reportId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([portraitId])
+  @@index([status])
+  @@index([sourceName])
+}
+
+// ============================================================
+// InfringementMonitorConfig
+// ============================================================
+
+model InfringementMonitorConfig {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  enabled Boolean @default(true)
+
+  similarityThreshold Float @default(0.85)
+
+  enabledPlatforms  String[] @default([])
+  excludedPlatforms String[] @default([])
+
+  notifyEmail  Boolean @default(true)
+  notifySms    Boolean @default(false)
+  notifyWechat Boolean @default(false)
+
+  quietHoursStart String?
+  quietHoursEnd   String?
+
+  highPriorityMuteExempt Boolean @default(true)
+
+  scanIntervalHours Int @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// InfringementNotice
+// ============================================================
+
+model InfringementNotice {
+  id String @id @default(cuid())
+
+  reportId String
+  report   InfringementReport @relation(fields: [reportId], references: [id])
+
+  // Type: TAKEDOWN, WARNING, LEGAL
+  type String @default("TAKEDOWN")
+
+  recipientName    String
+  recipientEmail   String?
+  recipientPhone   String?
+  recipientAddress String? @db.Text
+
+  subject      String
+  body         String  @db.Text
+  renderedHtml String? @db.Text
+
+  attachmentUrl String?
+
+  // Channel: EMAIL, POST, API
+  channel String @default("EMAIL")
+
+  // Status: DRAFT, SENT, RECEIVED, ACKNOWLEDGED, COMPLIED, REJECTED, ESCALATED
+  status String @default("DRAFT")
+
+  sentAt DateTime?
+
+  notarizationId   String?
+  notarizationCert String?
+  notarizedAt      DateTime?
+
+  noticeHash    String? @unique
+  noticeIpfsCid String?
+
+  responseReceivedAt DateTime?
+  responseContent    String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reportId])
+  @@index([status])
+}
+
+// ============================================================
+// EvidencePackage
+// ============================================================
+
+model EvidencePackage {
+  id String @id @default(cuid())
+
+  reportId String? @unique
+  alertId  String? @unique
+
+  evidenceType String
+  evidenceUrl  String
+  evidenceKey  String?
+
+  capturedAt DateTime @default(now())
+  capturedBy String   @default("SYSTEM")
+
+  contentHash String @unique
+
+  pageUrl         String?
+  pageTitle       String?
+  pageSnapshotUrl String?
+
+  ipfsCid String?
+
+  notarized      Boolean @default(false)
+  notarizationId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// KYCLog
+// ============================================================
+
+model KYCLog {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  provider    String
+  externalRef String?
+  action      String
+  result      Json?
+
+  level          Int?
+  idCardNumber   String?
+  idCardName     String?
+  idCardAddress  String?
+  idCardExpire   DateTime?
+  faceMatchScore Float?
+  ocrRawData     Json?
+  faceRawData    Json?
+  rejectReason   String?
+  verifierId     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ============================================================
+// CelebrityApplication
+// ============================================================
+
+model CelebrityApplication {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  stageName       String
+  realName        String
+  idCardNumber    String
+  idCardFrontUrl  String
+  idCardBackUrl   String
+  authLetterUrl   String
+  authLetterHash  String?
+  notaryCertUrl   String?
+
+  agencyName    String?
+  agencyContact String?
+  agencyPhone   String?
+
+  // Status: PENDING_REVIEW, APPROVED, REJECTED
+  status String @default("PENDING_REVIEW")
+
+  reviewerId      String?
+  reviewedAt      DateTime?
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================================
+// License
+// ============================================================
+
+model License {
+  id String @id @default(cuid())
+
+  authorizationId String
+  authorization   Authorization @relation(fields: [authorizationId], references: [id])
+
+  portraitId String
+  portrait   Portrait @relation(fields: [portraitId], references: [id])
+
+  licenseeId String
+  user       User   @relation(fields: [licenseeId], references: [id])
+
+  startDate DateTime
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([portraitId])
+  @@index([licenseeId])
+}
+
+// ============================================================
+// Enterprise
+// ============================================================
+
+model Enterprise {
+  id String @id @default(cuid())
+
+  userId String @unique
+
+  companyName       String
+  unifiedCreditCode String    @unique
+  legalPersonName   String
+  legalPersonIdCard String
+  registeredCapital String?
+  establishedDate   DateTime?
+  businessTerm      String?
+  businessScope     String?   @db.Text
+
+  licenseImageUrl           String
+  legalPersonIdCardFrontUrl String?
+  legalPersonIdCardBackUrl  String?
+
+  contactName  String
+  contactPhone String
+  contactEmail String
+
+  // Status: PENDING, APPROVED, REJECTED, EXPIRED
+  status          String @default("PENDING")
+  reviewerId      String?
+  reviewedAt      DateTime?
+  rejectionReason String?          @db.Text
+
+  isAgency         Boolean @default(false)
+  agencyLicenseUrl String?
+
+  validUntil DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  entAuthApplications EntAuthApplication[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================================
+// AgencyArtist
+// ============================================================
+
+model AgencyArtist {
+  id String @id @default(cuid())
+
+  agencyId String
+  artistId String
+
+  proxyAgreementUrl String?
+  proxyStartDate    DateTime?
+  proxyEndDate      DateTime?
+  // Status: ACTIVE, EXPIRED, REVOKED
+  proxyStatus String @default("ACTIVE")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([agencyId, artistId])
+  @@index([agencyId])
+  @@index([artistId])
+}
+
+// ============================================================
+// EntAuthApplication
+// ============================================================
+
+model EntAuthApplication {
+  id String @id @default(cuid())
+
+  enterpriseId String
+  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id])
+
+  portraitId String
+  portrait   Portrait   @relation(fields: [portraitId], references: [id])
+
+  purpose          String   @db.Text
+  usageScope       String[] @default([])
+  exclusivity      Boolean  @default(false)
+  territorialScope String   @default("global")
+  usageDuration    Int
+
+  proposedFee Decimal @db.Decimal(12, 2)
+  currency    String  @default("CNY")
+
+  // Status: PENDING_PORTRAIT_OWNER, PENDING_PLATFORM_REVIEW, APPROVED, REJECTED, REVOKED, EXPIRED
+  status String @default("PENDING_PORTRAIT_OWNER")
+
+  portraitOwnerConfirmedAt DateTime?
+  portraitOwnerConfirmed   Boolean   @default(false)
+
+  platformReviewerId      String?
+  platformReviewedAt      DateTime?
+  platformRejectionReason String?   @db.Text
+
+  authorizationId String?   @unique
+  authorization  Authorization? @relation(fields: [authorizationId], references: [id])
+
+  contractHash    String? @unique
+  contractIpfsCid String?
+
+  certificateNo String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enterpriseId])
+  @@index([portraitId])
+  @@index([status])
+}
+
+// ============================================================
+// AuthorizationCertificate
+// ============================================================
+
+model AuthorizationCertificate {
+  id String @id @default(cuid())
+
+  applicationId   String @unique
+  authorizationId String @unique
+
+  certificateNo String    @unique
+  issuedAt      DateTime  @default(now())
+  expiresAt     DateTime?
+
+  pdfUrl String?
+
+  blockchainTxHash  String?
+  blockchainNetwork String?
+
+  portraitOwnerSigned Boolean @default(false)
+  enterpriseSigned    Boolean @default(false)
+  platformSigned      Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([certificateNo])
+}
+
+// ============================================================
+// Withdrawal
+// ============================================================
+
+model Withdrawal {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  amount       Decimal  @db.Decimal(12, 2)
+  currency     String   @default("CNY")
+  actualAmount Decimal? @db.Decimal(12, 2)
+  exchangeRate Decimal? @db.Decimal(12, 4)
+
+  bankName         String?
+  bankAccount      String?
+  bankAccountLast4 String?
+  accountHolder    String?
+
+  // Status: PENDING, PROCESSING, APPROVED, REJECTED, COMPLETED, FAILED
+  status          String @default("PENDING")
+  rejectionReason String?
+  approvedAt      DateTime?
+  approvedBy      String?
+  processedAt     DateTime?
+  completedAt     DateTime?
+
+  stripeTransferId String?
+  stripePayoutId   String?
+
+  settlementId String?
+  settlement   Settlement? @relation(fields: [settlementId], references: [id])
+
+  notes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([settlementId])
+}
+
+// ============================================================
+// Settlement
+// ============================================================
+
+model Settlement {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  periodStart DateTime
+  periodEnd   DateTime
+
+  grossRevenue Decimal @db.Decimal(12, 2)
+  platformFee  Decimal @db.Decimal(12, 2)
+  netRevenue   Decimal @db.Decimal(12, 2)
+
+  withdrawnAmount Decimal @default(0) @db.Decimal(12, 2)
+  pendingAmount   Decimal @default(0) @db.Decimal(12, 2)
+  availableAmount Decimal @default(0) @db.Decimal(12, 2)
+
+  currency String @default("CNY")
+  // Status: PENDING, CALCULATING, COMPLETED, CANCELLED
+  status   String @default("PENDING")
+
+  breakdown Json?
+
+  settledAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  withdrawals Withdrawal[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([periodStart, periodEnd])
+}
+
+// ============================================================
+// AuditLog
+// ============================================================
+
+model AuditLog {
+  id String @id @default(cuid())
+
+  adminId    String
+  admin      User        @relation("AuditAdmin", fields: [adminId], references: [id])
+  targetType String
+  targetId   String
+  // Action: WITHDRAWAL_APPROVE, WITHDRAWAL_REJECT, SETTLEMENT_GENERATE, SETTLEMENT_APPROVE, USER_BALANCE_ADJUST, TRANSACTION_FLAG
+  action     String
+  before     Json?
+  after      Json?
+  reason     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+}
+
+// ============================================================
+// Notification
+// ============================================================
+
+model Notification {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Type: SYSTEM, AUTHORIZATION, EARNING, INFRINGEMENT, KYC, SETTLEMENT, WITHDRAWAL
+  type  String @default("SYSTEM")
+  title String
+  body  String           @db.Text
+  data  Json?
+
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  // Channel: IN_APP, WEBSOCKET, EMAIL, SMS
+  channel String @default("IN_APP")
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+}
+
+// ============================================================
+// UserAuditLog
+// ============================================================
+
+model UserAuditLog {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Action: LOGIN, LOGIN_FAILED, LOGOUT, OTP_SENT, OTP_VERIFIED, OTP_FAILED, PROFILE_UPDATE, PHONE_BIND, PHONE_UNBIND, WALLET_BIND, WALLET_UNBIND, KYC_SUBMITTED, KYC_APPROVED, KYC_REJECTED, KYC_EXPIRED, PORTRAIT_REGISTERED, PORTRAIT_UPDATED, PORTRAIT_SUSPENDED, PORTRAIT_DELETED, AUTH_REQUEST_SENT, AUTH_APPROVED, AUTH_REJECTED, AUTH_REVOKED, AUTH_CERTIFICATE_DOWNLOADED, EARNINGS_WITHDRAWN, EARNINGS_EXPORTED, SETTLEMENT_VIEWED, NOTIFICATION_SETTINGS_UPDATED, MONITOR_CONFIG_UPDATED, API_KEY_CREATED, API_KEY_DELETED, API_KEY_ROTATED
+  action    String
+  ipAddress String?
+  userAgent String?
+
+  targetType String?
+  targetId   String?
+
+  success Boolean @default(true)
+  detail  String? @db.Text
+  meta    Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, action])
+  @@index([action, createdAt])
+}
+
+// ============================================================
+// ApiKey
+// ============================================================
+
+model ApiKey {
+  id String @id @default(cuid())
+
+  name String
+
+  keyHash String @unique
+  keyPrefix String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Status: ACTIVE, SUSPENDED, EXPIRED, REVOKED
+  status String @default("ACTIVE")
+
+  scopes String[] @default([])
+
+  rateLimitPerMinute Int @default(60)
+
+  lastUsedAt   DateTime?
+  requestCount BigInt    @default(0)
+
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([keyHash])
+}
+
+// ============================================================
+// RateLimitRecord
+// ============================================================
+
+model RateLimitRecord {
+  id String @id @default(cuid())
+
+  identifier   String
+  windowStart  DateTime
+  requestCount Int      @default(1)
+
+  @@unique([identifier, windowStart])
+  @@index([identifier, windowStart])
+}
+
+// ============================================================
+// NextAuth
+// ============================================================
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+// AIContent & IPRegistration
+// ============================================================
+
+model AIContent {
+  id String @id @default(cuid())
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  title       String
+  description String?       @db.Text
+  // Content Type: CHARACTER, ARTWORK, MUSIC, TEXT, VIDEO, MODEL_3D, OTHER
+  contentType String @default("CHARACTER")
+
+  generationTool   String
+  generationPrompt String?   @db.Text
+  generationDate   DateTime?
+  modelVersion     String?
+  cfgScale         Float?
+  seed             String?
+  sampler          String?
+
+  originalFileUrl String?
+  thumbnailUrl    String?
+  fileSize        Int?
+  mimeType        String?
+
+  contentHash String? @unique
+
+  ipfsCid String?
+  ipfsUrl String?
+
+  tags String[] @default([])
+
+  copyrightNotice  String?  @db.Text
+  licenseScope     String[] @default([])
+  isPublicDomain   Boolean  @default(false)
+  thirdPartyRights Boolean  @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  ipRegistrations IPRegistration[]
+
+  @@index([ownerId])
+  @@index([contentType])
+  @@index([contentHash])
+}
+
+model IPRegistration {
+  id String @id @default(cuid())
+
+  aiContentId String
+  aiContent   AIContent @relation(fields: [aiContentId], references: [id])
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  title         String
+  description   String? @db.Text
+  certificateNo String  @unique
+
+  // Certificate Type: OWNERSHIP, LICENSE, CREATION, DERIVATIVE
+  certificateType String @default("OWNERSHIP")
+
+  rightsDeclared   String[] @default([])
+  territorialScope String   @default("global")
+  exclusivity      Boolean  @default(false)
+  usageDuration    Int?
+
+  blockchainNetwork  String  @default("sepolia")
+  blockchainTxHash   String? @unique
+  blockchainBlockNum Int?
+  contractAddress    String?
+
+  certificateIpfsCid String?
+  metadataIpfsCid    String?
+
+  certifiedAt DateTime?
+  expiresAt   DateTime?
+  // Status: DRAFT, CERTIFIED, ACTIVE, REVOKED, EXPIRED
+  status      String @default("DRAFT")
+
+  originalityDeclaration String? @db.Text
+  generationToolConfirm  Boolean @default(false)
+
+  thirdPartyClearance Boolean  @default(false)
+  thirdPartyRefs      String[] @default([])
+
+  version       Int     @default(1)
+  previousRegId String?
+
+  metadata Json?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([aiContentId])
+  @@index([ownerId])
+  @@index([status])
+  @@index([certificateNo])
+}
+
+// ============================================================
+// ContactSubmission
+// ============================================================
+
+model ContactSubmission {
+  id String @id @default(cuid())
+
+  // Type: GENERAL, ENTERPRISE
+  type String @default("GENERAL")
+
+  name    String
+  email   String
+  company String?
+
+  subject String?
+  message String  @db.Text
+
+  enterpriseName String?
+  intendedUse    String? @db.Text
+  expectedScale  String?
+  contactPhone   String?
+
+  // Status: NEW, READ, PROCESSING, REPLIED, RESOLVED, CLOSED
+  status     String @default("NEW")
+  adminNotes String? @db.Text
+  handledBy  String?
+  handledAt  DateTime?
+
+  emailSent   Boolean   @default(false)
+  emailSentAt DateTime?
+  emailError  String?
+
+  repliedAt      DateTime?
+  repliedMessage String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
