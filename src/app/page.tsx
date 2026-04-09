@@ -307,9 +307,9 @@ export default function HomePage() {
 
           {/* Right side */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <LanguageToggle />
-            <ThemeToggle />
-            <Link href="/login" className="btn btn-secondary btn-sm">{t.nav.signIn}</Link>
+            <span className="hidden-mobile"><LanguageToggle /></span>
+            <span className="hidden-mobile"><ThemeToggle /></span>
+            <Link href="/login" className="btn btn-secondary btn-sm hidden-mobile">{t.nav.signIn}</Link>
           </div>
         </div>
       </header>
@@ -373,7 +373,7 @@ export default function HomePage() {
               </Link>
               <Link href="#how-it-works" className="btn btn-secondary btn-lg">
                 {t.hero.cta2}
-                <IconArrowRight style={{ width: "16px", height: "16px" }} />
+                <span style={{ width: "16px", height: "16px", display: "inline-flex", flexShrink: 0 }}><IconArrowRight /></span>
               </Link>
             </div>
 
