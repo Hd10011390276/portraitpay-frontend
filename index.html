@@ -32,7 +32,147 @@
             --nav-border: rgba(255,255,255,0.08);
             --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
             --card-border: rgba(0,0,0,0.08);
+            --logo-src: url('logo.png');
         }
+
+        /* Dark mode — manual toggle + system preference */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #000000;
+                --bg-secondary: #1c1c1e;
+                --card: #1c1c1e;
+                --text: #f5f5f7;
+                --text-secondary: #98989d;
+                --nav-bg: rgba(10,10,15,0.95);
+                --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+                --card-border: rgba(255,255,255,0.1);
+                --logo-src: url('logo-white.png');
+            }
+        }
+
+        [data-theme="dark"] {
+            --bg: #000000;
+            --bg-secondary: #1c1c1e;
+            --card: #1c1c1e;
+            --text: #f5f5f7;
+            --text-secondary: #98989d;
+            --nav-bg: rgba(10,10,15,0.95);
+            --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --card-border: rgba(255,255,255,0.1);
+            --logo-src: url('logo-white.png');
+        }
+
+        /* Dark mode override for light-mode-marked elements */
+        [data-theme="dark"] body,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) body {
+                background: var(--bg);
+                color: var(--text);
+            }
+        }
+
+        /* Dark mode: logo turns white via filter */
+        [data-theme="dark"] .nav-logo img,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .nav-logo img {
+                filter: brightness(0) invert(1);
+            }
+        }
+
+        /* Dark mode — hardcoded color overrides */
+        [data-theme="dark"] .hero h1,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .hero h1 { color: #f5f5f7; }
+        }
+        [data-theme="dark"] .hero h2,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .hero h2 { color: #e5e5e7; }
+        }
+        [data-theme="dark"] .hero p,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .hero p { color: #98989d; }
+        }
+        [data-theme="dark"] .hero-badge,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .hero-badge { background: rgba(255,255,255,0.12); color: #e5e5e7; border-color: rgba(255,255,255,0.2); }
+        }
+        [data-theme="dark"] .section-title,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .section-title { color: #f5f5f7; }
+        }
+        [data-theme="dark"] .section-desc,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .section-desc { color: #98989d; }
+        }
+        [data-theme="dark"] .feature-card,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .feature-card { background: #1c1c1e; border-color: rgba(255,255,255,0.1); }
+        }
+        [data-theme="dark"] .feature-card h3,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .feature-card h3 { color: #f5f5f7; }
+        }
+        [data-theme="dark"] .feature-card p,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .feature-card p { color: #98989d; }
+        }
+        [data-theme="dark"] .contact-card,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .contact-card { background: #1c1c1e; }
+        }
+        [data-theme="dark"] .form-input,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .form-input { background: #2c2c2e; border-color: rgba(255,255,255,0.15); color: #f5f5f7; }
+        }
+        [data-theme="dark"] .form-textarea,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .form-textarea { background: #2c2c2e; border-color: rgba(255,255,255,0.15); color: #f5f5f7; }
+        }
+        [data-theme="dark"] .upload-zone,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .upload-zone { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+        }
+        [data-theme="dark"] .contact-email,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .contact-email { background: #2c2c2e; color: #f5f5f7; }
+        }
+        [data-theme="dark"] .face-card,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .face-card { background: #1c1c1e; border-color: rgba(255,255,255,0.1); }
+        }
+        [data-theme="dark"] .face-name,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .face-name { color: #f5f5f7; }
+        }
+        [data-theme="dark"] .faces-tab,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .faces-tab { background: #2c2c2e; color: #f5f5f7; }
+        }
+        [data-theme="dark"] .faces-search-input,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .faces-search-input { background: #2c2c2e; border-color: rgba(255,255,255,0.15); color: #f5f5f7; }
+        }
+        [data-theme="dark"] .faces-page-btn,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .faces-page-btn { background: #2c2c2e; color: #f5f5f7; border-color: rgba(255,255,255,0.1); }
+        }
+        [data-theme="dark"] .toast,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .toast { background: #2c2c2e; color: #f5f5f7; }
+        }
+        [data-theme="dark"] .modal-overlay-bg,
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .modal-overlay-bg { background: rgba(0,0,0,0.85); }
+        }
+
+        /* Dark mode — nav mobile dropdown text */
+        @media (max-width: 768px) {
+            [data-theme="dark"] .nav-links.show a { color: #f5f5f7; }
+        }
+
+        /* Dark toggle — ensure visible in dark mode */
+        [data-theme="dark"] .dark-toggle { color: #f5f5f7 !important; }
+        [data-theme="dark"] .dark-toggle:hover { background: rgba(255,255,255,0.1) !important; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -1071,6 +1211,7 @@
             .nav-logo img { width: 28px; height: 28px; }
             .nav-links { display: none; }
             .nav-toggle { display: block; font-size: 22px; padding: 6px; }
+            .dark-toggle { font-size: 17px !important; padding: 5px 6px !important; }
 
             /* Nav mobile dropdown */
             .nav-links {
@@ -1176,8 +1317,8 @@
             .auth-tab:first-child { border-radius: 10px 0 0 10px; }
             .auth-tab:last-child { border-radius: 0 10px 10px 0; }
 
-            /* Lang selector */
-            .lang-selector { top: 64px; right: 12px; gap: 6px; }
+            /* Lang selector — hide on mobile, default zh-CN */
+            .lang-selector { display: none; }
             .lang-btn { padding: 5px 10px; font-size: 11px; }
 
             /* Toast */
@@ -1324,6 +1465,7 @@
     <!-- Nav -->
     <nav class="nav">
         <a href="#" class="nav-logo"><img src="logo.png" alt="PortraitPay AI"> PortraitPay AI</a>
+        <button class="dark-toggle" id="darkToggle" onclick="toggleDark()" title="切换深色模式" style="background:none;border:none;cursor:pointer;font-size:18px;padding:6px 8px;border-radius:8px;color:#fff;transition:background 0.2s;">🌙</button>
         <button class="nav-toggle" onclick="toggleNav()">☰</button>
         <div class="nav-links" id="navLinks">
             <a href="#features" data-i18n="nav_features">功能</a>
@@ -2123,6 +2265,38 @@
         function toggleNav() {
             document.getElementById('navLinks').classList.toggle('show');
         }
+
+        // Dark mode toggle
+        function toggleDark() {
+            const root = document.documentElement;
+            const btn = document.getElementById('darkToggle');
+            const isDark = root.getAttribute('data-theme') === 'dark' ||
+                (!root.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                root.setAttribute('data-theme', 'light');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                root.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Init dark toggle button state
+        (function() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = saved ? saved === 'dark' : prefersDark;
+            const btn = document.getElementById('darkToggle');
+            if (isDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                btn.textContent = '🌙';
+            }
+        })();
 
         // Active nav indicator
         (function() {
