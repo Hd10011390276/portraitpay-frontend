@@ -262,7 +262,6 @@ function PricingCard({ title, price, period, desc, features, cta, badge, highlig
 // ─── Main Page ──────────────────────────────────────────────────
 export default function HomePage() {
   const { locale } = useLanguage();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const t = locale === "zh-CN" ? translations["zh-CN"] : translations["en-US"];
 
   return (
@@ -310,38 +309,7 @@ export default function HomePage() {
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <LanguageToggle />
             <ThemeToggle />
-            <Link href="/login" className="btn btn-secondary btn-sm hidden-mobile">{t.nav.signIn}</Link>
-            {/* Hamburger */}
-            <button
-              className="show-mobile"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", flexDirection: "column", gap: "5px", color: "var(--text-primary)" }}
-              aria-label="Toggle menu"
-            >
-              <span style={{ display: "block", width: "22px", height: "2px", background: "currentColor", borderRadius: "2px", transition: "all 200ms", transform: mobileOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />
-              <span style={{ display: "block", width: "22px", height: "2px", background: "currentColor", borderRadius: "2px", transition: "all 200ms", opacity: mobileOpen ? 0 : 1 }} />
-              <span style={{ display: "block", width: "22px", height: "2px", background: "currentColor", borderRadius: "2px", transition: "all 200ms", transform: mobileOpen ? "rotate(-45deg) translate(5px, -5px)" : "none" }} />
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <div style={{
-          overflow: "hidden",
-          maxHeight: mobileOpen ? "400px" : "0",
-          transition: "max-height 300ms ease-out",
-          background: "var(--bg-primary)",
-          borderTop: mobileOpen ? "1px solid var(--border-default)" : "none",
-        }} className="show-mobile">
-          <div className="container" style={{ display: "flex", flexDirection: "column", padding: "16px 0", gap: "4px" }}>
-            <a href="#features" onClick={() => setMobileOpen(false)} style={{ padding: "12px 0", fontSize: "15px", fontWeight: 500, color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid var(--border-default)" }}>{t.nav.features}</a>
-            <a href="#how-it-works" onClick={() => setMobileOpen(false)} style={{ padding: "12px 0", fontSize: "15px", fontWeight: 500, color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid var(--border-default)" }}>{t.nav.howItWorks}</a>
-            <a href="#pricing" onClick={() => setMobileOpen(false)} style={{ padding: "12px 0", fontSize: "15px", fontWeight: 500, color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid var(--border-default)" }}>{t.nav.pricing}</a>
-            <a href="#faq" onClick={() => setMobileOpen(false)} style={{ padding: "12px 0", fontSize: "15px", fontWeight: 500, color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid var(--border-default)" }}>{t.nav.faq}</a>
-            <div style={{ display: "flex", gap: "8px", paddingTop: "12px" }}>
-              <Link href="/login" className="btn btn-secondary btn-sm" style={{ flex: 1, justifyContent: "center" }}>{t.nav.signIn}</Link>
-              <Link href="/register" className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: "center" }}>{t.nav.getStarted}</Link>
-            </div>
+            <Link href="/login" className="btn btn-secondary btn-sm">{t.nav.signIn}</Link>
           </div>
         </div>
       </header>
