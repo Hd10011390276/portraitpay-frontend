@@ -1239,6 +1239,8 @@
                 text-align: left;
             }
             .nav-links a:last-child { border-bottom: none; }
+            .nav-links a[onclick="openModal('register')"],
+            .nav-links a[onclick="openModal('login')"] { display: none; }
 
             /* Hero */
             .hero { min-height: 100svh; height: auto; padding: 72px 20px 60px; }
@@ -1317,8 +1319,8 @@
             .auth-tab:first-child { border-radius: 10px 0 0 10px; }
             .auth-tab:last-child { border-radius: 0 10px 10px 0; }
 
-            /* Lang selector — hide on mobile, default zh-CN */
-            .lang-selector { display: none; }
+            /* Lang selector */
+            .lang-selector { top: 64px; right: 12px; gap: 6px; }
             .lang-btn { padding: 5px 10px; font-size: 11px; }
 
             /* Toast */
