@@ -132,7 +132,7 @@ export const translations = {
     // Hero
     hero: {
       badge: "Beta · Running on Testnet",
-      headline: "Your Portrait Your Rights",
+      headline: "Your Portrait  Your Rights",
       sub: "Register and protect your portrait rights with AI-powered infringement detection, customizable authorization templates, and real-time earnings tracking.",
 
       cta1: "Start Free — Register Now",
