@@ -352,7 +352,7 @@ export default function HomePage() {
               maxWidth: "720px",
               margin: "0 auto 24px",
             }}>
-              {t.hero.headline}
+              <span dangerouslySetInnerHTML={{ __html: t.hero.headline.replace(' ', '<br/>') }} />
             </h1>
 
             {/* Sub */}
