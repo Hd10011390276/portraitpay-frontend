@@ -22,7 +22,7 @@ export const translations = {
     // Hero
     hero: {
       badge: "Beta · 测试网运行中",
-      headline: "你的肖像 你的权利",
+      headline: "你的肖像\n你的权利",
       sub: "注册并保护你的肖像权。AI 侵权检测、可定制授权模板、实时收益追踪。",
 
       cta1: "免费注册 — 立即开始",
@@ -132,7 +132,7 @@ export const translations = {
     // Hero
     hero: {
       badge: "Beta · Running on Testnet",
-      headline: "Your Portrait Your Rights",
+      headline: "Your Portrait\nYour Rights",
       sub: "Register and protect your portrait rights with AI-powered infringement detection, customizable authorization templates, and real-time earnings tracking.",
 
       cta1: "Start Free — Register Now",
