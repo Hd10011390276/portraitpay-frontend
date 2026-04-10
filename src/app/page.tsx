@@ -307,8 +307,8 @@ export default function HomePage() {
 
           {/* Right side */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span className="hidden-mobile"><LanguageToggle /></span>
-            <span className="hidden-mobile"><ThemeToggle /></span>
+            <LanguageToggle />
+            <ThemeToggle />
             <Link href="/login" className="btn btn-secondary btn-sm hidden-mobile">{t.nav.signIn}</Link>
           </div>
         </div>
