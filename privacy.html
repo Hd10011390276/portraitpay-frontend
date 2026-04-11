@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="privacy_title">PortraitPay AI - 隐私政策</title>
+    <meta name="description" data-i18n-desc="privacy_desc" content="PortraitPay AI 隐私政策 - 我们如何收集、使用和保护您的个人信息">
+    <style>
+        :root {
+            --bg: #000000;
+            --bg-secondary: #1d1d1f;
+            --card: #2d2d2f;
+            --text: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #2997ff;
+            --success: #30d158;
+            --danger: #ff453a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            color: var(--accent);
+        }
+        p, li {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 8px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .version {
+            background: var(--card);
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .version span {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .version strong {
+            color: var(--success);
+            font-size: 13px;
+        }
+        .highlight {
+            background: rgba(41, 151, 255, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+        .highlight p { margin: 0; color: var(--text); }
+        .danger-zone {
+            background: rgba(255, 69, 58, 0.1);
+            border-left: 3px solid var(--danger);
+            padding: 16px 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+        .danger-zone p { margin: 0; color: var(--danger); }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: #3d3d3f; }
+        .table-of-contents {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .table-of-contents a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+            padding: 6px 0;
+        }
+        .table-of-contents a:hover { text-decoration: underline; }
+        .lang-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            display: flex;
+            gap: 8px;
+        }
+        .lang-btn {
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-secondary);
+            font-size: 12px;
+            border-top: 1px solid var(--bg-secondary);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="lang-selector">
+        <button class="lang-btn active" onclick="setLang('zh')">简体中文</button>
+        <button class="lang-btn" onclick="setLang('en')">English</button>
+    </div>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">← <span data-i18n="back_home">返回首页</span></a>
+        
+        <h1 data-i18n="privacy_h1">PortraitPay AI</h1>
+        <p class="subtitle" data-i18n="privacy_subtitle">隐私政策 · Privacy Policy</p>
+        
+        <div class="version">
+            <span data-i18n="version_date">版本生效日期</span>
+            <strong>2026年3月25日 · <span data-i18n="version_latest">最新版本</span></strong>
+        </div>
+        
+        <div class="table-of-contents">
+            <h3 style="margin-top:0; color: var(--text);" data-i18n="toc_title">目录</h3>
+            <a href="#collection" data-i18n="toc1">一、信息收集</a>
+            <a href="#usage" data-i18n="toc2">二、信息使用</a>
+            <a href="#protection" data-i18n="toc3">三、信息保护</a>
+            <a href="#sharing" data-i18n="toc4">四、信息共享</a>
+            <a href="#rights" data-i18n="toc5">五、用户权利</a>
+            <a href="#cookies" data-i18n="toc6">六、Cookie 政策</a>
+            <a href="#children" data-i18n="toc7">七、儿童隐私</a>
+            <a href="#changes" data-i18n="toc8">八、政策变更</a>
+            <a href="#contact" data-i18n="toc9">九、联系方式</a>
+        </div>
+        
+        <div class="card" id="collection">
+            <h2>📋 <span data-i18n="c1_title">一、信息收集</span></h2>
+            
+            <h3>1.1 您主动提供的信息</h3>
+            <p data-i18n="c1_p1">当您注册账户时，我们收集：姓名、用户名、电子邮件地址、电话号码。您上传肖像时，我们收集人脸图像及由 AI 生成的人脸向量数据（用于身份识别，不存储原始生物特征）。</p>
+            
+            <h3>1.2 自动收集的信息</h3>
+            <p data-i18n="c1_p2">当您访问服务时，我们自动收集：IP 地址、浏览器类型、操作系统、设备标识符、访问时间、浏览的页面。您使用 API 时，我们记录调用日志用于计费和安全保障。</p>
+            
+            <h3>1.3 第三方来源的信息</h3>
+            <p data-i18n="c1_p3">在法律允许的范围内，我们可能从第三方服务（如身份验证提供商）获取信息，以核实您的身份或防止欺诈。</p>
+            
+            <div class="highlight">
+                <p><strong data-i18n="c1_note">重要：</strong><span data-i18n="c1_note_text">我们仅收集提供服务所必需的信息。人脸向量数据与原始图像分离存储，且不可反向推算出原始图像。</span></p>
+            </div>
+        </div>
+        
+        <div class="card" id="usage">
+            <h2>⚙️ <span data-i18n="c2_title">二、信息使用</span></h2>
+            
+            <h3>2.1 提供服务</h3>
+            <p data-i18n="c2_p1">使用您提供的信息来：创建和管理您的账户、处理人脸识别验证、计算和分配肖像使用收益、发送服务通知和收益提醒。</p>
+            
+            <h3>2.2 服务改进</h3>
+            <p data-i18n="c2_p2">分析使用数据以：改进算法准确性、提升用户体验、开发新功能、检测和预防安全威胁与欺诈行为。</p>
+            
+            <h3>2.3 法律合规</h3>
+            <p data-i18n="c2_p3">在以下情况下，我们可能披露您的信息：遵守法律法规、司法命令、政府要求；保护我们的合法权益；紧急情况下保护人身安全。</p>
+            
+            <div class="danger-zone">
+                <p><strong data-i18n="c2_warn">注意：</strong><span data-i18n="c2_warn_text">我们决不出售您的个人信息或将其用于广告投放目的。</span></p>
+            </div>
+        </div>
+        
+        <div class="card" id="protection">
+            <h2>🔒 <span data-i18n="c3_title">三、信息保护</span></h2>
+            
+            <h3>3.1 加密技术</h3>
+            <ul>
+                <li data-i18n="c3_l1"><strong>AES-256：</strong>静态数据加密存储</li>
+                <li data-i18n="c3_l2"><strong>TLS 1.3：</strong>传输层加密</li>
+                <li data-i18n="c3_l3"><strong>人脸向量分离：</strong>原始人脸图像与人脸向量数据物理分离存储</li>
+            </ul>
+            
+            <h3>3.2 访问控制</h3>
+            <p data-i18n="c3_p1">严格限制员工访问权限，实行最小权限原则。所有访问均有审计日志，可追溯、可审查。</p>
+            
+            <h3>3.3 安全审计</h3>
+            <p data-i18n="c3_p2">我们定期进行第三方安全评估和渗透测试，及时修复发现的漏洞。制定了完善的数据泄露应急响应预案。</p>
+            
+            <h3>3.4 数据保留</h3>
+            <p data-i18n="c3_p3">账户注销后，人脸向量数据将在 30 天内删除，历史收益记录因合规要求保留 7 年。API 调用日志保留 2 年。</p>
+        </div>
+        
+        <div class="card" id="sharing">
+            <h2>🤝 <span data-i18n="c4_title">四、信息共享</span></h2>
+            
+            <h3>4.1 AI 平台授权</h3>
+            <p data-i18n="c4_p1">当您授权某 AI 平台使用时，我们仅共享：您选择公开的肖像元数据（如姓名/艺名）、授权范围和使用限制。人脸原始图像和向量数据不会共享给任何第三方。</p>
+            
+            <h3>4.2 服务提供商</h3>
+            <p data-i18n="c4_p2">我们使用可信的服务提供商（如云服务商、支付机构）来支持业务运营。这些提供商受到严格的保密协议约束。</p>
+            
+            <h3>4.3 业务转让</h3>
+            <p data-i18n="c4_p3">如发生合并、收购或资产出售，您的信息将作为业务资产转移，我们提前通知您并确保接收方继续履行本隐私政策。</p>
+        </div>
+        
+        <div class="card" id="rights">
+            <h2>✊ <span data-i18n="c5_title">五、用户权利</span></h2>
+            
+            <h3>5.1 访问与更正</h3>
+            <p data-i18n="c5_p1">您有权随时访问和更正您的个人信息。登录后进入"设置"即可修改个人资料。</p>
+            
+            <h3>5.2 删除账户</h3>
+            <p data-i18n="c5_p2">您可以申请删除账户。删除后，人脸向量数据将在 30 天内从所有系统中清除，但历史交易记录将因税务和合规要求保留。</p>
+            
+            <h3>5.3 数据导出</h3>
+            <p data-i18n="c5_p3">您可以申请导出您的账户数据（收益记录、使用日志等），我们将在 7 个工作日内提供可读的格式。</p>
+            
+            <h3>5.4 撤回同意</h3>
+            <p data-i18n="c5_p4">对于基于同意的处理（如营销通知），您可以随时撤回。撤回前基于同意的处理活动不受影响。</p>
+            
+            <h3>5.5 投诉权利</h3>
+            <p data-i18n="c5_p5">如您认为我们处理个人信息的方式违反法律，可向当地数据保护监管机构投诉。</p>
+        </div>
+        
+        <div class="card" id="cookies">
+            <h2>🍪 <span data-i18n="c6_title">六、Cookie 政策</span></h2>
+            
+            <h3>6.1 我们使用的 Cookie</h3>
+            <ul>
+                <li data-i18n="c6_l1"><strong>身份验证 Cookie：</strong>保持登录状态，期限为您指定的记住时间</li>
+                <li data-i18n="c6_l2"><strong>功能 Cookie：</strong>记住您的偏好设置（如语言选择）</li>
+                <li data-i18n="c6_l3"><strong>分析 Cookie：</strong>了解服务使用情况以改进（可选，您可以关闭）</li>
+            </ul>
+            
+            <h3>6.2 管理 Cookie</h3>
+            <p data-i18n="c6_p1">大多数浏览器允许您阻止或删除 Cookie。如禁用 Cookie，部分功能可能无法正常使用。</p>
+        </div>
+        
+        <div class="card" id="children">
+            <h2>👶 <span data-i18n="c7_title">七、儿童隐私</span></h2>
+            
+            <p data-i18n="c7_p1">我们的服务不面向未满 18 周岁的未成年人。我们不会故意收集未成年人的个人信息。如果发现无意中收集了未成年人信息，我们将立即删除。如家长发现孩子使用了我们的服务，请联系我们进行删除。</p>
+        </div>
+        
+        <div class="card" id="changes">
+            <h2>📝 <span data-i18n="c8_title">八、政策变更</span></h2>
+            
+            <p data-i18n="c8_p1">我们可能不时更新本隐私政策。重大变更（如变更目的或信息使用方式）将通过电子邮件或网站公告提前 30 天通知。我们鼓励您定期查看最新版本。</p>
+            
+            <div class="highlight">
+                <p><strong data-i18n="c8_note">更新日期：</strong><span data-i18n="c8_date">2026年3月25日</span></p>
+            </div>
+        </div>
+        
+        <div class="card" id="contact">
+            <h2>📞 <span data-i18n="c9_title">九、联系方式</span></h2>
+            
+            <p><strong data-i18n="contact_company">公司名称：</strong>PortraitPay AI</p>
+            <p><strong data-i18n="contact_email">联系邮箱：</strong>support@portraitpayai.com</p>
+            <p><strong data-i18n="contact_phone">服务热线：</strong>400-XXX-XXXX（<span data-i18n="contact_hours">工作日 9:00-18:00</span>）</p>
+            <p><strong data-i18n="contact_address">地址：</strong><span data-i18n="contact_addr_text">中华人民共和国</span></p>
+            
+            <div class="highlight">
+                <p data-i18n="contact_response">如有疑问或投诉，我们将在1-3个工作日内回复。</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p data-i18n="footer_rights">© 2026 PortraitPay AI. 保留所有权利。</p>
+        </footer>
+    </div>
+    
+    <script>
+        const i18n = {
+            zh: {
+                privacy_title: 'PortraitPay AI - 隐私政策',
+                privacy_desc: 'PortraitPay AI 隐私政策 - 我们如何收集、使用和保护您的个人信息',
+                privacy_h1: 'PortraitPay AI',
+                privacy_subtitle: '隐私政策 · Privacy Policy',
+                back_home: '返回首页',
+                version_date: '版本生效日期',
+                version_latest: '最新版本',
+                toc_title: '目录',
+                toc1: '一、信息收集', toc2: '二、信息使用', toc3: '三、信息保护',
+                toc4: '四、信息共享', toc5: '五、用户权利', toc6: '六、Cookie 政策',
+                toc7: '七、儿童隐私', toc8: '八、政策变更', toc9: '九、联系方式',
+                c1_title: '一、信息收集',
+                c1_p1: '当您注册账户时，我们收集：姓名、用户名、电子邮件地址、电话号码。您上传肖像时，我们收集人脸图像及由 AI 生成的人脸向量数据（用于身份识别，不存储原始生物特征）。',
+                c1_p2: '当您访问服务时，我们自动收集：IP 地址、浏览器类型、操作系统、设备标识符、访问时间、浏览的页面。您使用 API 时，我们记录调用日志用于计费和安全保障。',
+                c1_p3: '在法律允许的范围内，我们可能从第三方服务（如身份验证提供商）获取信息，以核实您的身份或防止欺诈。',
+                c1_note: '重要：',
+                c1_note_text: '我们仅收集提供服务所必需的信息。人脸向量数据与原始图像分离存储，且不可反向推算出原始图像。',
+                c2_title: '二、信息使用',
+                c2_p1: '使用您提供的信息来：创建和管理您的账户、处理人脸识别验证、计算和分配肖像使用收益、发送服务通知和收益提醒。',
+                c2_p2: '分析使用数据以：改进算法准确性、提升用户体验、开发新功能、检测和预防安全威胁与欺诈行为。',
+                c2_p3: '在以下情况下，我们可能披露您的信息：遵守法律法规、司法命令、政府要求；保护我们的合法权益；紧急情况下保护人身安全。',
+                c2_warn: '注意：',
+                c2_warn_text: '我们决不出售您的个人信息或将其用于广告投放目的。',
+                c3_title: '三、信息保护',
+                c3_l1: 'AES-256：静态数据加密存储',
+                c3_l2: 'TLS 1.3：传输层加密',
+                c3_l3: '人脸向量分离：原始人脸图像与人脸向量数据物理分离存储',
+                c3_p1: '严格限制员工访问权限，实行最小权限原则。所有访问均有审计日志，可追溯、可审查。',
+                c3_p2: '我们定期进行第三方安全评估和渗透测试，及时修复发现的漏洞。制定了完善的数据泄露应急响应预案。',
+                c3_p3: '账户注销后，人脸向量数据将在 30 天内删除，历史收益记录因合规要求保留 7 年。API 调用日志保留 2 年。',
+                c4_title: '四、信息共享',
+                c4_p1: '当您授权某 AI 平台使用时，我们仅共享：您选择公开的肖像元数据（如姓名/艺名）、授权范围和使用限制。人脸原始图像和向量数据不会共享给任何第三方。',
+                c4_p2: '我们使用可信的服务提供商（如云服务商、支付机构）来支持业务运营。这些提供商受到严格的保密协议约束。',
+                c4_p3: '如发生合并、收购或资产出售，您的信息将作为业务资产转移，我们提前通知您并确保接收方继续履行本隐私政策。',
+                c5_title: '五、用户权利',
+                c5_p1: '您有权随时访问和更正您的个人信息。登录后进入"设置"即可修改个人资料。',
+                c5_p2: '您可以申请删除账户。删除后，人脸向量数据将在 30 天内从所有系统中清除，但历史交易记录将因税务和合规要求保留。',
+                c5_p3: '您可以申请导出您的账户数据（收益记录、使用日志等），我们将在 7 个工作日内提供可读的格式。',
+                c5_p4: '对于基于同意的处理（如营销通知），您可以随时撤回。撤回前基于同意的处理活动不受影响。',
+                c5_p5: '如您认为我们处理个人信息的方式违反法律，可向当地数据保护监管机构投诉。',
+                c6_title: '六、Cookie 政策',
+                c6_l1: '身份验证 Cookie：保持登录状态，期限为您指定的记住时间',
+                c6_l2: '功能 Cookie：记住您的偏好设置（如语言选择）',
+                c6_l3: '分析 Cookie：了解服务使用情况以改进（可选，您可以关闭）',
+                c6_p1: '大多数浏览器允许您阻止或删除 Cookie。如禁用 Cookie，部分功能可能无法正常使用。',
+                c7_title: '七、儿童隐私',
+                c7_p1: '我们的服务不面向未满 18 周岁的未成年人。我们不会故意收集未成年人的个人信息。如果发现无意中收集了未成年人信息，我们将立即删除。如家长发现孩子使用了我们的服务，请联系我们进行删除。',
+                c8_title: '八、政策变更',
+                c8_p1: '我们可能不时更新本隐私政策。重大变更（如变更目的或信息使用方式）将通过电子邮件或网站公告提前 30 天通知。我们鼓励您定期查看最新版本。',
+                c8_note: '更新日期：',
+                c8_date: '2026年3月25日',
+                c9_title: '九、联系方式',
+                contact_company: '公司名称：',
+                contact_email: '联系邮箱：',
+                contact_phone: '服务热线：',
+                contact_hours: '工作日 9:00-18:00',
+                contact_address: '地址：',
+                contact_addr_text: '中华人民共和国',
+                contact_response: '如有疑问或投诉，我们将在1-3个工作日内回复。',
+                footer_rights: '© 2026 PortraitPay AI. 保留所有权利。'
+            },
+            en: {
+                privacy_title: 'PortraitPay AI - Privacy Policy',
+                privacy_desc: 'PortraitPay AI Privacy Policy - How we collect, use, and protect your personal information',
+                privacy_h1: 'PortraitPay AI',
+                privacy_subtitle: 'Privacy Policy · 隐私政策',
+                back_home: 'Back to Home',
+                version_date: 'Effective Date',
+                version_latest: 'Latest Version',
+                toc_title: 'Table of Contents',
+                toc1: 'I. Information Collection', toc2: 'II. Information Use', toc3: 'III. Information Protection',
+                toc4: 'IV. Information Sharing', toc5: 'V. Your Rights', toc6: 'VI. Cookie Policy',
+                toc7: 'VII. Children\'s Privacy', toc8: 'VIII. Policy Changes', toc9: 'IX. Contact Us',
+                c1_title: 'I. Information Collection',
+                c1_p1: 'When you register, we collect: name, username, email address, phone number. When you upload a portrait, we collect facial images and AI-generated face vectors (for identity verification; original biometrics are not stored).',
+                c1_p2: 'When you visit, we automatically collect: IP address, browser type, OS, device identifier, access time, pages viewed. When you use the API, we log calls for billing and security.',
+                c1_p3: 'To the extent permitted by law, we may obtain information from third parties (e.g., identity verification providers) to verify your identity or prevent fraud.',
+                c1_note: 'Important:',
+                c1_note_text: 'We only collect information necessary for the service. Face vectors are stored separately from original images and cannot reverse-engineer them.',
+                c2_title: 'II. Information Use',
+                c2_p1: 'We use your information to: create and manage your account, process face verification, calculate and distribute portrait usage earnings, send service and earnings notifications.',
+                c2_p2: 'We analyze usage data to: improve algorithm accuracy, enhance user experience, develop new features, detect and prevent security threats and fraud.',
+                c2_p3: 'We may disclose your information when: complying with laws, court orders, government requests; protecting our legitimate rights; protecting personal safety in emergencies.',
+                c2_warn: 'Note:',
+                c2_warn_text: 'We never sell your personal information or use it for advertising purposes.',
+                c3_title: 'III. Information Protection',
+                c3_l1: 'AES-256: encrypted storage for data at rest',
+                c3_l2: 'TLS 1.3: encrypted data in transit',
+                c3_l3: 'Face vector separation: original face images and face vectors stored physically apart',
+                c3_p1: 'Strict employee access controls with least-privilege principle. All access is audited and traceable.',
+                c3_p2: 'We conduct regular third-party security assessments and penetration tests. We have a comprehensive data breach response plan.',
+                c3_p3: 'After account deletion, face vectors are removed within 30 days. Historical earnings records are retained for 7 years for compliance. API logs are kept for 2 years.',
+                c4_title: 'IV. Information Sharing',
+                c4_p1: 'When you authorize an AI platform, we only share: portrait metadata you choose to make public (e.g., name/stage name), authorization scope and usage limits. Original face images and vectors are never shared.',
+                c4_p2: 'We use trusted service providers (cloud, payment processors) to support our operations. They are bound by strict confidentiality agreements.',
+                c4_p3: 'In case of merger, acquisition, or asset sale, your information transfers as a business asset. We will notify you in advance and ensure the recipient continues to honor this policy.',
+                c5_title: 'V. Your Rights',
+                c5_p1: 'You have the right to access and correct your personal information at any time. Log in and go to Settings to modify your profile.',
+                c5_p2: 'You may request account deletion. After deletion, face vectors will be purged from all systems within 30 days, but historical transaction records are retained for tax and compliance.',
+                c5_p3: 'You may request a data export of your account data (earnings, usage logs, etc.). We will provide a readable format within 7 business days.',
+                c5_p4: 'For consent-based processing (e.g., marketing), you may withdraw consent at any time. Processing activities before withdrawal are unaffected.',
+                c5_p5: 'If you believe our handling of personal information violates the law, you may file a complaint with your local data protection authority.',
+                c6_title: 'VI. Cookie Policy',
+                c6_l1: 'Authentication Cookies: keep you logged in for your chosen remember period',
+                c6_l2: 'Functional Cookies: remember your preferences (e.g., language selection)',
+                c6_l3: 'Analytics Cookies: understand service usage to improve (optional, you can disable)',
+                c6_p1: 'Most browsers allow you to block or delete cookies. Disabling cookies may impair some functionality.',
+                c7_title: 'VII. Children\'s Privacy',
+                c7_p1: 'Our service is not directed to minors under 18. We do not knowingly collect personal information from minors. If we discover inadvertent collection, we will delete it immediately. If a parent discovers their child has used our service, please contact us for deletion.',
+                c8_title: 'VIII. Policy Changes',
+                c8_p1: 'We may update this policy periodically. Material changes (e.g., change of purpose or data use) will be notified 30 days in advance via email or website notice. We encourage you to review the latest version regularly.',
+                c8_note: 'Last Updated:',
+                c8_date: 'March 25, 2026',
+                c9_title: 'IX. Contact Us',
+                contact_company: 'Company:',
+                contact_email: 'Email:',
+                contact_phone: 'Hotline:',
+                contact_hours: 'Weekdays 9:00-18:00',
+                contact_address: 'Address:',
+                contact_addr_text: 'People\'s Republic of China',
+                contact_response: 'We will respond to inquiries or complaints within 1-3 business days.',
+                footer_rights: '© 2026 PortraitPay AI. All rights reserved.'
+            }
+        };
+
+        let currentLang = localStorage.getItem('portrait_lang') || 'zh';
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('portrait_lang', lang);
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((btn.textContent.includes('简体') && lang === 'zh') ||
+                    (btn.textContent === 'English' && lang === 'en')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) el.textContent = i18n[lang][key];
+            });
+
+            const titleEl = document.querySelector('[data-i18n-title]');
+            if (titleEl && i18n[lang]['privacy_title']) titleEl.textContent = i18n[lang]['privacy_title'];
+
+            const descEl = document.querySelector('[data-i18n-desc]');
+            if (descEl && i18n[lang]['privacy_desc']) descEl.setAttribute('content', i18n[lang]['privacy_desc']);
+        }
+
+        setLang(currentLang);
+    </script>
+</body>
+</html>

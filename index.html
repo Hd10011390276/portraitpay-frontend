@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortraitPay AI - 肖像版权数据库</title>
+    <title data-i18n-title="index_title">PortraitPay AI - 肖像版权数据库</title>
+    <meta name="description" data-i18n-desc="index_desc" content="为AI时代构建可信的肖像权保护体系">
     <meta name="description" content="为AI时代构建可信的肖像权保护体系。您的肖像值得尊重。">
     <meta property="og:title" content="PortraitPay AI - 肖像版权数据库">
     <meta property="og:description" content="为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。">
@@ -1787,6 +1788,8 @@
         // i18n Translations
         const i18n = {
             zh: {
+                index_title: 'PortraitPay AI - 肖像版权数据库',
+                index_desc: '为AI时代构建可信的肖像权保护体系',
                 nav_features: '功能',
                 nav_faces: '肖像库',
                 nav_pricing: '定价',
@@ -1866,6 +1869,8 @@
                 waitlist_success: '预约成功！我们会在主网上线时通知您'
             },
             en: {
+                index_title: 'PortraitPay AI - Portrait Rights Database',
+                index_desc: 'Building trusted portrait rights protection for the AI era',
                 nav_features: 'Features',
                 nav_faces: 'Faces',
                 nav_pricing: 'Pricing',
@@ -1978,11 +1983,15 @@
             });
 
             // Update page title & meta
-            document.title = i18n[lang].page_title || document.title;
-            const descMeta = document.querySelector('meta[name="description"]');
-            if (descMeta) descMeta.setAttribute('content', i18n[lang].page_desc || '');
-            const ogDesc = document.querySelector('meta[property="og:description"]');
-            if (ogDesc) ogDesc.setAttribute('content', i18n[lang].page_desc || '');
+            const titleEl = document.querySelector('[data-i18n-title]');
+            if (titleEl && i18n[lang]['index_title']) {
+                titleEl.textContent = i18n[lang]['index_title'];
+                document.title = i18n[lang]['index_title'];
+            }
+            const descEl = document.querySelector('[data-i18n-desc]');
+            if (descEl && i18n[lang]['index_desc']) {
+                descEl.setAttribute('content', i18n[lang]['index_desc']);
+            }
         }
 
         const API = window.location.hostname === 'localhost' ? 'http://127.0.0.1:5000/api' : 'https://portraitpay-api-production.up.railway.app/api';

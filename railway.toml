@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+buildCommand = "echo 'static site'"
+watchPatterns = ["*.html", "*.png", "*.css", "*.js"]
+
+[deploy]
+root = "."

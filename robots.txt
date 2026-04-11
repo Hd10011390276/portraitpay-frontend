@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://portraitpayai.com/sitemap.xml
