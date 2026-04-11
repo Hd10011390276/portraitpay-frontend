@@ -185,7 +185,7 @@
         
         <div class="version">
             <span data-i18n="version_date">版本生效日期</span>
-            <strong>2026年3月25日 · <span data-i18n="version_latest">最新版本</span></strong>
+            <strong>2026年4月11日 · <span data-i18n="version_latest">重大更新 - Local-First 架构</span></strong>
         </div>
         
         <div class="table-of-contents">
@@ -205,16 +205,19 @@
             <h2>📋 <span data-i18n="c1_title">一、信息收集</span></h2>
             
             <h3>1.1 您主动提供的信息</h3>
-            <p data-i18n="c1_p1">当您注册账户时，我们收集：姓名、用户名、电子邮件地址、电话号码。您上传肖像时，我们收集人脸图像及由 AI 生成的人脸向量数据（用于身份识别，不存储原始生物特征）。</p>
-            
+            <p data-i18n="c1_p1">当您注册账户时，我们收集：用户名、电子邮件地址。您上传肖像时：
+            <br>• <strong>原始肖像图像</strong>保存在<strong>您的本地设备</strong>上，不会上传至我们的服务器
+            <br>• 您的浏览器在本地生成<strong>不可逆肖像指纹</strong>（单向哈希，无法还原原始图像）
+            <br>• 我们仅存储：账户凭证、授权状态、公开的肖像元数据（姓名/艺名、授权范围）、交易记录、审计日志</p>
+
             <h3>1.2 自动收集的信息</h3>
-            <p data-i18n="c1_p2">当您访问服务时，我们自动收集：IP 地址、浏览器类型、操作系统、设备标识符、访问时间、浏览的页面。您使用 API 时，我们记录调用日志用于计费和安全保障。</p>
-            
+            <p data-i18n="c1_p2">当您访问服务时，我们自动收集：IP 地址（用于安全防护）、浏览器类型、访问时间。您使用 API 时，我们记录调用日志用于计费和安全保障。<strong>我们不存储您上传的原始图像。</strong></p>
+
             <h3>1.3 第三方来源的信息</h3>
-            <p data-i18n="c1_p3">在法律允许的范围内，我们可能从第三方服务（如身份验证提供商）获取信息，以核实您的身份或防止欺诈。</p>
+            <p data-i18n="c1_p3">我们<strong>不主动从第三方获取个人信息</strong>。如因法律合规需要核实身份，我们将提前征得您同意。</p>
             
             <div class="highlight">
-                <p><strong data-i18n="c1_note">重要：</strong><span data-i18n="c1_note_text">我们仅收集提供服务所必需的信息。人脸向量数据与原始图像分离存储，且不可反向推算出原始图像。</span></p>
+                <p><strong data-i18n="c1_note">核心原则：</strong><span data-i18n="c1_note_text">您的原始肖像保存在您的设备上。我们服务器只存储不可逆的肖像指纹，用于检索和授权验证。这些指纹无法还原出您的原始图像。</span></p>
             </div>
         </div>
         
@@ -222,10 +225,10 @@
             <h2>⚙️ <span data-i18n="c2_title">二、信息使用</span></h2>
             
             <h3>2.1 提供服务</h3>
-            <p data-i18n="c2_p1">使用您提供的信息来：创建和管理您的账户、处理人脸识别验证、计算和分配肖像使用收益、发送服务通知和收益提醒。</p>
-            
+            <p data-i18n="c2_p1">使用您提供的信息来：创建和管理您的账户、验证肖像授权状态、计算和分配肖像使用收益、发送服务通知和收益提醒。<strong>人脸识别验证在您的浏览器本地完成。</strong></p>
+
             <h3>2.2 服务改进</h3>
-            <p data-i18n="c2_p2">分析使用数据以：改进算法准确性、提升用户体验、开发新功能、检测和预防安全威胁与欺诈行为。</p>
+            <p data-i18n="c2_p2">分析<strong>脱敏后的</strong>聚合数据以：提升检索准确性、改善用户体验、开发新功能、检测和预防安全威胁与欺诈行为。<strong>我们无法访问您的原始肖像。</strong></p>
             
             <h3>2.3 法律合规</h3>
             <p data-i18n="c2_p3">在以下情况下，我们可能披露您的信息：遵守法律法规、司法命令、政府要求；保护我们的合法权益；紧急情况下保护人身安全。</p>
@@ -240,26 +243,26 @@
             
             <h3>3.1 加密技术</h3>
             <ul>
-                <li data-i18n="c3_l1"><strong>AES-256：</strong>静态数据加密存储</li>
+                <li data-i18n="c3_l1"><strong>AES-256：</strong>服务器端静态数据加密存储</li>
                 <li data-i18n="c3_l2"><strong>TLS 1.3：</strong>传输层加密</li>
-                <li data-i18n="c3_l3"><strong>人脸向量分离：</strong>原始人脸图像与人脸向量数据物理分离存储</li>
+                <li data-i18n="c3_l3"><strong>本地优先：</strong>原始肖像保存在您的设备上，我们无法访问</li>
             </ul>
-            
+
             <h3>3.2 访问控制</h3>
-            <p data-i18n="c3_p1">严格限制员工访问权限，实行最小权限原则。所有访问均有审计日志，可追溯、可审查。</p>
-            
+            <p data-i18n="c3_p1">严格限制员工访问权限，实行最小权限原则。所有访问均有审计日志，可追溯、可审查。<strong>由于我们不存储原始肖像，数据泄露不包含您的肖像信息。</strong></p>
+
             <h3>3.3 安全审计</h3>
             <p data-i18n="c3_p2">我们定期进行第三方安全评估和渗透测试，及时修复发现的漏洞。制定了完善的数据泄露应急响应预案。</p>
-            
+
             <h3>3.4 数据保留</h3>
-            <p data-i18n="c3_p3">账户注销后，人脸向量数据将在 30 天内删除，历史收益记录因合规要求保留 7 年。API 调用日志保留 2 年。</p>
+            <p data-i18n="c3_p3">账户注销后，肖像指纹将在 30 天内删除。历史收益记录和审计日志因合规要求保留 7 年。API 调用日志保留 2 年。<strong>您的原始肖像从未存储在我们的服务器上。</strong></p>
         </div>
         
         <div class="card" id="sharing">
             <h2>🤝 <span data-i18n="c4_title">四、信息共享</span></h2>
             
             <h3>4.1 AI 平台授权</h3>
-            <p data-i18n="c4_p1">当您授权某 AI 平台使用时，我们仅共享：您选择公开的肖像元数据（如姓名/艺名）、授权范围和使用限制。人脸原始图像和向量数据不会共享给任何第三方。</p>
+            <p data-i18n="c4_p1">当您授权某 AI 平台使用时，我们仅共享：您选择公开的肖像元数据（如姓名/艺名）、授权范围和使用限制。<strong>我们不存储原始肖像，因此也无法共享它们。</strong></p>
             
             <h3>4.2 服务提供商</h3>
             <p data-i18n="c4_p2">我们使用可信的服务提供商（如云服务商、支付机构）来支持业务运营。这些提供商受到严格的保密协议约束。</p>
@@ -275,7 +278,7 @@
             <p data-i18n="c5_p1">您有权随时访问和更正您的个人信息。登录后进入"设置"即可修改个人资料。</p>
             
             <h3>5.2 删除账户</h3>
-            <p data-i18n="c5_p2">您可以申请删除账户。删除后，人脸向量数据将在 30 天内从所有系统中清除，但历史交易记录将因税务和合规要求保留。</p>
+            <p data-i18n="c5_p2">您可以申请删除账户。删除后，肖像指纹将从服务器中清除。<strong>您本地的原始肖像不受影响（它们从未上传到我们的服务器）。</strong>历史交易记录因税务和合规要求保留。</p>
             
             <h3>5.3 数据导出</h3>
             <p data-i18n="c5_p3">您可以申请导出您的账户数据（收益记录、使用日志等），我们将在 7 个工作日内提供可读的格式。</p>
@@ -344,37 +347,37 @@
                 privacy_subtitle: '隐私政策 · Privacy Policy',
                 back_home: '返回首页',
                 version_date: '版本生效日期',
-                version_latest: '最新版本',
+                version_latest: '重大更新 - Local-First 架构',
                 toc_title: '目录',
                 toc1: '一、信息收集', toc2: '二、信息使用', toc3: '三、信息保护',
                 toc4: '四、信息共享', toc5: '五、用户权利', toc6: '六、Cookie 政策',
                 toc7: '七、儿童隐私', toc8: '八、政策变更', toc9: '九、联系方式',
                 c1_title: '一、信息收集',
-                c1_p1: '当您注册账户时，我们收集：姓名、用户名、电子邮件地址、电话号码。您上传肖像时，我们收集人脸图像及由 AI 生成的人脸向量数据（用于身份识别，不存储原始生物特征）。',
-                c1_p2: '当您访问服务时，我们自动收集：IP 地址、浏览器类型、操作系统、设备标识符、访问时间、浏览的页面。您使用 API 时，我们记录调用日志用于计费和安全保障。',
-                c1_p3: '在法律允许的范围内，我们可能从第三方服务（如身份验证提供商）获取信息，以核实您的身份或防止欺诈。',
-                c1_note: '重要：',
-                c1_note_text: '我们仅收集提供服务所必需的信息。人脸向量数据与原始图像分离存储，且不可反向推算出原始图像。',
+                c1_p1: '当您注册账户时，我们收集：用户名、电子邮件地址。您上传肖像时：原始肖像图像保存在您的本地设备上，不会上传至我们的服务器；您的浏览器在本地生成不可逆肖像指纹（单向哈希，无法还原原始图像）；我们仅存储：账户凭证、授权状态、公开的肖像元数据、交易记录、审计日志。',
+                c1_p2: '当您访问服务时，我们自动收集：IP 地址（用于安全防护）、浏览器类型、访问时间。我们不存储您上传的原始图像。',
+                c1_p3: '我们不主动从第三方获取个人信息。如因法律合规需要核实身份，我们将提前征得您同意。',
+                c1_note: '核心原则：',
+                c1_note_text: '您的原始肖像保存在您的设备上。我们服务器只存储不可逆的肖像指纹，用于检索和授权验证。这些指纹无法还原出您的原始图像。',
                 c2_title: '二、信息使用',
-                c2_p1: '使用您提供的信息来：创建和管理您的账户、处理人脸识别验证、计算和分配肖像使用收益、发送服务通知和收益提醒。',
-                c2_p2: '分析使用数据以：改进算法准确性、提升用户体验、开发新功能、检测和预防安全威胁与欺诈行为。',
+                c2_p1: '使用您提供的信息来：创建和管理您的账户、验证肖像授权状态、计算和分配肖像使用收益、发送服务通知和收益提醒。人脸识别验证在您的浏览器本地完成。',
+                c2_p2: '分析脱敏后的聚合数据以：提升检索准确性、改善用户体验、开发新功能、检测和预防安全威胁与欺诈行为。我们无法访问您的原始肖像。',
                 c2_p3: '在以下情况下，我们可能披露您的信息：遵守法律法规、司法命令、政府要求；保护我们的合法权益；紧急情况下保护人身安全。',
                 c2_warn: '注意：',
                 c2_warn_text: '我们决不出售您的个人信息或将其用于广告投放目的。',
                 c3_title: '三、信息保护',
-                c3_l1: 'AES-256：静态数据加密存储',
+                c3_l1: 'AES-256：服务器端静态数据加密存储',
                 c3_l2: 'TLS 1.3：传输层加密',
-                c3_l3: '人脸向量分离：原始人脸图像与人脸向量数据物理分离存储',
-                c3_p1: '严格限制员工访问权限，实行最小权限原则。所有访问均有审计日志，可追溯、可审查。',
+                c3_l3: '本地优先：原始肖像保存在您的设备上，我们无法访问',
+                c3_p1: '严格限制员工访问权限，实行最小权限原则。所有访问均有审计日志，可追溯、可审查。由于我们不存储原始肖像，数据泄露不包含您的肖像信息。',
                 c3_p2: '我们定期进行第三方安全评估和渗透测试，及时修复发现的漏洞。制定了完善的数据泄露应急响应预案。',
-                c3_p3: '账户注销后，人脸向量数据将在 30 天内删除，历史收益记录因合规要求保留 7 年。API 调用日志保留 2 年。',
+                c3_p3: '账户注销后，肖像指纹将在 30 天内删除。历史收益记录和审计日志因合规要求保留 7 年。API 调用日志保留 2 年。您的原始肖像从未存储在我们的服务器上。',
                 c4_title: '四、信息共享',
-                c4_p1: '当您授权某 AI 平台使用时，我们仅共享：您选择公开的肖像元数据（如姓名/艺名）、授权范围和使用限制。人脸原始图像和向量数据不会共享给任何第三方。',
+                c4_p1: '当您授权某 AI 平台使用时，我们仅共享：您选择公开的肖像元数据（如姓名/艺名）、授权范围和使用限制。我们不存储原始肖像，因此也无法共享它们。',
                 c4_p2: '我们使用可信的服务提供商（如云服务商、支付机构）来支持业务运营。这些提供商受到严格的保密协议约束。',
                 c4_p3: '如发生合并、收购或资产出售，您的信息将作为业务资产转移，我们提前通知您并确保接收方继续履行本隐私政策。',
                 c5_title: '五、用户权利',
                 c5_p1: '您有权随时访问和更正您的个人信息。登录后进入"设置"即可修改个人资料。',
-                c5_p2: '您可以申请删除账户。删除后，人脸向量数据将在 30 天内从所有系统中清除，但历史交易记录将因税务和合规要求保留。',
+                c5_p2: '您可以申请删除账户。删除后，肖像指纹将从服务器中清除。您本地的原始肖像不受影响（它们从未上传到我们的服务器）。历史交易记录因税务和合规要求保留。',
                 c5_p3: '您可以申请导出您的账户数据（收益记录、使用日志等），我们将在 7 个工作日内提供可读的格式。',
                 c5_p4: '对于基于同意的处理（如营销通知），您可以随时撤回。撤回前基于同意的处理活动不受影响。',
                 c5_p5: '如您认为我们处理个人信息的方式违反法律，可向当地数据保护监管机构投诉。',
@@ -406,37 +409,37 @@
                 privacy_subtitle: 'Privacy Policy · 隐私政策',
                 back_home: 'Back to Home',
                 version_date: 'Effective Date',
-                version_latest: 'Latest Version',
+                version_latest: 'Major Update - Local-First Architecture',
                 toc_title: 'Table of Contents',
                 toc1: 'I. Information Collection', toc2: 'II. Information Use', toc3: 'III. Information Protection',
                 toc4: 'IV. Information Sharing', toc5: 'V. Your Rights', toc6: 'VI. Cookie Policy',
                 toc7: 'VII. Children\'s Privacy', toc8: 'VIII. Policy Changes', toc9: 'IX. Contact Us',
                 c1_title: 'I. Information Collection',
-                c1_p1: 'When you register, we collect: name, username, email address, phone number. When you upload a portrait, we collect facial images and AI-generated face vectors (for identity verification; original biometrics are not stored).',
-                c1_p2: 'When you visit, we automatically collect: IP address, browser type, OS, device identifier, access time, pages viewed. When you use the API, we log calls for billing and security.',
-                c1_p3: 'To the extent permitted by law, we may obtain information from third parties (e.g., identity verification providers) to verify your identity or prevent fraud.',
-                c1_note: 'Important:',
-                c1_note_text: 'We only collect information necessary for the service. Face vectors are stored separately from original images and cannot reverse-engineer them.',
+                c1_p1: 'When you register, we collect: username, email address. When you upload a portrait: Your original portrait image stays on your local device and is never uploaded to our servers; Your browser generates an irreversible portrait fingerprint locally (one-way hash, cannot reconstruct original image); We only store: account credentials, authorization status, public portrait metadata, transaction records, audit logs.',
+                c1_p2: 'When you visit, we automatically collect: IP address (for security), browser type, access time. We do not store your original uploaded images.',
+                c1_p3: 'We do not proactively obtain personal information from third parties. If identity verification is required for legal compliance, we will obtain your consent in advance.',
+                c1_note: 'Core Principle:',
+                c1_note_text: 'Your original portrait stays on your device. Our servers only store irreversible portrait fingerprints for search and authorization verification. These fingerprints cannot be used to reconstruct your original image.',
                 c2_title: 'II. Information Use',
-                c2_p1: 'We use your information to: create and manage your account, process face verification, calculate and distribute portrait usage earnings, send service and earnings notifications.',
-                c2_p2: 'We analyze usage data to: improve algorithm accuracy, enhance user experience, develop new features, detect and prevent security threats and fraud.',
+                c2_p1: 'We use your information to: create and manage your account, verify portrait authorization status, calculate and distribute portrait usage earnings, send service and earnings notifications. Face verification is performed locally in your browser.',
+                c2_p2: 'We analyze anonymized aggregate data to: improve search accuracy, enhance user experience, develop new features, detect and prevent security threats and fraud. We cannot access your original portraits.',
                 c2_p3: 'We may disclose your information when: complying with laws, court orders, government requests; protecting our legitimate rights; protecting personal safety in emergencies.',
                 c2_warn: 'Note:',
                 c2_warn_text: 'We never sell your personal information or use it for advertising purposes.',
                 c3_title: 'III. Information Protection',
-                c3_l1: 'AES-256: encrypted storage for data at rest',
+                c3_l1: 'AES-256: encrypted storage for server-side data at rest',
                 c3_l2: 'TLS 1.3: encrypted data in transit',
-                c3_l3: 'Face vector separation: original face images and face vectors stored physically apart',
-                c3_p1: 'Strict employee access controls with least-privilege principle. All access is audited and traceable.',
+                c3_l3: 'Local-first: Original portraits stay on your device; we cannot access them',
+                c3_p1: 'Strict employee access controls with least-privilege principle. All access is audited and traceable. Since we do not store original portraits, data breaches do not contain your portrait information.',
                 c3_p2: 'We conduct regular third-party security assessments and penetration tests. We have a comprehensive data breach response plan.',
-                c3_p3: 'After account deletion, face vectors are removed within 30 days. Historical earnings records are retained for 7 years for compliance. API logs are kept for 2 years.',
+                c3_p3: 'After account deletion, portrait fingerprints are removed within 30 days. Historical earnings records and audit logs are retained for 7 years for compliance. API logs are kept for 2 years. Your original portrait was never stored on our servers.',
                 c4_title: 'IV. Information Sharing',
-                c4_p1: 'When you authorize an AI platform, we only share: portrait metadata you choose to make public (e.g., name/stage name), authorization scope and usage limits. Original face images and vectors are never shared.',
+                c4_p1: 'When you authorize an AI platform, we only share: portrait metadata you choose to make public (e.g., name/stage name), authorization scope and usage limits. We do not store original portraits, so we cannot share them.',
                 c4_p2: 'We use trusted service providers (cloud, payment processors) to support our operations. They are bound by strict confidentiality agreements.',
                 c4_p3: 'In case of merger, acquisition, or asset sale, your information transfers as a business asset. We will notify you in advance and ensure the recipient continues to honor this policy.',
                 c5_title: 'V. Your Rights',
                 c5_p1: 'You have the right to access and correct your personal information at any time. Log in and go to Settings to modify your profile.',
-                c5_p2: 'You may request account deletion. After deletion, face vectors will be purged from all systems within 30 days, but historical transaction records are retained for tax and compliance.',
+                c5_p2: 'You may request account deletion. After deletion, portrait fingerprints will be purged from our servers. Your local original portrait is unaffected (it was never uploaded to our servers). Historical transaction records are retained for tax and compliance.',
                 c5_p3: 'You may request a data export of your account data (earnings, usage logs, etc.). We will provide a readable format within 7 business days.',
                 c5_p4: 'For consent-based processing (e.g., marketing), you may withdraw consent at any time. Processing activities before withdrawal are unaffected.',
                 c5_p5: 'If you believe our handling of personal information violates the law, you may file a complaint with your local data protection authority.',

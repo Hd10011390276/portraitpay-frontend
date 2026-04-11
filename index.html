@@ -1494,7 +1494,7 @@
         <p data-i18n="hero_desc">为AI时代构建可信的肖像权保护体系。<br>您的肖像值得尊重。</p>
         <div class="hero-btns">
             <button class="btn btn-primary hero-upload-btn" id="heroUploadBtn" onclick="triggerHashFlow()">
-                <span data-i18n="btn_upload_demo">体验上链演示</span>
+                <span data-i18n="btn_upload_demo">体验本地搜索</span>
                 <span>⚡</span>
             </button>
             <button class="btn btn-outline" onclick="openModal('register')">
@@ -1531,7 +1531,7 @@
                     <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </div>
                 <h3 data-i18n="feature1_title">版权保护</h3>
-                <p data-i18n="feature1_desc">区块链时间戳技术,确保每一次授权都可追溯</p>
+                <p data-i18n="feature1_desc">Local-First 架构，原始肖像本地保存，仅存不可逆检索索引</p>
             </div>
             <div class="feature-card" style="transition-delay: 0.1s">
                 <div class="feature-icon">
@@ -1809,7 +1809,7 @@
                 trust_subtitle: '为什么领先的AI平台信赖我们',
                 features_desc: '在这里,每一位明星的肖像权都能得到尊重和保护',
                 feature1_title: '版权保护',
-                feature1_desc: '区块链时间戳技术,确保每一次授权都可追溯',
+                feature1_desc: 'Local-First 架构，原始肖像本地保存，仅存不可逆检索索引',
                 feature2_title: '收益分成',
                 feature2_desc: 'AI调用您的肖像,您获得收益。1%平台服务费',
                 feature3_title: '全模型适配',
@@ -1855,9 +1855,9 @@
                 btn_send: '发送消息',
                 page_title: 'PortraitPay AI - 肖像版权数据库',
                 page_desc: '为AI时代构建可信的肖像权保护体系。明星名人的肖像，值得更好的尊重。',
-                hash_label: '哈希存证预览',
+                hash_label: '肖像指纹预览',
                 hash_waiting: '等待上传...',
-                btn_upload_demo: '体验上链演示',
+                btn_upload_demo: '体验本地搜索',
                 radar_title: '实时侵权监测',
                 radar_desc: 'AI 正在全网扫描您的肖像使用情况，发现疑似侵权即刻预警',
                 radar_scanned: '已扫描URL',
@@ -1890,7 +1890,7 @@
                 trust_subtitle: 'Why leading AI platforms trust us',
                 features_desc: 'Where every celebrity portrait rights are respected and protected',
                 feature1_title: 'Rights Protection',
-                feature1_desc: 'Blockchain timestamp technology ensures every authorization is traceable',
+                feature1_desc: 'Local-First architecture, original portraits stored locally, irreversible search index only',
                 feature2_title: 'Revenue Share',
                 feature2_desc: 'Get paid when AI uses your portrait. 1% platform fee',
                 feature3_title: 'All Models Supported',
@@ -1936,9 +1936,9 @@
                 btn_send: 'Send Message',
                 page_title: 'PortraitPay AI - Portrait Rights Database',
                 page_desc: 'Building trusted portrait rights protection for the AI era. Celebrity portraits deserve better respect.',
-                hash_label: 'Hash Proof Preview',
+                hash_label: 'Portrait Fingerprint Preview',
                 hash_waiting: 'Waiting for upload...',
-                btn_upload_demo: 'Try On-Chain Demo',
+                btn_upload_demo: 'Try Local Search',
                 radar_title: 'Real-Time Infringement Monitoring',
                 radar_desc: 'AI is scanning the web for unauthorized use of your portrait, alerting you instantly.',
                 radar_scanned: 'URLs Scanned',
@@ -2330,8 +2330,8 @@
             const hashVal = document.getElementById('hashValue');
             const status = document.getElementById('hashStatus');
             const statusTexts = {
-                zh: ['正在计算哈希...', '区块打包中...', '链上确认...', '存证完成 ✓'],
-                en: ['Computing hash...', 'Packing block...', 'On-chain confirm...', 'Sealed ✓']
+                zh: ['正在计算指纹...', '生成检索索引...', '安全验证...', '完成 ✓'],
+                en: ['Computing fingerprint...', 'Generating index...', 'Verifying...', 'Done ✓']
             };
             const texts = statusTexts[currentLang] || statusTexts.zh;
 

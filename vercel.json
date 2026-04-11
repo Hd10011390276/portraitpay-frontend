@@ -3,5 +3,28 @@
     { "source": "/api/(.*)", "destination": "https://portraitpay-api-production.up.railway.app/api/$1" }
   ],
   "trailingSlash": false,
-  "cleanUrls": false
+  "cleanUrls": false,
+  "headers": [
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain" },
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml" },
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/((?!api/|robots\\.txt|sitemap\\.xml|static/|.*\\.(js|css|png|jpg|gif|svg|ico|woff|woff2|ttf)$).*)",
+      "destination": "/index.html",
+      "permanent": false
+    }
+  ]
 }
