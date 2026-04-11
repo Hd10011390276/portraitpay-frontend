@@ -28,6 +28,7 @@ model User {
   kycProviderRef String?
   kycVerifiedAt  DateTime?
   kycExpiredAt   DateTime?
+  kycLevel       Int?
 
   walletAddress    String? @unique
   stripeCustomerId String?
@@ -1048,4 +1049,23 @@ model ContactSubmission {
   @@index([status])
   @@index([type])
   @@index([createdAt])
+}
+
+// Celebrity - known faces to prevent face copyright fraud
+model Celebrity {
+  id        String   @id @default(cuid())
+  name      String
+  enName    String?
+  category  String   // film, music, sports, politics, tv
+  imageUrl  String?
+  sourceUrl String?
+  country   String   @default("CN")
+  faceId    String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([country])
+  @@index([faceId])
 }

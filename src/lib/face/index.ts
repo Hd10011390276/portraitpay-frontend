@@ -3,6 +3,11 @@
  * Real face detection is handled by @vladmandic/face-api on the client side.
  */
 
+export interface FaceEmbeddingResult {
+  embedding: number[];
+  provider: string;
+}
+
 /**
  * Convert a face-api descriptor Float32Array to a plain number array.
  * Used by FaceApiDetector and FaceTraceUploader.
@@ -32,10 +37,10 @@ export function cosineSimilarity(a: number[], b: number[]): number {
 /**
  * Extract face embedding using Aliyun API format.
  * Stub: in production this calls the Aliyun face API.
- * Returns a base64-encoded feature vector.
+ * Returns an object with the embedding array and provider name.
  */
-export async function extractFaceEmbeddingAliyun(_imageBuffer: Buffer): Promise<string> {
-  // Stub: return a zero vector encoded in base64
+export async function extractFaceEmbeddingAliyun(_imageBuffer: Buffer): Promise<FaceEmbeddingResult> {
+  // Stub: return a zero vector
   const zeros = new Float32Array(512).fill(0);
-  return Buffer.from(zeros).toString("base64");
+  return { embedding: Array.from(zeros), provider: "aliyun" };
 }
