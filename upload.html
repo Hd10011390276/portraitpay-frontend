@@ -192,73 +192,129 @@
     </div>
     
     <div class="toast" id="toast"></div>
-    
+
+    <script src="static/js/fingerprint.js"></script>
     <script>
         const API = window.location.hostname === 'localhost' ? 'http://127.0.0.1:5000/api' : 'https://web-production-2757f.up.railway.app/api';
-        let portraitData = '';
-        let idData = '';
-        
+        let portraitFile = null;  // Store file reference for local processing
+        let portraitFingerprint = null;
+        let localStore = new LocalPortraitStore();
+
+        async function initLocalStore() {
+            try {
+                await localStore.init();
+            } catch (e) {
+                console.warn('IndexedDB not available:', e);
+            }
+        }
+        initLocalStore();
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
-        
-        function handlePortrait(input) {
+
+        async function handlePortrait(input) {
             const file = input.files[0];
             if (!file) return;
-            
+
+            portraitFile = file;
+
             const reader = new FileReader();
-            reader.onload = function(e) {
-                portraitData = e.target.result.split(',')[1];
-                document.getElementById('portraitZone').innerHTML = '<img src="' + e.target.result + '">';
+            reader.onload = async function(e) {
+                const dataUrl = e.target.result;
+                document.getElementById('portraitZone').innerHTML = '<img src="' + dataUrl + '">';
                 document.getElementById('portraitZone').classList.add('has-image');
+
+                // Generate fingerprint locally (Local-First)
+                try {
+                    showToast('正在本地生成肖像指纹...');
+                    const result = await PortraitFingerprint.generate(dataUrl);
+                    portraitFingerprint = result.hash;
+                    console.log('Fingerprint generated:', portraitFingerprint);
+                    showToast('指纹生成成功！原始图片保留在本地');
+                } catch (err) {
+                    console.error('Fingerprint generation failed:', err);
+                    showToast('指纹生成失败，但图片已选择');
+                }
             };
             reader.readAsDataURL(file);
         }
-        
+
         function handleId(input) {
             const file = input.files[0];
             if (!file) return;
-            
+
             const reader = new FileReader();
             reader.onload = function(e) {
-                idData = e.target.result.split(',')[1];
                 document.getElementById('idZone').innerHTML = '<img src="' + e.target.result + '">';
                 document.getElementById('idZone').classList.add('has-image');
+                // Note: ID image is NOT uploaded to server in Local-First mode
+                // It could be stored locally in IndexedDB if needed
             };
             reader.readAsDataURL(file);
         }
-        
+
         async function submitUpload() {
             const name = document.getElementById('faceName').value;
             const age = parseInt(document.getElementById('age').value);
             const declaration = document.getElementById('declaration').checked;
             const token = localStorage.getItem('portrait_token');
-            
+
             if (!token) {
                 showToast('请先登录');
                 return;
             }
-            
-            if (!name || !age || !portraitData) {
-                showToast('请填写完整信息');
+
+            if (!name || !age || !portraitFile) {
+                showToast('请上传肖像照片');
                 return;
             }
-            
+
             if (age < 18) {
                 showToast('必须年满18岁才能注册');
                 return;
             }
-            
+
             if (!declaration) {
                 showToast('请确认肖像权声明');
                 return;
             }
-            
+
+            // Check if fingerprint was generated
+            if (!portraitFingerprint) {
+                showToast('正在生成指纹，请稍候...');
+                return;
+            }
+
             try {
-                const res = await fetch(`${API}/upload/portrait`, {
+                // Save portrait data locally first (Local-First)
+                if (localStore.db) {
+                    const reader = new FileReader();
+                    const imageBlob = await new Promise((resolve) => {
+                        reader.onload = (e) => {
+                            // Convert data URL to blob
+                            const arr = atob(e.target.result.split(',')[1]);
+                            const mime = portraitFile.type;
+                            const blob = new Blob([new Uint8Array(Array.from(arr).map(c => c.charCodeAt(0)))], { type: mime });
+                            resolve(blob);
+                        };
+                        reader.readAsDataURL(portraitFile);
+                    });
+
+                    await localStore.savePortrait({
+                        name: name,
+                        imageBlob: imageBlob,
+                        fingerprint: portraitFingerprint,
+                        fingerprintType: 'dhash',
+                        deviceId: await getDeviceId()
+                    });
+                }
+
+                // Send ONLY fingerprint to server (not the actual image)
+                const res = await fetch(`${API}/portrait/register-fingerprint`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -267,33 +323,41 @@
                     body: JSON.stringify({
                         name: name,
                         age: age,
-                        image: portraitData,
-                        id_image: idData,
+                        fingerprint_hash: portraitFingerprint,
+                        fingerprint_type: 'dhash',
+                        local_device_id: await getDeviceId(),
                         ai_declaration: 1
                     })
                 });
                 const d = await res.json();
-                
+
                 if (d.success) {
                     document.getElementById('result').style.display = 'block';
-                    document.getElementById('filePath').textContent = d.portrait_path;
-                    localStorage.setItem('portrait_path', d.portrait_path);
-                    showToast('上传成功！');
+                    document.getElementById('filePath').textContent = '肖像已保存在本地，指纹已注册';
+                    showToast('注册成功！您的肖像指纹已登记');
                 } else {
-                    showToast(d.error || '上传失败');
+                    showToast(d.error || '注册失败');
                 }
             } catch(e) {
+                console.error('Upload error:', e);
                 showToast('网络错误');
             }
         }
-        
-        function openFolder() {
-            const path = localStorage.getItem('portrait_path');
-            if (path) {
-                // Try to open the folder containing the file
-                const folder = path.substring(0, path.lastIndexOf('/'));
-                window.open('file://' + folder);
+
+        // Get or create a unique device ID for this browser
+        async function getDeviceId() {
+            let deviceId = localStorage.getItem('portraitpay_device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+                localStorage.setItem('portraitpay_device_id', deviceId);
             }
+            return deviceId;
+        }
+
+        function openFolder() {
+            // In Local-First mode, we can't open the system folder
+            // Instead, show a message about where the data is stored
+            showToast('您的肖像数据已安全保存在本设备中');
         }
         
         function logout() {
