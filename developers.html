@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开发者 API - PortraitPay AI</title>
+    <meta name="description" content="PortraitPay AI 开发者 API - 为 AI 模型和平台提供肖像版权查询接口">
+    <style>
+        :root {
+            --bg: #000000;
+            --bg-secondary: #1d1d1f;
+            --card: #2d2d2f;
+            --text: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #2997ff;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --danger: #ff453a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .nav-logo { font-size: 18px; font-weight: 700; color: var(--text); text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; }
+        .nav-links a:hover { color: var(--text); }
+
+        .hero {
+            padding: 120px 20px 60px;
+            text-align: center;
+            background: radial-gradient(ellipse at center top, rgba(41,151,255,0.12) 0%, transparent 60%);
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(41,151,255,0.15);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 48px);
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .hero p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px 80px; }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+        .card h2 {
+            font-size: 22px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h3 { font-size: 18px; margin-bottom: 12px; }
+        .card p { color: var(--text-secondary); margin-bottom: 16px; }
+
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #0a0a0f;
+            border-radius: 12px;
+        }
+        .method {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .method.get { background: rgba(48,209,88,0.2); color: var(--success); }
+        .method.post { background: rgba(41,151,255,0.2); color: var(--accent); }
+        .method.put { background: rgba(255,159,10,0.2); color: var(--warning); }
+        .method.delete { background: rgba(255,69,58,0.2); color: var(--danger); }
+
+        .endpoint-path {
+            font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .code-block {
+            background: #0a0a0f;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .code-block .comment { color: #6e6e73; }
+        .code-block .key { color: #2997ff; }
+        .code-block .string { color: #30d158; }
+        .code-block .number { color: #ff9f0a; }
+        .code-block .keyword { color: #ff453a; }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .param-table th {
+            text-align: left;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+        }
+        .param-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-secondary);
+        }
+        .param-table td:first-child {
+            color: var(--accent);
+            font-family: monospace;
+        }
+        .param-table .required {
+            color: var(--danger);
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .response-example {
+            background: rgba(48,209,88,0.1);
+            border: 1px solid rgba(48,209,88,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .response-example h4 {
+            color: var(--success);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.available { background: rgba(48,209,88,0.2); color: var(--success); }
+        .status-badge.unavailable { background: rgba(255,69,58,0.2); color: var(--danger); }
+        .status-badge.pending { background: rgba(255,159,10,0.2); color: var(--warning); }
+        .status-badge.requires_manual { background: rgba(41,151,255,0.2); color: var(--accent); }
+
+        .info-box {
+            background: rgba(41,151,255,0.1);
+            border-left: 3px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 20px;
+        }
+        .info-box p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+
+        .toc {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .toc h3 { margin-bottom: 12px; font-size: 16px; }
+        .toc a {
+            display: block;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        .toc a:hover { text-decoration: underline; }
+
+        footer {
+            background: var(--bg-secondary);
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-logo">← PortraitPay AI</a>
+        <div class="nav-links">
+            <a href="#endpoints">API 端点</a>
+            <a href="#authentication">认证</a>
+            <a href="#examples">示例</a>
+            <a href="enterprise.html">企业合作</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-badge">🔧 开发者 API</div>
+        <h1>PortraitPay AI Licensing API</h1>
+        <p>为 AI 模型和创作者平台提供肖像版权查询与授权接口</p>
+    </section>
+
+    <div class="container">
+        <div class="toc">
+            <h3>目录</h3>
+            <a href="#overview">概述</a>
+            <a href="#authentication">认证方式</a>
+            <a href="#endpoints">API 端点</a>
+            <a href="#search">搜索肖像</a>
+            <a href="#authorize">授权查询</a>
+            <a href="#localfirst">Local-First 说明</a>
+            <a href="#examples">完整示例</a>
+        </div>
+
+        <section class="card" id="overview">
+            <h2>📖 概述</h2>
+            <p>PortraitPay API 允许 AI 平台、创作者工具和任何需要查询肖像版权的应用：</p>
+            <ul style="color: var(--text-secondary); padding-left: 20px; margin-bottom: 16px;">
+                <li>查询特定肖像的授权状态和可用性</li>
+                <li>通过指纹搜索相似已注册肖像</li>
+                <li>获取授权价格和使用限制</li>
+                <li>发起授权申请或购买</li>
+            </ul>
+
+            <div class="info-box">
+                <p><strong>Local-First 模式：</strong>PortraitPay 采用 Local-First 架构。原始肖像图像保留在用户设备上，只上传不可逆指纹哈希进行检索。您的应用可以在不传输原始图像的情况下进行版权查询。</p>
+            </div>
+
+            <p><strong>Base URL:</strong></p>
+            <div class="code-block">https://portraitpayai.com/api</div>
+
+            <p><strong>响应格式:</strong> 所有响应均为 JSON</p>
+        </section>
+
+        <section class="card" id="authentication">
+            <h2>🔐 认证</h2>
+            <p>API 使用 API Key 进行认证。在请求头中添加：</p>
+            <div class="code-block">X-API-Key: your_api_key_here</div>
+            <p>获取 API Key：</p>
+            <ul style="color: var(--text-secondary); padding-left: 20px;">
+                <li>注册 PortraitPay 账户</li>
+                <li>登录后访问仪表盘获取 API Key</li>
+                <li>企业客户可申请更高调用额度</li>
+            </ul>
+        </section>
+
+        <section class="card" id="endpoints">
+            <h2>📡 API 端点</h2>
+
+            <!-- Search by Fingerprint -->
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/portrait/search-by-fingerprint</span>
+            </div>
+            <p>通过指纹哈希搜索已注册肖像（Local-First 模式）</p>
+
+            <table class="param-table">
+                <tr>
+                    <th>参数</th>
+                    <th>类型</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>fingerprint_hash</td>
+                    <td>string</td>
+                    <td>图像的 dHash/ahash 指纹（16-64字符）</td>
+                </tr>
+                <tr>
+                    <td>fingerprint_type</td>
+                    <td>string</td>
+                    <td>"dhash" | "ahash" | "phash"（默认 "dhash"）</td>
+                </tr>
+                <tr>
+                    <td>threshold</td>
+                    <td>float</td>
+                    <td>相似度阈值 0-1（默认 0.35）</td>
+                </tr>
+                <tr>
+                    <td>limit</td>
+                    <td>int</td>
+                    <td>最大返回结果数（默认 5，最大 20）</td>
+                </tr>
+            </table>
+
+            <div class="code-block"><span class="comment">// Request</span>
+{
+  <span class="key">"fingerprint_hash"</span>: <span class="string">"7f3d8a9c1b4e5d2f6a8b3c5d7e9f1a2"</span>,
+  <span class="key">"fingerprint_type"</span>: <span class="string">"dhash"</span>,
+  <span class="key">"threshold"</span>: <span class="number">0.35</span>
+}</div>
+
+            <div class="response-example">
+                <h4>响应示例</h4>
+                <div class="code-block" style="background: transparent; padding: 0;"><span class="comment">// 200 OK</span>
+{
+  <span class="key">"matches"</span>: [
+    {
+      <span class="key">"face_id"</span>: <span class="number">12345</span>,
+      <span class="key">"name"</span>: <span class="string">"刘德华"</span>,
+      <span class="key">"similarity"</span>: <span class="number">0.92</span>,
+      <span class="key">"authorization_status"</span>: <span class="string">"available"</span>,
+      <span class="key">"price"</span>: <span class="number">500</span>,
+      <span class="key">"copyright_info"</span>: <span class="string">"禁止用于政治目的"</span>
+    }
+  ],
+  <span class="key">"total"</span>: <span class="number">1</span>,
+  <span class="key">"search_id"</span>: <span class="string">"audit_12345"</span>
+}</div>
+            </div>
+
+            <!-- Authorization Check -->
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/portrait/authorization-check</span>
+            </div>
+            <p>查询特定肖像是否可用于特定场景</p>
+
+            <table class="param-table">
+                <tr>
+                    <th>参数</th>
+                    <th>类型</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>face_id</td>
+                    <td>int</td>
+                    <td>肖像 ID（<span class="required">必填</span>）</td>
+                </tr>
+                <tr>
+                    <td>usage_type</td>
+                    <td>string</td>
+                    <td>"ai_training" | "ai_generation" | "advertising" | "entertainment"</td>
+                </tr>
+                <tr>
+                    <td>commercial_use</td>
+                    <td>boolean</td>
+                    <td>是否商业用途</td>
+                </tr>
+                <tr>
+                    <td>exclusive</td>
+                    <td>boolean</td>
+                    <td>是否需要独家授权</td>
+                </tr>
+            </table>
+
+            <div class="code-block"><span class="comment">// Request</span>
+{
+  <span class="key">"face_id"</span>: <span class="number">12345</span>,
+  <span class="key">"usage_type"</span>: <span class="string">"ai_generation"</span>,
+  <span class="key">"commercial_use"</span>: <span class="keyword">true</span>
+}</div>
+
+            <div class="response-example">
+                <h4>响应示例</h4>
+                <div class="code-block" style="background: transparent; padding: 0;"><span class="comment">// 200 OK</span>
+{
+  <span class="key">"can_use"</span>: <span class="keyword">true</span>,
+  <span class="key">"authorization_status"</span>: <span class="string">"available"</span>,
+  <span class="key">"price"</span>: <span class="number">500</span>,
+  <span class="key">"license_type"</span>: <span class="string">"commercial"</span>,
+  <span class="key">"restrictions"</span>: [<span class="string">"no_politics"</span>, <span class="string">"no_porn"</span>],
+  <span class="key">"requires_contract"</span>: <span class="keyword">false</span>
+}</div>
+            </div>
+
+            <!-- Authorization Status Values -->
+            <h3>授权状态说明</h3>
+            <table class="param-table">
+                <tr>
+                    <th>状态</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td><span class="status-badge available">available</span></td>
+                    <td>可直接使用，无需额外审批</td>
+                </tr>
+                <tr>
+                    <td><span class="status-badge pending">pending_review</span></td>
+                    <td>正在审核中，暂不可用</td>
+                </tr>
+                <tr>
+                    <td><span class="status-badge requires_manual">requires_manual_approval</span></td>
+                    <td>需要权利人手动审批</td>
+                </tr>
+                <tr>
+                    <td><span class="status-badge unavailable">unavailable</span></td>
+                    <td>不可用（已禁用或已删除）</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="card" id="localfirst">
+            <h2>🖥️ Local-First 实现</h2>
+            <p>PortraitPay 支持 Local-First 模式，保护用户隐私同时实现版权检索。</p>
+
+            <h3>在浏览器中生成指纹</h3>
+            <div class="code-block"><span class="comment">// 使用 PortraitFingerprint JS 库（见下方链接）</span>
+<span class="keyword">const</span> fingerprint = <span class="keyword">await</span> PortraitFingerprint.generate(imageFile);
+<span class="comment">// 返回 { hash: "7f3d8a9c...", type: "dhash", bits: 64 }</span></div>
+
+            <h3>Python 示例</h3>
+            <div class="code-block"><span class="comment"># 安装: pip install imagehash pillow</span>
+<span class="keyword">import</span> imagehash
+<span class="keyword">from</span> PIL <span class="keyword">import</span> Image
+
+img = Image.open(<span class="string">'portrait.jpg'</span>)
+fingerprint = imagehash.dhash(img)
+<span class="comment"># 返回类似 "7f3d8a9c1b4e5d2f"</span></div>
+
+            <div class="info-box">
+                <p><strong>注意：</strong>指纹是单向哈希，无法从指纹还原原始图像。这确保了用户肖像隐私，同时允许有效的相似度匹配。</p>
+            </div>
+        </section>
+
+        <section class="card" id="examples">
+            <h2>💻 完整示例</h2>
+
+            <h3>cURL</h3>
+            <div class="code-block"><span class="comment"># 搜索肖像</span>
+curl -X POST https://portraitpayai.com/api/portrait/search-by-fingerprint \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -H <span class="string">"X-API-Key: your_api_key"</span> \
+  -d <span class="string">'{"fingerprint_hash": "7f3d8a9c1b4e5d2f", "threshold": 0.35}'</span>
+
+<span class="comment"># 检查授权</span>
+curl -X POST https://portraitpayai.com/api/portrait/authorization-check \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -H <span class="string">"X-API-Key: your_api_key"</span> \
+  -d <span class="string">'{"face_id": 12345, "usage_type": "ai_generation", "commercial_use": true}'</span></div>
+
+            <h3>Python</h3>
+            <div class="code-block"><span class="keyword">import</span> requests
+
+API_KEY = <span class="string">"your_api_key"</span>
+BASE_URL = <span class="string">"https://portraitpayai.com/api"</span>
+
+headers = {
+    <span class="string">"X-API-Key"</span>: API_KEY,
+    <span class="string">"Content-Type"</span>: <span class="string">"application/json"</span>
+}
+
+<span class="comment"># 搜索肖像</span>
+search_data = {
+    <span class="string">"fingerprint_hash"</span>: <span class="string">"7f3d8a9c1b4e5d2f"</span>,
+    <span class="key">"threshold"</span>: <span class="number">0.35</span>
+}
+result = requests.post(
+    <span class="string">f"{BASE_URL}/portrait/search-by-fingerprint"</span>,
+    json=search_data,
+    headers=headers
+).json()
+
+<span class="keyword">for</span> match <span class="keyword">in</span> result[<span class="string">"matches"</span>]:
+    <span class="keyword">print</span>(<span class="string">f"{match['name']}: {match['similarity']*100}% 相似"</span>)</div>
+
+            <h3>JavaScript</h3>
+            <div class="code-block"><span class="keyword">const</span> response = <span class="keyword">await</span> fetch(
+    <span class="string">'https://portraitpayai.com/api/portrait/search-by-fingerprint'</span>,
+    {
+        method: <span class="string">'POST'</span>,
+        headers: {
+            <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+            <span class="string">'X-API-Key'</span>: <span class="string">'your_api_key'</span>
+        },
+        body: JSON.stringify({
+            fingerprint_hash: <span class="string">'7f3d8a9c1b4e5d2f'</span>,
+            threshold: <span class="number">0.35</span>
+        })
+    }
+);
+<span class="keyword">const</span> data = <span class="keyword">await</span> response.json();
+console.log(<span class="string">`找到 <span class="keyword">${</span>data.matches.length<span class="keyword">}</span> 个匹配`</span>);</div>
+        </section>
+
+        <section class="card">
+            <h2>📊 限制与配额</h2>
+            <table class="param-table">
+                <tr>
+                    <th>计划</th>
+                    <th>每日调用</th>
+                    <th>每分钟限制</th>
+                </tr>
+                <tr>
+                    <td>免费</td>
+                    <td>100</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>专业版</td>
+                    <td>10,000</td>
+                    <td>100</td>
+                </tr>
+                <tr>
+                    <td>企业</td>
+                    <td>无限制</td>
+                    <td>可协商</td>
+                </tr>
+            </table>
+            <p style="margin-top: 16px;">需要更高配额？<a href="enterprise.html" style="color: var(--accent);">联系企业销售</a></p>
+        </section>
+    </div>
+
+    <footer>
+        <p>© 2026 PortraitPay AI. All rights reserved.</p>
+        <p style="margin-top: 8px;">
+            <a href="privacy.html">隐私政策</a> · <a href="terms.html">服务条款</a> · <a href="enterprise.html">企业合作</a>
+        </p>
+    </footer>
+</body>
+</html>
