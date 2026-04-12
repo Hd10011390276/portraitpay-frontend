@@ -164,9 +164,9 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label={t.register.email === "Email" ? "Password" : "密码"}
+                label={t.register.password}
                 type="password"
-                placeholder={t.register.email === "Email" ? "8+ chars with uppercase & number" : "8位，含大写字母和数字"}
+                placeholder={t.register.passwordPlaceholder}
                 value={form.password}
                 onChange={set("password")}
                 error={errors.password}
@@ -197,11 +197,11 @@ export default function RegisterPage() {
           <p className="text-xs text-center text-gray-400 dark:text-gray-500">
             {t.register.agreeToTerms}{" "}
             <a href="/terms" className="text-blue-600 dark:text-blue-400 hover:underline">
-              {t.register.email === "Email" ? "Terms of Service" : "服务条款"}
+              {t.register.terms}
             </a>{" "}
             {t.register.and}{" "}
             <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
-              {t.register.email === "Email" ? "Privacy Policy" : "隐私政策"}
+              {t.register.privacy}
             </a>
           </p>
         </div>
