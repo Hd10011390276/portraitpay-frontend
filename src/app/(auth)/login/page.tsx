@@ -133,31 +133,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
-      {/* Top bar with theme and language toggles */}
-      <div className="fixed top-4 right-4 flex items-center gap-3">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 py-8 sm:py-12">
+      {/* Top bar with theme and language toggles - mobile optimized */}
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 sm:gap-3 z-50">
         <ThemeToggle />
         <LanguageToggle />
       </div>
 
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8">
         {/* Logo / Header */}
-        <div className="text-center">
+        <div className="text-center px-2">
           <Link href="/" className="inline-block">
-            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2 hover:opacity-80 transition-opacity">
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2 hover:opacity-80 transition-opacity">
               PortraitPay
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {t.login.welcomeBack}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
             {t.login.signInToContinue}
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-gray-200 dark:border-gray-700">
             {[
@@ -167,7 +167,7 @@ export default function LoginPage() {
               <button
                 key={t.key}
                 onClick={() => { setTab(t.key as Tab); setGlobalError(""); setEmailErrors({}); setPhoneErrors({}); }}
-                className={`flex-1 py-3 text-sm font-medium transition-colors
+                className={`flex-1 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors
                   ${tab === t.key
                     ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/20"
                     : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
@@ -179,9 +179,9 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="p-6 space-y-5">
+          <form onSubmit={handleLogin} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
             {globalError && (
-              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3 text-sm text-red-600 dark:text-red-400">
+              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-red-600 dark:text-red-400">
                 {globalError}
               </div>
             )}
@@ -230,7 +230,7 @@ export default function LoginPage() {
 
                 {otpSent && (
                   <>
-                    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg px-4 py-2 text-sm text-green-700 dark:text-green-400">
+                    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-green-700 dark:text-green-400">
                       ✅ {t.login.verificationCodeSent} <strong>{otpSentTo}</strong>
                       {process.env.NODE_ENV === "development" && otpCode && (
                         <span className="ml-2 font-mono bg-green-200 dark:bg-green-800 px-1 rounded">
@@ -285,7 +285,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400 px-4">
           {t.login.noAccount}{" "}
           <Link href="/register" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
             {t.login.registerNow}

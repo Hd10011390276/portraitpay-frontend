@@ -100,34 +100,34 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
-      {/* Top bar with theme and language toggles */}
-      <div className="fixed top-4 right-4 flex items-center gap-3">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 py-6 sm:py-12">
+      {/* Top bar with theme and language toggles - mobile optimized */}
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 sm:gap-3 z-50">
         <ThemeToggle />
         <LanguageToggle />
       </div>
 
-      <div className="w-full max-w-lg space-y-8">
+      <div className="w-full max-w-lg space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="text-center">
+        <div className="text-center px-2">
           <Link href="/" className="inline-block">
-            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2 hover:opacity-80 transition-opacity">
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2 hover:opacity-80 transition-opacity">
               PortraitPay
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {t.register.createAccount}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
             {t.register.joinPortraitPay}
           </p>
         </div>
 
         {/* card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 space-y-4 sm:space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {globalError && (
-              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3 text-sm text-red-600 dark:text-red-400">
+              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-red-600 dark:text-red-400">
                 {globalError}
               </div>
             )}
@@ -162,7 +162,7 @@ export default function RegisterPage() {
               autoComplete="tel"
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <Input
                 label={t.register.password}
                 type="password"
@@ -206,7 +206,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400 px-4">
           {t.register.alreadyHaveAccount}{" "}
           <Link href="/login" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
             {t.register.signInNow}
