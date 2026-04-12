@@ -1,1 +1,1 @@
-{"version": 2}
+{"version":2,"rewrites":[{"source":"/api/(.*)","destination":"https://portraitpay-api-production.up.railway.app/api/$1"}]}
