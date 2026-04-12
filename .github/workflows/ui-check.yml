@@ -1,0 +1,127 @@
+name: UI Protection Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ui-check:
+    runs-on: ubuntu-latest
+    name: Check for UI Changes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for UI file changes
+        id: ui-check
+        run: |
+          # UI protected files and directories
+          UI_PATTERNS=(
+            "src/app/page.tsx"
+            "src/app/layout.tsx"
+            "src/app/globals.css"
+            "tailwind.config.ts"
+            "src/components/ui/"
+            "public/logo.png"
+            "public/logo-dark.png"
+            ".css"
+          )
+          
+          CHANGED_UI_FILES=""
+          CHANGES_DETECTED=false
+          
+          for file in $(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD); do
+            for pattern in "${UI_PATTERNS[@]}"; do
+              if [[ "$file" == *"$pattern"* ]]; then
+                CHANGES_DETECTED=true
+                CHANGED_UI_FILES="$CHANGED_UI_FILES\n  - $file"
+              fi
+            done
+          done
+          
+          echo "UI_CHANGES_DETECTED=$CHANGES_DETECTED" >> $GITHUB_OUTPUT
+          echo "CHANGED_FILES=$CHANGED_UI_FILES" >> $GITHUB_OUTPUT
+          
+          if [ "$CHANGES_DETECTED" = "true" ]; then
+            echo "⚠️ WARNING: UI changes detected!"
+            echo "$CHANGED_UI_FILES"
+          else
+            echo "✅ No UI changes detected"
+          fi
+
+      - name: Comment on PR if UI changes detected
+        if: steps.ui-check.outputs.UI_CHANGES_DETECTED == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ⚠️ UI Protection Alert
+            
+            This PR contains changes to UI files:
+            ${steps.ui-check.outputs.CHANGED_FILES}
+            
+            **Please verify these UI changes are intentional and necessary.**
+            
+            If these UI changes were not intended, please revert them using:
+            \`\`\`bash
+            git checkout -- <file>
+            \`\`\`
+            
+            ---
+            *🤖 QA Agent - UI Protection Check*`
+            })
+
+      - name: Fail if critical UI files changed
+        if: steps.ui-check.outputs.UI_CHANGES_DETECTED == 'true'
+        run: |
+          echo "❌ PR contains UI changes. Please review."
+          echo "Changed files:${{ steps.ui-check.outputs.CHANGED_FILES }}"
+          exit 1
+
+  build-check:
+    runs-on: ubuntu-latest
+    name: Verify Build Still Works
+    needs: ui-check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build project
+        run: npm run build
+        continue-on-error: true
+        id: build
+
+      - name: Comment build status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const buildSuccess = ${{ steps.build.outputs.success != false }};
+            const emoji = buildSuccess ? '✅' : '❌';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${emoji} Build ${buildSuccess ? 'passed' : 'failed'}
+            
+            ${buildSuccess ? 'Code compiles successfully.' : 'There are build errors that need to be fixed.'}
+            
+            ---
+            *🤖 QA Agent - Build Check*`
+            });
