@@ -90,13 +90,11 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 h-16 border-b border-gray-100 dark:border-gray-800">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-          <span className="text-white text-sm font-bold">PP</span>
-        </div>
-        <div>
-          <span className="font-bold text-gray-900 dark:text-white text-sm">PortraitPay</span>
-          <span className="block text-xs text-gray-400">AI Platform</span>
-        </div>
+        <Link href="/" className="flex items-center gap-3">
+          <img src="/logo.png" alt="Logo" className="logo-light w-8 h-8 object-contain" style={{ borderRadius: "6px" }} />
+          <img src="/logo-dark.png" alt="Logo" className="logo-dark w-8 h-8 object-contain" style={{ borderRadius: "6px" }} />
+          <span className="font-bold text-gray-900 dark:text-white text-sm" style={{ letterSpacing: "-0.02em" }}>PortraitPay AI</span>
+        </Link>
       </div>
 
       {/* Nav */}
