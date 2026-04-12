@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { Skeleton, SkeletonStatCard, SkeletonTableRow } from "@/components/ui/Skeleton";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface User {
   id: string;
@@ -20,7 +21,14 @@ interface Stat {
   bg: string;
 }
 
-const ROLE_LABELS: Record<string, string> = {
+const ROLE_LABELS_EN: Record<string, string> = {
+  USER: "Regular User",
+  ARTIST: "Artist",
+  AGENCY: "Agency",
+  ENTERPRISE: "Enterprise",
+};
+
+const ROLE_LABELS_ZH: Record<string, string> = {
   USER: "普通用户",
   ARTIST: "艺人",
   AGENCY: "经纪公司",
@@ -28,19 +36,23 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 function DashboardContent({ user }: { user: User }) {
+  const { t, locale } = useLanguage();
+  const isZh = locale === "zh-CN";
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stat[]>([]);
   const [recentPortraits, setRecentPortraits] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
 
+  const roleLabels = isZh ? ROLE_LABELS_ZH : ROLE_LABELS_EN;
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
       setStats([
-        { label: "已认证肖像", value: "12", delta: "+2 本月", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
-        { label: "本月收益", value: "¥3,840", delta: "+¥620", color: "text-green-600", bg: "bg-green-50 dark:bg-green-900/20" },
-        { label: "待处理授权", value: "3", delta: "", color: "text-yellow-600", bg: "bg-yellow-50 dark:bg-yellow-900/20" },
-        { label: "KYC 状态", value: "✅ 已认证", delta: "", color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-900/20" },
+        { label: t.dashboard.stats.certifiedPortraits, value: "12", delta: isZh ? "+2 本月" : "+2 this month", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
+        { label: t.dashboard.stats.monthlyEarnings, value: "¥3,840", delta: "+¥620", color: "text-green-600", bg: "bg-green-50 dark:bg-green-900/20" },
+        { label: t.dashboard.stats.pendingAuthorizations, value: "3", delta: "", color: "text-yellow-600", bg: "bg-yellow-50 dark:bg-yellow-900/20" },
+        { label: t.dashboard.stats.kycStatus, value: user.role !== "USER" ? t.dashboard.stats.verified : t.dashboard.stats.notVerified, delta: "", color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-900/20" },
       ]);
       setRecentPortraits([
         { id: "1", title: "Official Portrait — Jane D.", status: "ACTIVE", thumbnailUrl: null },
@@ -54,14 +66,14 @@ function DashboardContent({ user }: { user: User }) {
       ]);
     }, 800);
     return () => clearTimeout(timer);
-  }, []);
+  }, [t, isZh, user.role]);
 
   const initials = user?.name?.[0] ?? user?.email[0]?.toUpperCase() ?? "?";
 
   return (
     <DashboardShell
-      title={`欢迎回来，${user?.name ?? user?.email.split("@")[0]} 👋`}
-      subtitle="PortraitPay AI 控制台"
+      title={`${t.dashboard.welcome}${user?.name ?? user?.email.split("@")[0]} 👋`}
+      subtitle={t.dashboard.console}
       action={
         <Link
           href="/portraits/upload"
@@ -70,7 +82,7 @@ function DashboardContent({ user }: { user: User }) {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          上传肖像
+          {t.dashboard.uploadPortrait}
         </Link>
       }
     >
@@ -94,9 +106,9 @@ function DashboardContent({ user }: { user: User }) {
           {/* Recent Portraits */}
           <div className="lg:col-span-3 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-              <h2 className="font-semibold text-gray-900 dark:text-white">最近肖像</h2>
+              <h2 className="font-semibold text-gray-900 dark:text-white">{t.dashboard.recentPortraits}</h2>
               <Link href="/portraits" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                查看全部 →
+                {t.dashboard.viewAll}
               </Link>
             </div>
 
@@ -114,12 +126,12 @@ function DashboardContent({ user }: { user: User }) {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{p.title}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {p.status === "ACTIVE" ? "✅ 已上链认证" : "🔍 审核中"}
+                        {p.status === "ACTIVE" ? t.dashboard.status.onChain : t.dashboard.status.underReview}
                       </p>
                     </div>
                     <Link href={`/portraits/${p.id}`}
                       className="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                      查看
+                      {isZh ? "查看" : "View"}
                     </Link>
                   </div>
                 ))}
@@ -130,9 +142,9 @@ function DashboardContent({ user }: { user: User }) {
           {/* Recent Transactions */}
           <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-              <h2 className="font-semibold text-gray-900 dark:text-white">最近收益</h2>
+              <h2 className="font-semibold text-gray-900 dark:text-white">{t.dashboard.recentEarnings}</h2>
               <Link href="/earnings" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                收益明细 →
+                {t.dashboard.earningsDetail}
               </Link>
             </div>
 
@@ -151,7 +163,7 @@ function DashboardContent({ user }: { user: User }) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                        {tx.type === "LICENSE_PURCHASE" ? "📋 授权购买" : tx.type === "ROYALTY_PAYOUT" ? "💰 版税收入" : "🔄 续期"}
+                        {tx.type === "LICENSE_PURCHASE" ? t.dashboard.transaction.licensePurchase : tx.type === "ROYALTY_PAYOUT" ? t.dashboard.transaction.royaltyIncome : t.dashboard.transaction.renewal}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{tx.portraitTitle}</p>
                     </div>
@@ -168,10 +180,10 @@ function DashboardContent({ user }: { user: User }) {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "上传肖像", href: "/portraits/upload", icon: "📤", desc: "注册新肖像到区块链" },
-            { label: "查看收益", href: "/earnings", icon: "💰", desc: "查看授权收益明细" },
-            { label: "申请认证", href: "/kyc", icon: "🔐", desc: "完成身份认证" },
-            { label: "举报侵权", href: "/report", icon: "🚨", desc: "AI 检测侵权行为" },
+            { label: t.dashboard.uploadPortrait, href: "/portraits/upload", icon: "📤", desc: t.dashboard.uploadDesc },
+            { label: isZh ? "查看收益" : "View Earnings", href: "/earnings", icon: "💰", desc: t.dashboard.viewEarningsDesc },
+            { label: isZh ? "申请认证" : "Apply KYC", href: "/kyc", icon: "🔐", desc: t.dashboard.applyCertificationDesc },
+            { label: isZh ? "举报侵权" : "Report", href: "/report", icon: "🚨", desc: t.dashboard.reportInfringementDesc },
           ].map((action) => (
             <Link key={action.href} href={action.href}
               className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all">
@@ -193,14 +205,14 @@ function DashboardContent({ user }: { user: User }) {
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                  {user.name ?? "未设置姓名"}
+                  {user.name ?? t.dashboard.userCard.nameNotSet}
                 </h3>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
-                  {ROLE_LABELS[user.role] ?? user.role}
+                  {roleLabels[user.role] ?? user.role}
                 </span>
                 {user.role !== "USER" && (
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">
-                    ✅ KYC 已完成
+                    {t.dashboard.stats.verified}
                   </span>
                 )}
               </div>
@@ -208,11 +220,11 @@ function DashboardContent({ user }: { user: User }) {
               <div className="flex gap-3 mt-3">
                 <Link href="/kyc"
                   className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline">
-                  完成 KYC 认证 →
+                  {t.dashboard.userCard.completeKyc}
                 </Link>
                 <Link href="/settings"
                   className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:underline">
-                  账户设置
+                  {t.dashboard.userCard.accountSettings}
                 </Link>
               </div>
             </div>

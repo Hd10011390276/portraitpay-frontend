@@ -117,6 +117,52 @@ export const translations = {
       description:
         "在以太坊上注册你的肖像权。上传、认证、管理肖像授权，带有区块链时间戳和IPFS存储。",
     },
+    // Dashboard
+    dashboard: {
+      welcome: "欢迎回来，",
+      console: "PortraitPay AI 控制台",
+      uploadPortrait: "上传肖像",
+      stats: {
+        certifiedPortraits: "已认证肖像",
+        monthlyEarnings: "本月收益",
+        pendingAuthorizations: "待处理授权",
+        kycStatus: "KYC 状态",
+        verified: "✅ 已认证",
+        notVerified: "❌ 未认证",
+      },
+      recentPortraits: "最近肖像",
+      recentEarnings: "最近收益",
+      viewAll: "查看全部 →",
+      earningsDetail: "收益明细 →",
+      quickActions: "快捷操作",
+      uploadDesc: "注册新肖像到区块链",
+      viewEarningsDesc: "查看授权收益明细",
+      applyCertificationDesc: "完成身份认证",
+      reportInfringementDesc: "AI 检测侵权行为",
+      userCard: {
+        nameNotSet: "未设置姓名",
+        completeKyc: "完成 KYC 认证 →",
+        accountSettings: "账户设置",
+      },
+      status: {
+        onChain: "✅ 已上链认证",
+        underReview: "🔍 审核中",
+      },
+      transaction: {
+        licensePurchase: "📋 授权购买",
+        royaltyIncome: "💰 版税收入",
+        renewal: "🔄 续期",
+      },
+    },
+    // Header
+    header: {
+      accountSettings: "账户设置",
+      signOut: "退出登录",
+      signingOut: "退出中...",
+      logoutSuccess: "已退出登录",
+      logoutFailed: "退出失败",
+      pleaseRetry: "请稍后重试",
+    },
   },
 
   "en-US": {
@@ -226,6 +272,52 @@ export const translations = {
       title: "PortraitPay AI — Portrait Rights on Blockchain",
       description:
         "Register your portrait rights on Ethereum. Upload, certify, and manage portrait authorization with blockchain timestamps and IPFS storage.",
+    },
+    // Dashboard
+    dashboard: {
+      welcome: "Welcome back, ",
+      console: "PortraitPay AI Console",
+      uploadPortrait: "Upload Portrait",
+      stats: {
+        certifiedPortraits: "Certified Portraits",
+        monthlyEarnings: "Monthly Earnings",
+        pendingAuthorizations: "Pending Authorizations",
+        kycStatus: "KYC Status",
+        verified: "✅ Verified",
+        notVerified: "❌ Not Verified",
+      },
+      recentPortraits: "Recent Portraits",
+      recentEarnings: "Recent Earnings",
+      viewAll: "View All →",
+      earningsDetail: "Earnings Detail →",
+      quickActions: "Quick Actions",
+      uploadDesc: "Register new portrait on blockchain",
+      viewEarningsDesc: "View licensing earnings details",
+      applyCertificationDesc: "Complete identity verification",
+      reportInfringementDesc: "AI detects infringement",
+      userCard: {
+        nameNotSet: "Name not set",
+        completeKyc: "Complete KYC →",
+        accountSettings: "Account Settings",
+      },
+      status: {
+        onChain: "✅ On-chain Certified",
+        underReview: "🔍 Under Review",
+      },
+      transaction: {
+        licensePurchase: "📋 License Purchase",
+        royaltyIncome: "💰 Royalty Income",
+        renewal: "🔄 Renewal",
+      },
+    },
+    // Header
+    header: {
+      accountSettings: "Account Settings",
+      signOut: "Sign Out",
+      signingOut: "Signing out...",
+      logoutSuccess: "Logged out",
+      logoutFailed: "Logout failed",
+      pleaseRetry: "Please try again",
     },
   },
 } as const;
