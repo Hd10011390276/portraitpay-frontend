@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth/jwt";
+import { verifyToken } from "@/lib/auth/edge-jwt";
 
 const PUBLIC_PATHS = [
   "/login",
@@ -12,7 +12,7 @@ const PUBLIC_PATHS = [
   "/enterprise/authorization/apply",
 ];
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow public pages (exact match for "/" + prefix match for others)
@@ -34,7 +34,7 @@ export function middleware(req: NextRequest) {
     req.cookies.get("pp_access_token")?.value ||
     req.cookies.get("accessToken")?.value;
 
-  if (!token || !verifyToken(token)) {
+  if (!token || !(await verifyToken(token))) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.next();
     }
