@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/auth/Input";
@@ -17,36 +17,34 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState("");
 
-  // Email login state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailErrors, setEmailErrors] = useState<Record<string, string>>({});
 
-  // Phone login state
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [phoneErrors, setPhoneErrors] = useState<Record<string, string>>({});
   const [otpSent, setOtpSent] = useState(false);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [otpSentTo, setOtpSentTo] = useState("");
-  const [otpCode, setOtpCode] = useState(""); // test mode display
+  const [otpCode, setOtpCode] = useState("");
 
   const isZh = locale === "zh-CN";
 
   const validateEmailForm = () => {
     const errs: Record<string, string> = {};
-    if (!email) errs.email = "邮箱不能为空";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "请输入有效的邮箱地址";
-    if (!password) errs.password = "密码不能为空";
+    if (!email) errs.email = t.login.errors.emailRequired;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = t.login.errors.invalidEmail;
+    if (!password) errs.password = t.login.errors.passwordRequired;
     setEmailErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
   const validatePhoneForm = () => {
     const errs: Record<string, string> = {};
-    if (!/^1[3-9]\d{9}$/.test(phone)) errs.phone = "请输入有效的中国大陆手机号";
-    if (!otpSent) errs.phone = "请先发送验证码";
-    if (!code || !/^\d{6}$/.test(code)) errs.code = "请输入6位验证码";
+    if (!/^1[3-9]\d{9}$/.test(phone)) errs.phone = t.login.errors.invalidPhone;
+    if (!otpSent) errs.phone = t.login.errors.sendOtpFirst;
+    if (!code || !/^\d{6}$/.test(code)) errs.code = t.login.errors.invalidCode;
     setPhoneErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -54,7 +52,7 @@ export default function LoginPage() {
   const handleSendOtp = async () => {
     const errs: Record<string, string> = {};
     if (!/^1[3-9]\d{9}$/.test(phone)) {
-      errs.phone = "请输入有效的中国大陆手机号";
+      errs.phone = t.login.errors.invalidPhone;
       setPhoneErrors(errs);
       return;
     }
@@ -69,7 +67,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setGlobalError(data.message || "发送失败");
+        setGlobalError(data.message || t.login.errors.sendFailed);
         return;
       }
       setOtpSent(true);
@@ -83,7 +81,7 @@ export default function LoginPage() {
         });
       }, 1000);
     } catch {
-      setGlobalError("网络错误，请稍后重试");
+      setGlobalError(t.login.errors.networkError);
     } finally {
       setLoading(false);
     }
@@ -116,11 +114,10 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setGlobalError(data.message || "登录失败");
+        setGlobalError(data.message || t.login.errors.loginFailed);
         return;
       }
 
-      // Store tokens in localStorage for client access
       if (data.data?.accessToken) {
         localStorage.setItem("pp_access_token", data.data.accessToken);
         localStorage.setItem("pp_refresh_token", data.data.refreshToken);
@@ -129,7 +126,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch {
-      setGlobalError("网络错误，请稍后重试");
+      setGlobalError(t.login.errors.networkError);
     } finally {
       setLoading(false);
     }
@@ -152,10 +149,10 @@ export default function LoginPage() {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {isZh ? "欢迎回来" : "Welcome Back"}
+            {t.login.welcomeBack}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {isZh ? "登录您的账户以继续" : "Sign in to continue"}
+            {t.login.signInToContinue}
           </p>
         </div>
 
@@ -164,8 +161,8 @@ export default function LoginPage() {
           {/* Tabs */}
           <div className="flex border-b border-gray-200 dark:border-gray-700">
             {[
-              { key: "email", label: isZh ? "邮箱登录" : "Email Login" },
-              { key: "phone", label: isZh ? "手机验证码" : "Phone OTP" },
+              { key: "email", label: t.login.emailLogin },
+              { key: "phone", label: t.login.phoneOtp },
             ].map((t) => (
               <button
                 key={t.key}
@@ -193,7 +190,7 @@ export default function LoginPage() {
             {tab === "email" && (
               <>
                 <Input
-                  label={isZh ? "邮箱" : "Email"}
+                  label={t.login.email}
                   type="email"
                   placeholder="your@email.com"
                   value={email}
@@ -202,7 +199,7 @@ export default function LoginPage() {
                   autoComplete="email"
                 />
                 <Input
-                  label={isZh ? "密码" : "Password"}
+                  label={t.login.password}
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -212,7 +209,7 @@ export default function LoginPage() {
                 />
                 <div className="flex justify-end">
                   <Link href="/forgot-password" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                    {isZh ? "忘记密码？" : "Forgot password?"}
+                    {t.login.forgotPassword}
                   </Link>
                 </div>
               </>
@@ -222,9 +219,9 @@ export default function LoginPage() {
             {tab === "phone" && (
               <>
                 <Input
-                  label={isZh ? "手机号" : "Phone"}
+                  label={t.login.phone}
                   type="tel"
-                  placeholder={isZh ? "请输入中国大陆手机号" : "Enter Chinese mobile number"}
+                  placeholder={t.login.enterChineseMobile}
                   value={phone}
                   onChange={(e) => { setPhone(e.target.value); setPhoneErrors((prev) => ({ ...prev, phone: "" })); setOtpSent(false); }}
                   error={phoneErrors.phone}
@@ -234,7 +231,7 @@ export default function LoginPage() {
                 {otpSent && (
                   <>
                     <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg px-4 py-2 text-sm text-green-700 dark:text-green-400">
-                      ✅ {isZh ? "验证码已发送至" : "Verification code sent to"} <strong>{otpSentTo}</strong>
+                      ✅ {t.login.verificationCodeSent} <strong>{otpSentTo}</strong>
                       {process.env.NODE_ENV === "development" && otpCode && (
                         <span className="ml-2 font-mono bg-green-200 dark:bg-green-800 px-1 rounded">
                           {otpCode}
@@ -242,9 +239,9 @@ export default function LoginPage() {
                       )}
                     </div>
                     <Input
-                      label={isZh ? "验证码" : "Verification Code"}
+                      label={t.login.verificationCode}
                       type="text"
-                      placeholder={isZh ? "请输入6位验证码" : "Enter 6-digit code"}
+                      placeholder={t.login.enter6DigitCode}
                       maxLength={6}
                       value={code}
                       onChange={(e) => { setCode(e.target.value.replace(/\D/g, "")); setPhoneErrors((prev) => ({ ...prev, code: "" })); }}
@@ -264,7 +261,7 @@ export default function LoginPage() {
                       disabled={otpCountdown > 0}
                       onClick={handleSendOtp}
                     >
-                      {otpCountdown > 0 ? `${otpCountdown}s ${isZh ? "后重发" : "resend"}` : (isZh ? "重新发送" : "Resend")}
+                      {otpCountdown > 0 ? `${otpCountdown}s ${t.login.resendIn}` : t.login.resend}
                     </Button>
                   ) : (
                     <Button
@@ -275,7 +272,7 @@ export default function LoginPage() {
                       onClick={handleSendOtp}
                       loading={loading}
                     >
-                      {isZh ? "发送验证码" : "Send Code"}
+                      {t.login.sendCode}
                     </Button>
                   )}
                 </div>
@@ -283,15 +280,15 @@ export default function LoginPage() {
             )}
 
             <Button type="submit" size="lg" loading={loading} className="w-full">
-              {isZh ? "登录" : "Sign In"}
+              {t.login.signIn}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          {isZh ? "还没有账户？" : "Don't have an account?"}{" "}
+          {t.login.noAccount}{" "}
           <Link href="/register" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
-            {isZh ? "立即注册" : "Register Now"}
+            {t.login.registerNow}
           </Link>
         </p>
       </div>

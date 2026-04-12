@@ -11,8 +11,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { locale } = useLanguage();
-  const isZh = locale === "zh-CN";
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState("");
 
@@ -37,18 +36,18 @@ export default function RegisterPage() {
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
 
-    if (!form.name.trim()) errs.name = isZh ? "姓名不能为空" : "Name is required";
-    if (!form.email) errs.email = isZh ? "邮箱不能为空" : "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = isZh ? "请输入有效的邮箱地址" : "Please enter a valid email";
-    if (!form.password) errs.password = isZh ? "密码不能为空" : "Password is required";
-    else if (form.password.length < 8) errs.password = isZh ? "密码至少8位" : "Password must be at least 8 characters";
+    if (!form.name.trim()) errs.name = t.register.errors.nameRequired;
+    if (!form.email) errs.email = t.register.errors.emailRequired;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = t.register.errors.invalidEmail;
+    if (!form.password) errs.password = t.register.errors.passwordRequired;
+    else if (form.password.length < 8) errs.password = t.register.errors.passwordTooShort;
     else {
-      if (!/[A-Z]/.test(form.password)) errs.password = isZh ? "密码需包含至少一个大写字母" : "Password must contain at least one uppercase letter";
-      else if (!/[0-9]/.test(form.password)) errs.password = isZh ? "密码需包含至少一个数字" : "Password must contain at least one number";
+      if (!/[A-Z]/.test(form.password)) errs.password = t.register.errors.passwordNeedUppercase;
+      else if (!/[0-9]/.test(form.password)) errs.password = t.register.errors.passwordNeedNumber;
     }
-    if (!form.confirmPassword) errs.confirmPassword = isZh ? "请确认密码" : "Please confirm password";
-    else if (form.password !== form.confirmPassword) errs.confirmPassword = isZh ? "两次密码不一致" : "Passwords do not match";
-    if (!form.role) errs.role = isZh ? "请选择角色" : "Please select a role";
+    if (!form.confirmPassword) errs.confirmPassword = t.register.errors.confirmPasswordRequired;
+    else if (form.password !== form.confirmPassword) errs.confirmPassword = t.register.errors.passwordsMismatch;
+    if (!form.role) errs.role = t.register.errors.selectRole;
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -81,7 +80,7 @@ export default function RegisterPage() {
         if (data.errors) {
           setErrors((prev) => ({ ...prev, ...data.errors }));
         } else {
-          setGlobalError(data.message || (isZh ? "注册失败" : "Registration failed"));
+          setGlobalError(data.message || t.register.errors.registrationFailed);
         }
         return;
       }
@@ -94,7 +93,7 @@ export default function RegisterPage() {
 
       router.push("/dashboard");
     } catch {
-      setGlobalError(isZh ? "网络错误，请稍后重试" : "Network error, please try again");
+      setGlobalError(t.register.errors.networkError);
     } finally {
       setLoading(false);
     }
@@ -117,14 +116,14 @@ export default function RegisterPage() {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {isZh ? "创建账户" : "Create Account"}
+            {t.register.createAccount}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {isZh ? "加入 PortraitPay，开启数字艺术之旅" : "Join PortraitPay and start your digital art journey"}
+            {t.register.joinPortraitPay}
           </p>
         </div>
 
-        {/* Card */}
+        {/* card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
           <form onSubmit={handleSubmit} className="space-y-5">
             {globalError && (
@@ -134,9 +133,9 @@ export default function RegisterPage() {
             )}
 
             <Input
-              label={isZh ? "姓名" : "Name"}
+              label={t.register.name}
               type="text"
-              placeholder={isZh ? "请输入真实姓名" : "Enter your real name"}
+              placeholder={t.register.enterRealName}
               value={form.name}
               onChange={set("name")}
               error={errors.name}
@@ -144,7 +143,7 @@ export default function RegisterPage() {
             />
 
             <Input
-              label={isZh ? "邮箱" : "Email"}
+              label={t.register.email}
               type="email"
               placeholder="your@email.com"
               value={form.email}
@@ -154,9 +153,9 @@ export default function RegisterPage() {
             />
 
             <Input
-              label={isZh ? "手机号（选填）" : "Phone (Optional)"}
+              label={t.register.phoneOptional}
               type="tel"
-              placeholder={isZh ? "可后续绑定" : "Can be added later"}
+              placeholder={t.register.phoneCanAddLater}
               value={form.phone}
               onChange={set("phone")}
               error={errors.phone}
@@ -165,18 +164,18 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label={isZh ? "密码" : "Password"}
+                label={t.register.email === "Email" ? "Password" : "密码"}
                 type="password"
-                placeholder={isZh ? "8位，含大写字母和数字" : "8+ chars with uppercase & number"}
+                placeholder={t.register.email === "Email" ? "8+ chars with uppercase & number" : "8位，含大写字母和数字"}
                 value={form.password}
                 onChange={set("password")}
                 error={errors.password}
                 autoComplete="new-password"
               />
               <Input
-                label={isZh ? "确认密码" : "Confirm Password"}
+                label={t.register.confirmPassword}
                 type="password"
-                placeholder={isZh ? "再次输入密码" : "Re-enter password"}
+                placeholder={t.register.reEnterPassword}
                 value={form.confirmPassword}
                 onChange={set("confirmPassword")}
                 error={errors.confirmPassword}
@@ -191,26 +190,26 @@ export default function RegisterPage() {
             />
 
             <Button type="submit" size="lg" loading={loading} className="w-full">
-              {isZh ? "注册" : "Register"}
+              {t.register.register}
             </Button>
           </form>
 
           <p className="text-xs text-center text-gray-400 dark:text-gray-500">
-            {isZh ? "注册即表示同意" : "By registering, you agree to"}{" "}
+            {t.register.agreeToTerms}{" "}
             <a href="/terms" className="text-blue-600 dark:text-blue-400 hover:underline">
-              {isZh ? "服务条款" : "Terms of Service"}
+              {t.register.email === "Email" ? "Terms of Service" : "服务条款"}
             </a>{" "}
-            {isZh ? "和" : "and"}{" "}
+            {t.register.and}{" "}
             <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
-              {isZh ? "隐私政策" : "Privacy Policy"}
+              {t.register.email === "Email" ? "Privacy Policy" : "隐私政策"}
             </a>
           </p>
         </div>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          {isZh ? "已有账户？" : "Already have an account?"}{" "}
+          {t.register.alreadyHaveAccount}{" "}
           <Link href="/login" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
-            {isZh ? "立即登录" : "Sign In"}
+            {t.register.signInNow}
           </Link>
         </p>
       </div>
