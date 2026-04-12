@@ -4,11 +4,15 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/auth/Input";
 import { Button } from "@/components/auth/Button";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import ThemeToggle from "@/components/ThemeToggle";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Tab = "email" | "phone";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { locale, t } = useLanguage();
   const [tab, setTab] = useState<Tab>("email");
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState("");
@@ -26,6 +30,8 @@ export default function LoginPage() {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [otpSentTo, setOtpSentTo] = useState("");
   const [otpCode, setOtpCode] = useState(""); // test mode display
+
+  const isZh = locale === "zh-CN";
 
   const validateEmailForm = () => {
     const errs: Record<string, string> = {};
@@ -130,15 +136,25 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
+      {/* Top bar with theme and language toggles */}
+      <div className="fixed top-4 right-4 flex items-center gap-3">
+        <ThemeToggle />
+        <LanguageToggle />
+      </div>
+
       <div className="w-full max-w-md space-y-8">
         {/* Logo / Header */}
         <div className="text-center">
-          <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-            PortraitPay
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">欢迎回来</h1>
+          <Link href="/" className="inline-block">
+            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2 hover:opacity-80 transition-opacity">
+              PortraitPay
+            </div>
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {isZh ? "欢迎回来" : "Welcome Back"}
+          </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            登录您的账户以继续
+            {isZh ? "登录您的账户以继续" : "Sign in to continue"}
           </p>
         </div>
 
@@ -147,8 +163,8 @@ export default function LoginPage() {
           {/* Tabs */}
           <div className="flex border-b border-gray-200 dark:border-gray-700">
             {[
-              { key: "email", label: "邮箱登录" },
-              { key: "phone", label: "手机验证码" },
+              { key: "email", label: isZh ? "邮箱登录" : "Email Login" },
+              { key: "phone", label: isZh ? "手机验证码" : "Phone OTP" },
             ].map((t) => (
               <button
                 key={t.key}
@@ -176,7 +192,7 @@ export default function LoginPage() {
             {tab === "email" && (
               <>
                 <Input
-                  label="邮箱"
+                  label={isZh ? "邮箱" : "Email"}
                   type="email"
                   placeholder="your@email.com"
                   value={email}
@@ -185,7 +201,7 @@ export default function LoginPage() {
                   autoComplete="email"
                 />
                 <Input
-                  label="密码"
+                  label={isZh ? "密码" : "Password"}
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -195,7 +211,7 @@ export default function LoginPage() {
                 />
                 <div className="flex justify-end">
                   <Link href="/forgot-password" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                    忘记密码？
+                    {isZh ? "忘记密码？" : "Forgot password?"}
                   </Link>
                 </div>
               </>
@@ -205,9 +221,9 @@ export default function LoginPage() {
             {tab === "phone" && (
               <>
                 <Input
-                  label="手机号"
+                  label={isZh ? "手机号" : "Phone"}
                   type="tel"
-                  placeholder="请输入中国大陆手机号"
+                  placeholder={isZh ? "请输入中国大陆手机号" : "Enter Chinese mobile number"}
                   value={phone}
                   onChange={(e) => { setPhone(e.target.value); setPhoneErrors((prev) => ({ ...prev, phone: "" })); setOtpSent(false); }}
                   error={phoneErrors.phone}
@@ -217,7 +233,7 @@ export default function LoginPage() {
                 {otpSent && (
                   <>
                     <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg px-4 py-2 text-sm text-green-700 dark:text-green-400">
-                      ✅ 验证码已发送至 <strong>{otpSentTo}</strong>
+                      ✅ {isZh ? "验证码已发送至" : "Verification code sent to"} <strong>{otpSentTo}</strong>
                       {process.env.NODE_ENV === "development" && otpCode && (
                         <span className="ml-2 font-mono bg-green-200 dark:bg-green-800 px-1 rounded">
                           {otpCode}
@@ -225,9 +241,9 @@ export default function LoginPage() {
                       )}
                     </div>
                     <Input
-                      label="验证码"
+                      label={isZh ? "验证码" : "Verification Code"}
                       type="text"
-                      placeholder="请输入6位验证码"
+                      placeholder={isZh ? "请输入6位验证码" : "Enter 6-digit code"}
                       maxLength={6}
                       value={code}
                       onChange={(e) => { setCode(e.target.value.replace(/\D/g, "")); setPhoneErrors((prev) => ({ ...prev, code: "" })); }}
@@ -247,7 +263,7 @@ export default function LoginPage() {
                       disabled={otpCountdown > 0}
                       onClick={handleSendOtp}
                     >
-                      {otpCountdown > 0 ? `${otpCountdown}s 后重发` : "重新发送"}
+                      {otpCountdown > 0 ? `${otpCountdown}s ${isZh ? "后重发" : "resend"}` : (isZh ? "重新发送" : "Resend")}
                     </Button>
                   ) : (
                     <Button
@@ -258,7 +274,7 @@ export default function LoginPage() {
                       onClick={handleSendOtp}
                       loading={loading}
                     >
-                      发送验证码
+                      {isZh ? "发送验证码" : "Send Code"}
                     </Button>
                   )}
                 </div>
@@ -266,15 +282,15 @@ export default function LoginPage() {
             )}
 
             <Button type="submit" size="lg" loading={loading} className="w-full">
-              登录
+              {isZh ? "登录" : "Sign In"}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          还没有账户？{" "}
+          {isZh ? "还没有账户？" : "Don't have an account?"}{" "}
           <Link href="/register" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
-            立即注册
+            {isZh ? "立即注册" : "Register Now"}
           </Link>
         </p>
       </div>
