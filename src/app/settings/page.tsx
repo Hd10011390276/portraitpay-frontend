@@ -3,8 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useToast, ToastProvider } from "@/components/ui/Toast";
+import { DashboardShell } from "@/components/layout/DashboardShell";
+import { useLanguage } from "@/context/LanguageContext";
 
 function SettingsContent() {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -20,27 +23,15 @@ function SettingsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2 text-xl font-bold text-purple-600">
-            🎭 PortraitPay
-          </Link>
-          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700 transition">
-            ← 返回控制台
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">账户设置</h1>
-        <p className="text-sm text-gray-500 mb-8">管理您的账户偏好设置和通知</p>
-
+    <DashboardShell
+      title="账户设置"
+      subtitle="管理您的账户偏好设置和通知"
+    >
+      <div className="max-w-3xl">
         <form onSubmit={handleSave} className="space-y-6">
           {/* Notification Settings */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-5">通知设置</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-5">通知设置</h2>
             <div className="space-y-4">
               {[
                 {
@@ -67,8 +58,8 @@ function SettingsContent() {
               ].map((item) => (
                 <div key={item.id} className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.desc}</p>
                   </div>
                   <button
                     type="button"
@@ -76,7 +67,7 @@ function SettingsContent() {
                     aria-checked={item.checked}
                     onClick={() => item.onChange(!item.checked)}
                     className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-                      item.checked ? "bg-purple-600" : "bg-gray-200"
+                      item.checked ? "bg-purple-600" : "bg-gray-200 dark:bg-gray-700"
                     }`}
                   >
                     <span
@@ -91,40 +82,40 @@ function SettingsContent() {
           </div>
 
           {/* Account Info */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-5">账户信息</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-5">账户信息</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">邮箱地址</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">邮箱地址</label>
                 <input
                   type="email"
                   defaultValue="user@example.com"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">显示名称</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">显示名称</label>
                 <input
                   type="text"
                   defaultValue="用户名"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
           </div>
 
           {/* Danger Zone */}
-          <div className="bg-white rounded-2xl border border-red-200 p-6">
-            <h2 className="text-base font-semibold text-red-600 mb-5">危险区域</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-red-200 dark:border-red-900/50 p-6">
+            <h2 className="text-base font-semibold text-red-600 dark:text-red-400 mb-5">危险区域</h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">注销账户</p>
-                  <p className="text-xs text-gray-500 mt-0.5">永久删除您的账户和所有数据。区块链记录除外。</p>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">注销账户</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">永久删除您的账户和所有数据。区块链记录除外。</p>
                 </div>
                 <button
                   type="button"
-                  className="px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition"
+                  className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition shrink-0"
                 >
                   注销账户
                 </button>
@@ -150,8 +141,8 @@ function SettingsContent() {
             </button>
           </div>
         </form>
-      </main>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }
 

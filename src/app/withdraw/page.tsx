@@ -6,6 +6,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { DashboardShell } from "@/components/layout/DashboardShell";
 
 interface EarningsSummary {
   availableBalance: number;
@@ -133,92 +134,85 @@ export default function WithdrawPage() {
     new Date(d).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-3xl mx-auto space-y-6">
-
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700">←</button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">提现</h1>
-            <p className="text-sm text-gray-500">PortraitPay AI · 收益提现申请</p>
-          </div>
-        </div>
-
+    <DashboardShell
+      title="提现"
+      subtitle="PortraitPay AI · 收益提现申请"
+    >
+      <div className="max-w-3xl space-y-6">
         {/* Balance Card */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
           <p className="text-blue-100 text-sm mb-1">可提现余额</p>
-          <p className="text-4xl font-bold">
+          <p className="text-3xl sm:text-4xl font-bold">
             {loading ? "—" : formatCurrency(balance?.availableBalance ?? 0)}
           </p>
           <p className="text-blue-200 text-xs mt-2">每月1-5日为对账周期，暂停提现</p>
         </div>
 
         {/* Withdrawal Form */}
-        <div className="bg-white rounded-xl p-6">
-          <h2 className="font-semibold text-gray-800 mb-5">填写提现信息</h2>
+        <div className="bg-white dark:bg-gray-900 rounded-xl p-6">
+          <h2 className="font-semibold text-gray-800 dark:text-white mb-5">填写提现信息</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">{error}</div>
           )}
           {successMsg && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">{successMsg}</div>
+            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-400 text-sm">{successMsg}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">提现金额 (¥)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">提现金额 (¥)</label>
               <input
                 type="number"
                 min={MIN_WITHDRAWAL}
                 step="0.01"
                 placeholder={`最低 ¥${MIN_WITHDRAWAL}`}
-                className="w-full border rounded-lg px-4 py-2.5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />
               {!loading && balance && (
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   当前可提现：{formatCurrency(balance.availableBalance)} · 输入全部可填「{balance.availableBalance.toFixed(2)}」
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">银行名称</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">银行名称</label>
               <input
                 type="text"
                 placeholder="例如：中国工商银行"
-                className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={bankName}
                 onChange={(e) => setBankName(e.target.value)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">银行账号</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">银行账号</label>
               <input
                 type="text"
                 inputMode="numeric"
                 placeholder="请输入银行卡号"
-                className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={bankAccount}
                 onChange={(e) => setBankAccount(e.target.value)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">开户姓名</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">开户姓名</label>
               <input
                 type="text"
                 placeholder="请输入持卡人姓名"
-                className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={accountHolder}
                 onChange={(e) => setAccountHolder(e.target.value)}
               />
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4 text-xs text-gray-500 space-y-1">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-xs text-gray-500 dark:text-gray-400 space-y-1">
               <p>• 最低提现金额：¥{MIN_WITHDRAWAL}</p>
               <p>• 到账时间：1-3 个工作日</p>
               <p>• 实际到账金额 = 申请金额（含Stripe手续费）</p>
@@ -235,29 +229,29 @@ export default function WithdrawPage() {
         </div>
 
         {/* History */}
-        <div className="bg-white rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-800">提现记录</h2>
+        <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+            <h2 className="font-semibold text-gray-800 dark:text-white">提现记录</h2>
           </div>
 
           {history.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">暂无提现记录</div>
+            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">暂无提现记录</div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-gray-50 dark:divide-gray-800">
               {history.map((w) => {
                 const status = STATUS_LABEL[w.status] ?? { text: w.status, color: "text-gray-600 bg-gray-50" };
                 return (
                   <div key={w.id} className="px-5 py-4 flex items-center gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">{formatCurrency(w.amount)}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{formatCurrency(w.amount)}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                         {w.bankName} ****{w.bankAccountLast4} · {formatDate(w.createdAt)}
                       </p>
                       {w.rejectionReason && (
-                        <p className="text-xs text-red-500 mt-0.5">拒绝原因：{w.rejectionReason}</p>
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-0.5">拒绝原因：{w.rejectionReason}</p>
                       )}
                     </div>
-                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${status.color}`}>
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${status.color}`}>
                       {status.text}
                     </span>
                   </div>
@@ -267,6 +261,6 @@ export default function WithdrawPage() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

@@ -10,6 +10,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { DashboardShell } from "@/components/layout/DashboardShell";
 
 const INFRINGEMENT_TYPES = [
   { value: "UNAUTHORIZED_USE", label: "未经授权使用" },
@@ -88,25 +89,19 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-12">
-      <div className="mx-auto max-w-2xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">提交侵权举报</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            发现有人在未经授权的情况下使用了您的肖像？请填写以下信息提交侵权举报。
-            平台将在 24 小时内完成初审并通知您。
-          </p>
-        </div>
-
+    <DashboardShell
+      title="提交侵权举报"
+      subtitle="发现有人在未经授权的情况下使用了您的肖像？请填写以下信息提交侵权举报"
+    >
+      <div className="max-w-2xl mx-auto">
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-8 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm">
           {/* Portrait ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               您的肖像 ID <span className="text-red-500">*</span>
             </label>
-            <p className="mb-1 text-xs text-gray-500">
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">
               前往「我的肖像」页面复制您要维权的肖像 ID
             </p>
             <input
@@ -114,20 +109,20 @@ export default function ReportPage() {
               value={form.portraitId}
               onChange={(e) => setForm((f) => ({ ...f, portraitId: e.target.value }))}
               placeholder="例如：clx8k2f3j0001qsrr9abcd123"
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               required
             />
           </div>
 
           {/* Infringement Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               侵权类型 <span className="text-red-500">*</span>
             </label>
             <select
               value={form.type}
               onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             >
               {INFRINGEMENT_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>{t.label}</option>
@@ -137,25 +132,25 @@ export default function ReportPage() {
 
           {/* Infringing URL */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               发现侵权的链接
             </label>
-            <p className="mb-1 text-xs text-gray-500">请粘贴包含侵权内容的页面 URL</p>
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">请粘贴包含侵权内容的页面 URL</p>
             <input
               type="url"
               value={form.detectedUrl}
               onChange={(e) => setForm((f) => ({ ...f, detectedUrl: e.target.value }))}
               placeholder="https://..."
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             />
           </div>
 
           {/* Evidence URLs */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               证据截图链接 <span className="text-red-500">*</span>
             </label>
-            <p className="mb-1 text-xs text-gray-500">
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">
               请上传侵权截图到图床，粘贴每行一个 URL（最多10张）
             </p>
             <textarea
@@ -163,68 +158,68 @@ export default function ReportPage() {
               onChange={(e) => setForm((f) => ({ ...f, evidenceUrls: e.target.value }))}
               placeholder={"https://example.com/screenshot1.jpg\nhttps://example.com/screenshot2.jpg"}
               rows={4}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               required
             />
             {evidenceUrls.length > 0 && (
-              <p className="mt-1 text-xs text-green-600">已填写 {evidenceUrls.length} 个证据链接</p>
+              <p className="mt-1 text-xs text-green-600 dark:text-green-400">已填写 {evidenceUrls.length} 个证据链接</p>
             )}
           </div>
 
           {/* Original Image URL */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               原始肖像图链接（选填）
             </label>
-            <p className="mb-1 text-xs text-gray-500">如有原始肖像照片，请提供链接以便核实</p>
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">如有原始肖像照片，请提供链接以便核实</p>
             <input
               type="url"
               value={form.originalImageUrl}
               onChange={(e) => setForm((f) => ({ ...f, originalImageUrl: e.target.value }))}
               placeholder="https://..."
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               详细描述 <span className="text-red-500">*</span>
             </label>
-            <p className="mb-1 text-xs text-gray-500">请描述侵权内容的具体情况，至少 10 个字符</p>
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">请描述侵权内容的具体情况，至少 10 个字符</p>
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               placeholder="请详细描述发现的侵权行为，例如：此用户在XX平台发布了使用我肖像的AI生成图..."
               rows={5}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               required
             />
-            <p className={`mt-1 text-xs ${form.description.length >= 10 ? "text-green-600" : "text-gray-400"}`}>
+            <p className={`mt-1 text-xs ${form.description.length >= 10 ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"}`}>
               {form.description.length} / 10 字符（最低要求）
             </p>
           </div>
 
           {/* Error / Success */}
           {error && (
-            <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>
+            <div className="rounded-lg bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">{error}</div>
           )}
           {success && (
-            <div className="rounded-lg bg-green-50 p-4 text-sm text-green-700">{success}</div>
+            <div className="rounded-lg bg-green-50 dark:bg-green-900/30 p-4 text-sm text-green-700 dark:text-green-400">{success}</div>
           )}
 
           {/* Submit */}
           <button
             type="submit"
             disabled={!isValid || submitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 dark:disabled:bg-gray-700"
           >
             {submitting ? "提交中..." : "提交侵权举报"}
           </button>
         </form>
 
         {/* Disclaimer */}
-        <p className="mt-4 text-center text-xs text-gray-400">
+        <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500">
           提交举报即表示您确认上述信息真实有效。恶意举报将被追究法律责任。
           举报详情请查阅{" "}
           <a href="/terms" className="underline">
@@ -233,6 +228,6 @@ export default function ReportPage() {
           。
         </p>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

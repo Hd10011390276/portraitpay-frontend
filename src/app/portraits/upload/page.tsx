@@ -9,6 +9,7 @@ import React, { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import UploadZone from "@/components/portrait/UploadZone";
 import ImageCropper from "@/components/portrait/ImageCropper";
+import { DashboardShell } from "@/components/layout/DashboardShell";
 
 type Stage = "form" | "upload" | "certify" | "done";
 
@@ -130,21 +131,16 @@ export default function UploadPortraitPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4">
-          <h1 className="text-xl font-bold text-gray-900">Upload Portrait</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Register a new portrait for blockchain certification</p>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <DashboardShell
+      title="Upload Portrait"
+      subtitle="Register a new portrait for blockchain certification"
+    >
+      <div className="max-w-3xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
 
           {/* ── Image Upload ── */}
-          <section className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               📸 Portrait Image
             </h2>
 
@@ -154,19 +150,19 @@ export default function UploadPortraitPage() {
             />
 
             {errors.image && (
-              <p className="mt-2 text-sm text-red-600">{errors.image}</p>
+              <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.image}</p>
             )}
 
             {/* Image hash preview */}
             {imageHash && (
-              <div className="mt-3 p-2 bg-gray-50 rounded-lg">
-                <p className="text-xs text-gray-400">SHA-256 (for on-chain certification):</p>
-                <p className="text-xs font-mono text-gray-600 break-all mt-0.5">{imageHash}</p>
+              <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <p className="text-xs text-gray-400 dark:text-gray-500">SHA-256 (for on-chain certification):</p>
+                <p className="text-xs font-mono text-gray-600 dark:text-gray-400 break-all mt-0.5">{imageHash}</p>
               </div>
             )}
 
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-blue-700">
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <p className="text-xs text-blue-700 dark:text-blue-400">
                 💡 <strong>Tip:</strong> For best results, use a clear frontal portrait with good lighting.
                 The image will be cropped to a square and certified on Ethereum Sepolia.
               </p>
@@ -174,15 +170,15 @@ export default function UploadPortraitPage() {
           </section>
 
           {/* ── Metadata ── */}
-          <section className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               📝 Portrait Details
             </h2>
 
             <div className="flex flex-col gap-4">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -193,35 +189,35 @@ export default function UploadPortraitPage() {
                   maxLength={200}
                   className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
                     errors.title
-                      ? "border-red-300 focus:ring-red-200"
-                      : "border-gray-200 focus:ring-blue-200 focus:border-blue-300"
-                  }`}
+                      ? "border-red-300 dark:border-red-700 focus:ring-red-200 dark:focus:ring-red-800"
+                      : "border-gray-200 dark:border-gray-700 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600"
+                  } bg-white dark:bg-gray-900 text-gray-900 dark:text-white`}
                 />
-                {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title}</p>}
-                <p className="mt-0.5 text-xs text-gray-400 text-right">{form.title.length}/200</p>
+                {errors.title && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.title}</p>}
+                <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500 text-right">{form.title.length}/200</p>
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="Optional description of the portrait..."
                   rows={3}
                   maxLength={2000}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 resize-none"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600 resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
-                <p className="mt-0.5 text-xs text-gray-400 text-right">{form.description.length}/2000</p>
+                <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500 text-right">{form.description.length}/2000</p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 >
                   <option value="general">General</option>
                   <option value="celebrity">Celebrity / Public Figure</option>
@@ -235,7 +231,7 @@ export default function UploadPortraitPage() {
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Tags <span className="text-xs text-gray-400">(comma-separated)</span>
                 </label>
                 <input
@@ -243,7 +239,7 @@ export default function UploadPortraitPage() {
                   value={form.tags}
                   onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
                   placeholder="actor, entertainment, drama..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -253,7 +249,7 @@ export default function UploadPortraitPage() {
                   type="button"
                   onClick={() => setForm((f) => ({ ...f, isPublic: !f.isPublic }))}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    form.isPublic ? "bg-blue-600" : "bg-gray-200"
+                    form.isPublic ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700"
                   }`}
                 >
                   <span
@@ -263,25 +259,25 @@ export default function UploadPortraitPage() {
                   />
                 </button>
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Public listing</p>
-                  <p className="text-xs text-gray-400">Allow others to discover this portrait</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Public listing</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Allow others to discover this portrait</p>
                 </div>
               </div>
             </div>
           </section>
 
           {/* ── Submit ── */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <button
               type="submit"
               disabled={stage === "upload"}
-              className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto"
             >
               {stage === "upload" ? "Uploading..." : "Create Portrait"}
             </button>
 
             {stage === "upload" && progress && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
                 <span>{progress}</span>
               </div>
@@ -290,14 +286,14 @@ export default function UploadPortraitPage() {
             <button
               type="button"
               onClick={() => router.push("/portraits")}
-              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
             >
               Cancel
             </button>
           </div>
 
         </form>
-      </main>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

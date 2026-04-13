@@ -10,6 +10,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { DashboardShell } from "@/components/layout/DashboardShell";
 
 type ReportStatus = "PENDING_REVIEW" | "VALIDATED" | "REJECTED" | "SETTLED" | "LEGAL_ACTION";
 type AlertStatus = "PENDING" | "CONFIRMED" | "FALSE_POSITIVE" | "EXPIRED";
@@ -123,225 +124,220 @@ export default function InfringementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        {/* Page header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">侵权管理</h1>
-            <p className="mt-1 text-sm text-gray-500">查看和管理您的侵权举报及系统告警</p>
-          </div>
-          <Link
-            href="/report"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+    <DashboardShell
+      title="侵权管理"
+      subtitle="查看和管理您的侵权举报及系统告警"
+      action={
+        <Link
+          href="/report"
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          + 提交新举报
+        </Link>
+      }
+    >
+      {/* Tabs */}
+      <div className="mb-6 flex gap-1 rounded-lg bg-gray-200 dark:bg-gray-800 p-1">
+        {[
+          { key: "reports", label: "我的举报" },
+          { key: "alerts", label: "系统告警" },
+          { key: "settings", label: "监测设置" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition ${
+              activeTab === tab.key
+                ? "bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-300 shadow-sm"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            }`}
           >
-            + 提交新举报
-          </Link>
-        </div>
-
-        {/* Tabs */}
-        <div className="mb-6 flex gap-1 rounded-lg bg-gray-200 p-1">
-          {[
-            { key: "reports", label: "我的举报" },
-            { key: "alerts", label: "系统告警" },
-            { key: "settings", label: "监测设置" },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as typeof activeTab)}
-              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition ${
-                activeTab === tab.key
-                  ? "bg-white text-blue-700 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* ── Reports Tab ── */}
-        {activeTab === "reports" && (
-          <div className="space-y-4">
-            {loading ? (
-              <p className="text-center text-gray-500">加载中...</p>
-            ) : reports.length === 0 ? (
-              <div className="rounded-lg bg-white py-16 text-center text-gray-500">
-                暂无举报记录。
-                <Link href="/report" className="ml-2 text-blue-600 underline">立即举报</Link>
-              </div>
-            ) : (
-              reports.map((report) => {
-                const status = STATUS_LABELS[report.status as ReportStatus] ?? { label: report.status, color: "bg-gray-100" };
-                return (
-                  <Link key={report.id} href={`/infringements/${report.id}`}>
-                    <div className="flex items-center justify-between rounded-lg bg-white p-5 shadow-sm hover:shadow-md transition">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
-                            {status.label}
-                          </span>
-                          <span className="text-xs text-gray-400">{report.source}</span>
-                        </div>
-                        <p className="truncate font-medium text-gray-900">{report.portrait?.title ?? "肖像"}</p>
-                        <p className="mt-0.5 truncate text-sm text-gray-500">{report.description}</p>
-                        <p className="mt-1 text-xs text-gray-400">
-                          {new Date(report.createdAt).toLocaleString("zh-CN")} &nbsp;|&nbsp; ID: {report.id.slice(0, 8)}...
-                        </p>
-                      </div>
-                      <div className="ml-4 flex-shrink-0 text-gray-400">›</div>
-                    </div>
-                  </Link>
-                );
-              })
-            )}
-          </div>
-        )}
-
-        {/* ── Alerts Tab ── */}
-        {activeTab === "alerts" && (
-          <div className="space-y-4">
-            {loading ? (
-              <p className="text-center text-gray-500">加载中...</p>
-            ) : alerts.length === 0 ? (
-              <div className="rounded-lg bg-white py-16 text-center text-gray-500">
-                暂无系统告警。
-              </div>
-            ) : (
-              alerts.map((alert) => {
-                const status = STATUS_LABELS[alert.status as AlertStatus] ?? { label: alert.status, color: "bg-gray-100" };
-                return (
-                  <div key={alert.id} className="rounded-lg bg-white p-5 shadow-sm">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
-                            {status.label}
-                          </span>
-                          <span className="text-xs text-gray-500">{alert.sourceName}</span>
-                          {alert.similarityScore && (
-                            <span className="text-xs text-red-600 font-medium">
-                              相似度 {(alert.similarityScore * 100).toFixed(1)}%
-                            </span>
-                          )}
-                        </div>
-                        <p className="font-medium text-gray-900">{alert.portrait?.title}</p>
-                        <a href={alert.sourceUrl} target="_blank" rel="noopener noreferrer"
-                          className="mt-0.5 block truncate text-sm text-blue-600 underline">
-                          {alert.sourceUrl}
-                        </a>
-                        <p className="mt-1 text-xs text-gray-400">
-                          {new Date(alert.createdAt).toLocaleString("zh-CN")}
-                        </p>
-                      </div>
-                      {alert.status === "PENDING" && (
-                        <div className="ml-4 flex gap-2 flex-shrink-0">
-                          <button
-                            onClick={() => confirmAlert(alert.id, "CONFIRMED")}
-                            className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
-                          >
-                            确认侵权
-                          </button>
-                          <button
-                            onClick={() => confirmAlert(alert.id, "FALSE_POSITIVE")}
-                            className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
-                          >
-                            误报
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        )}
-
-        {/* ── Settings Tab ── */}
-        {activeTab === "settings" && (
-          <form onSubmit={saveConfig} className="space-y-6 rounded-xl bg-white p-8 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900">监测配置</h2>
-
-            <div className="flex items-center justify-between py-3 border-b">
-              <div>
-                <p className="font-medium text-gray-900">开启侵权监测</p>
-                <p className="text-sm text-gray-500">系统将自动扫描互联网上的疑似侵权内容</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={configForm.enabled}
-                onChange={(e) => setConfigForm((f) => ({ ...f, enabled: e.target.checked }))}
-                className="h-5 w-5 rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium text-gray-900">
-                相似度阈值：{Math.round(configForm.similarityThreshold * 100)}%
-              </label>
-              <p className="mb-2 text-sm text-gray-500">低于此相似度的结果将被自动过滤（建议 85%）</p>
-              <input
-                type="range"
-                min="0.5"
-                max="1.0"
-                step="0.01"
-                value={configForm.similarityThreshold}
-                onChange={(e) => setConfigForm((f) => ({ ...f, similarityThreshold: parseFloat(e.target.value) }))}
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <p className="font-medium text-gray-900">通知渠道</p>
-              <label className="flex items-center gap-3">
-                <input type="checkbox" checked={configForm.notifyEmail}
-                  onChange={(e) => setConfigForm((f) => ({ ...f, notifyEmail: e.target.checked }))}
-                  className="h-4 w-4" />
-                <span className="text-sm">邮件通知</span>
-              </label>
-              <label className="flex items-center gap-3">
-                <input type="checkbox" checked={configForm.notifySms}
-                  onChange={(e) => setConfigForm((f) => ({ ...f, notifySms: e.target.checked }))}
-                  className="h-4 w-4" />
-                <span className="text-sm">短信通知（预留）</span>
-              </label>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">免打扰开始时间</label>
-                <input type="time" value={configForm.quietHoursStart}
-                  onChange={(e) => setConfigForm((f) => ({ ...f, quietHoursStart: e.target.value }))}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">免打扰结束时间</label>
-                <input type="time" value={configForm.quietHoursEnd}
-                  onChange={(e) => setConfigForm((f) => ({ ...f, quietHoursEnd: e.target.value }))}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
-              </div>
-            </div>
-
-            <div>
-              <label className="flex items-center gap-3">
-                <input type="checkbox" checked={configForm.highPriorityMuteExempt}
-                  onChange={(e) => setConfigForm((f) => ({ ...f, highPriorityMuteExempt: e.target.checked }))}
-                  className="h-4 w-4" />
-                <div>
-                  <span className="text-sm font-medium">高优先级告警不受免打扰限制</span>
-                  <p className="text-xs text-gray-500">相似度 ≥ 95% 的告警将在任何时间发送通知</p>
-                </div>
-              </label>
-            </div>
-
-            <button type="submit"
-              className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700">
-              保存设置
-            </button>
-          </form>
-        )}
+            {tab.label}
+          </button>
+        ))}
       </div>
-    </div>
+
+      {/* ── Reports Tab ── */}
+      {activeTab === "reports" && (
+        <div className="space-y-4">
+          {loading ? (
+            <p className="text-center text-gray-500 dark:text-gray-400">加载中...</p>
+          ) : reports.length === 0 ? (
+            <div className="rounded-lg bg-white dark:bg-gray-900 py-16 text-center text-gray-500 dark:text-gray-400">
+              暂无举报记录。
+              <Link href="/report" className="ml-2 text-blue-600 dark:text-blue-400 underline">立即举报</Link>
+            </div>
+          ) : (
+            reports.map((report) => {
+              const status = STATUS_LABELS[report.status as ReportStatus] ?? { label: report.status, color: "bg-gray-100 dark:bg-gray-800" };
+              return (
+                <Link key={report.id} href={`/infringements/${report.id}`}>
+                  <div className="flex items-center justify-between rounded-lg bg-white dark:bg-gray-900 p-5 shadow-sm hover:shadow-md transition border border-gray-100 dark:border-gray-800">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
+                          {status.label}
+                        </span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">{report.source}</span>
+                      </div>
+                      <p className="truncate font-medium text-gray-900 dark:text-white">{report.portrait?.title ?? "肖像"}</p>
+                      <p className="mt-0.5 truncate text-sm text-gray-500 dark:text-gray-400">{report.description}</p>
+                      <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                        {new Date(report.createdAt).toLocaleString("zh-CN")} &nbsp;|&nbsp; ID: {report.id.slice(0, 8)}...
+                      </p>
+                    </div>
+                    <div className="ml-4 flex-shrink-0 text-gray-400 dark:text-gray-500">›</div>
+                  </div>
+                </Link>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* ── Alerts Tab ── */}
+      {activeTab === "alerts" && (
+        <div className="space-y-4">
+          {loading ? (
+            <p className="text-center text-gray-500 dark:text-gray-400">加载中...</p>
+          ) : alerts.length === 0 ? (
+            <div className="rounded-lg bg-white dark:bg-gray-900 py-16 text-center text-gray-500 dark:text-gray-400">
+              暂无系统告警。
+            </div>
+          ) : (
+            alerts.map((alert) => {
+              const status = STATUS_LABELS[alert.status as AlertStatus] ?? { label: alert.status, color: "bg-gray-100 dark:bg-gray-800" };
+              return (
+                <div key={alert.id} className="rounded-lg bg-white dark:bg-gray-900 p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
+                          {status.label}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{alert.sourceName}</span>
+                        {alert.similarityScore && (
+                          <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+                            相似度 {(alert.similarityScore * 100).toFixed(1)}%
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-medium text-gray-900 dark:text-white">{alert.portrait?.title}</p>
+                      <a href={alert.sourceUrl} target="_blank" rel="noopener noreferrer"
+                        className="mt-0.5 block truncate text-sm text-blue-600 dark:text-blue-400 underline">
+                        {alert.sourceUrl}
+                      </a>
+                      <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                        {new Date(alert.createdAt).toLocaleString("zh-CN")}
+                      </p>
+                    </div>
+                    {alert.status === "PENDING" && (
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => confirmAlert(alert.id, "CONFIRMED")}
+                          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
+                        >
+                          确认侵权
+                        </button>
+                        <button
+                          onClick={() => confirmAlert(alert.id, "FALSE_POSITIVE")}
+                          className="rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        >
+                          误报
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* ── Settings Tab ── */}
+      {activeTab === "settings" && (
+        <form onSubmit={saveConfig} className="space-y-6 rounded-xl bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">监测配置</h2>
+
+          <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-800">
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">开启侵权监测</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">系统将自动扫描互联网上的疑似侵权内容</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={configForm.enabled}
+              onChange={(e) => setConfigForm((f) => ({ ...f, enabled: e.target.checked }))}
+              className="h-5 w-5 rounded"
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium text-gray-900 dark:text-white">
+              相似度阈值：{Math.round(configForm.similarityThreshold * 100)}%
+            </label>
+            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">低于此相似度的结果将被自动过滤（建议 85%）</p>
+            <input
+              type="range"
+              min="0.5"
+              max="1.0"
+              step="0.01"
+              value={configForm.similarityThreshold}
+              onChange={(e) => setConfigForm((f) => ({ ...f, similarityThreshold: parseFloat(e.target.value) }))}
+              className="w-full"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <p className="font-medium text-gray-900 dark:text-white">通知渠道</p>
+            <label className="flex items-center gap-3">
+              <input type="checkbox" checked={configForm.notifyEmail}
+                onChange={(e) => setConfigForm((f) => ({ ...f, notifyEmail: e.target.checked }))}
+                className="h-4 w-4" />
+              <span className="text-sm text-gray-700 dark:text-gray-300">邮件通知</span>
+            </label>
+            <label className="flex items-center gap-3">
+              <input type="checkbox" checked={configForm.notifySms}
+                onChange={(e) => setConfigForm((f) => ({ ...f, notifySms: e.target.checked }))}
+                className="h-4 w-4" />
+              <span className="text-sm text-gray-700 dark:text-gray-300">短信通知（预留）</span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">免打扰开始时间</label>
+              <input type="time" value={configForm.quietHoursStart}
+                onChange={(e) => setConfigForm((f) => ({ ...f, quietHoursStart: e.target.value }))}
+                className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">免打扰结束时间</label>
+              <input type="time" value={configForm.quietHoursEnd}
+                onChange={(e) => setConfigForm((f) => ({ ...f, quietHoursEnd: e.target.value }))}
+                className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
+            </div>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-3">
+              <input type="checkbox" checked={configForm.highPriorityMuteExempt}
+                onChange={(e) => setConfigForm((f) => ({ ...f, highPriorityMuteExempt: e.target.checked }))}
+                className="h-4 w-4" />
+              <div>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">高优先级告警不受免打扰限制</span>
+                <p className="text-xs text-gray-500 dark:text-gray-400">相似度 ≥ 95% 的告警将在任何时间发送通知</p>
+              </div>
+            </label>
+          </div>
+
+          <button type="submit"
+            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700">
+            保存设置
+          </button>
+        </form>
+      )}
+    </DashboardShell>
   );
 }

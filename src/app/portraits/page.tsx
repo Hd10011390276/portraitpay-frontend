@@ -6,6 +6,7 @@ import Link from "next/link";
 import PortraitCard from "@/components/portrait/PortraitCard";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { SkeletonGrid, Skeleton } from "@/components/ui/Skeleton";
+import { useLanguage } from "@/context/LanguageContext";
 
 type PortraitStatus = "DRAFT" | "UNDER_REVIEW" | "ACTIVE" | "SUSPENDED" | "ARCHIVED";
 
@@ -25,16 +26,8 @@ interface Portrait {
   isPublic: boolean;
 }
 
-const STATUS_OPTIONS = [
-  { value: "", label: "全部" },
-  { value: "DRAFT", label: "草稿" },
-  { value: "UNDER_REVIEW", label: "审核中" },
-  { value: "ACTIVE", label: "已认证" },
-  { value: "SUSPENDED", label: "已暂停" },
-  { value: "ARCHIVED", label: "已归档" },
-];
-
 export default function PortraitsPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [checking, setChecking] = useState(true);
@@ -44,6 +37,15 @@ export default function PortraitsPage() {
   const [certifyingId, setCertifyingId] = useState<string | null>(null);
   const [certifyStatus, setCertifyStatus] = useState<{ id: string; message: string } | null>(null);
   const [search, setSearch] = useState("");
+
+  const STATUS_OPTIONS = [
+    { value: "", label: t.portraits.all },
+    { value: "DRAFT", label: t.portraits.draft },
+    { value: "UNDER_REVIEW", label: t.portraits.underReview },
+    { value: "ACTIVE", label: t.portraits.active },
+    { value: "SUSPENDED", label: t.portraits.suspended },
+    { value: "ARCHIVED", label: t.portraits.archived },
+  ];
 
   useEffect(() => {
     const raw = localStorage.getItem("pp_user");
@@ -119,15 +121,15 @@ export default function PortraitsPage() {
 
   return (
     <DashboardShell
-      title="肖像管理"
-      subtitle={`共 ${portraits.length} 个肖像 · ${counts["ACTIVE"] ?? 0} 已上链`}
+      title={t.sidebar.myPortraits}
+      subtitle={`${t.portraits.total} ${portraits.length} ${t.portraits.onChain} · ${counts["ACTIVE"] ?? 0} ${t.portraits.active}`}
       action={
         <Link href="/portraits/upload"
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          上传肖像
+          {t.portraits.upload}
         </Link>
       }
     >
@@ -153,7 +155,7 @@ export default function PortraitsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="搜索肖像标题..."
+              placeholder={t.portraits.searchPlaceholder}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600 placeholder-gray-400"
             />
           </div>
@@ -185,14 +187,14 @@ export default function PortraitsPage() {
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="text-6xl mb-4">🎭</div>
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              {search ? "没有找到匹配的肖像" : "还没有肖像"}
+              {search ? t.portraits.noResults : t.portraits.noPortraits}
             </h2>
-            <p className="text-gray-400 mb-6 max-w-sm">
-              {search ? "试试其他关键词" : "上传你的第一个肖像，开始区块链认证之旅"}
+            <p className="text-gray-400 dark:text-gray-500 mb-6 max-w-sm">
+              {search ? t.portraits.tryDifferentKeyword : t.portraits.uploadFirstPortrait}
             </p>
             <Link href="/portraits/upload"
               className="px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
-              上传肖像
+              {t.portraits.upload}
             </Link>
           </div>
         ) : (
