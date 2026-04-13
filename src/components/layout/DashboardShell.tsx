@@ -86,9 +86,6 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
           </svg>
         </button>
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-bold">PP</span>
-          </div>
           <span className="font-bold text-gray-900 dark:text-white text-sm truncate">PortraitPay</span>
         </div>
       </div>
