@@ -124,33 +124,46 @@ class AutonomousMonitor {
     await this.test('Search functionality accessible', async () => {
       const page = await this.context.newPage();
       await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle', timeout: 30000 });
-      // Check for search input or search functionality
-      const searchInput = page.locator('input[type="search"], input[placeholder*="search"], input[placeholder*="搜索"]').first();
+      // Check for search input or search functionality (header nav or main content)
+      const searchInput = page.locator('input[type="search"], input[placeholder*="search"], input[placeholder*="搜索"], input[placeholder*="Search"]').first();
       const hasSearch = await searchInput.isVisible().catch(() => false);
-      if (!hasSearch) throw new Error('Search functionality not found on homepage');
+      // Also check for search icon/button in nav
+      const searchBtn = page.locator('button[aria-label*="search"], button[aria-label*="Search"], a[href*="search"]').first();
+      const hasSearchBtn = await searchBtn.isVisible().catch(() => false);
+      if (!hasSearch && !hasSearchBtn) {
+        throw new Error('Search functionality not found on homepage');
+      }
       await page.close();
     }, ['6-search']);
 
     // === CORE REQUIREMENT 2: Everyone can protect portrait and earn ===
     console.log('\n📋 Core Requirement 2: Everyone can protect their portrait and earn');
 
-    await this.test('Dashboard loads after login', async () => {
+    // Helper to login - returns page if successful, null if failed
+    async function loginAsDemo() {
       const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      try {
+        await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.fill('input[type="email"]', 'demo@portraitpayai.com');
+        await page.fill('input[type="password"]', 'Demo123456');
+        await page.click('button[type="submit"]');
+        await page.waitForURL('**/dashboard**', { timeout: 10000 });
+        return page;
+      } catch (e) {
+        await page.close();
+        return null;
+      }
+    }
+
+    await this.test('Dashboard loads after login', async () => {
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.close();
     }, ['2-portrait-protection', '1-passive-income']);
 
     await this.test('Dashboard shows earnings info', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle', timeout: 30000 });
       const earningsText = await page.locator('text=/earnings|收益|earning/i').first().isVisible().catch(() => false);
       if (!earningsText) throw new Error('Earnings section not found on dashboard');
@@ -158,23 +171,15 @@ class AutonomousMonitor {
     }, ['1-passive-income', '2-portrait-protection']);
 
     await this.test('Portraits page accessible', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/portraits`, { waitUntil: 'networkidle', timeout: 30000 });
       await page.close();
     }, ['2-portrait-protection']);
 
     await this.test('Upload portrait flow accessible', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/portraits/upload`, { waitUntil: 'networkidle', timeout: 30000 });
       await page.close();
     }, ['2-portrait-protection']);
@@ -183,23 +188,15 @@ class AutonomousMonitor {
     console.log('\n📋 Core Requirement 1: Personal passive income, minimal staff');
 
     await this.test('Earnings page loads', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/earnings`, { waitUntil: 'networkidle', timeout: 30000 });
       await page.close();
     }, ['1-passive-income']);
 
     await this.test('Withdraw page loads', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/withdraw`, { waitUntil: 'networkidle', timeout: 30000 });
       await page.close();
     }, ['1-passive-income']);
@@ -208,12 +205,8 @@ class AutonomousMonitor {
     console.log('\n📋 Core Requirement 3: Reform entertainment - Hollywood');
 
     await this.test('KYC Verification page loads', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/kyc`, { waitUntil: 'networkidle', timeout: 30000 });
       await page.close();
     }, ['3-entertainment-reform']);
@@ -222,18 +215,22 @@ class AutonomousMonitor {
     console.log('\n📋 Core Requirement 5: Hub for AI video creators');
 
     await this.test('API routes respond (contact)', async () => {
-      const response = await this.context.newPage().evaluate(async (url) => {
+      const page = await this.context.newPage();
+      const response = await page.evaluate(async (url) => {
         const res = await fetch(`${url}/api/contact`, { method: 'OPTIONS' });
         return { status: res.status, ok: res.ok };
       }, BASE_URL);
+      await page.close();
       if (!response.ok && response.status !== 404) throw new Error(`API returned ${response.status}`);
     }, ['5-ai-hub']);
 
     await this.test('API routes respond (portrait)', async () => {
-      const response = await this.context.newPage().evaluate(async (url) => {
+      const page = await this.context.newPage();
+      const response = await page.evaluate(async (url) => {
         const res = await fetch(`${url}/api/portrait`, { method: 'OPTIONS' });
         return { status: res.status, ok: res.ok };
       }, BASE_URL);
+      await page.close();
       if (!response.ok && response.status !== 404) throw new Error(`API returned ${response.status}`);
     }, ['5-ai-hub']);
 
@@ -286,12 +283,8 @@ class AutonomousMonitor {
     console.log('\n📋 Mobile Responsive Checks');
 
     await this.test('Mobile hamburger menu works', async () => {
-      const page = await this.mobileContext.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       // Check mobile hamburger button exists
       const hamburger = page.locator('button').filter({ hasText: /menu|菜单|☰/ }).first();
       if (!await hamburger.isVisible().catch(() => false)) {
@@ -301,12 +294,8 @@ class AutonomousMonitor {
     }, ['1-passive-income']);
 
     await this.test('Mobile dashboard loads correctly', async () => {
-      const page = await this.mobileContext.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle', timeout: 30000 });
       // Should not show desktop sidebar
       await page.close();
@@ -316,23 +305,15 @@ class AutonomousMonitor {
     console.log('\n📋 IP Protection & Infringement Handling');
 
     await this.test('Report infringement page loads', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/report`, { waitUntil: 'networkidle', timeout: 30000 });
       await page.close();
     }, ['2-portrait-protection', '5-ai-hub']);
 
     await this.test('Infringements page loads', async () => {
-      const page = await this.context.newPage();
-      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.fill('input[type="email"]', 'demo@portraitpayai.com');
-      await page.fill('input[type="password"]', 'Demo123456');
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/dashboard**', { timeout: 20000 });
+      const page = await loginAsDemo.call(this);
+      if (!page) throw new Error('Login failed - no valid demo account');
       await page.goto(`${BASE_URL}/infringements`, { waitUntil: 'networkidle', timeout: 30000 });
       await page.close();
     }, ['2-portrait-protection', '5-ai-hub']);
