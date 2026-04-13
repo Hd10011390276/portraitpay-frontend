@@ -51,13 +51,12 @@ export async function POST(request: NextRequest) {
     const portrait = await prisma.portrait.create({
       data: {
         ownerId: demoUser.id,
-        name: 'Demo Portrait',
+        title: 'Demo Portrait',
         description: 'This is a demo portrait for testing',
         status: 'ACTIVE',
-        allowedUsages: ['FILM', 'ANIMATION', 'ADVERTISING'],
-        prohibitedContent: ['ADULT', 'POLITICAL'],
-        faceEmbedding: Buffer.from(new Array(512).fill(0).map(() => Math.random() * 2 - 1)),
-        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+        faceEmbedding: new Array(512).fill(0).map(() => Math.random() * 2 - 1),
+        originalImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
       },
     });
 
