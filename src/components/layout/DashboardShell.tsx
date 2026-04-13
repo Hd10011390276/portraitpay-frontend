@@ -85,10 +85,7 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span className="font-bold text-gray-900 dark:text-white text-sm truncate">PortraitPay</span>
-        </div>
-      </div>
+              </div>
 
       {/* Main content — offset by sidebar on desktop, topbar on mobile */}
       <div className="sm:ml-64">
