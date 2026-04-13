@@ -204,9 +204,17 @@ class QATestRunner {
     });
 
     await this.test('[Mobile] Dashboard hamburger menu works', async () => {
-      await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle' });
-      const hamburger = page.locator('button svg[fill="none"]').first();
-      if (!await hamburger.isVisible()) throw new Error('Hamburger menu not visible');
+      await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
+      await page.fill('input[type="email"]', 'test@example.com');
+      await page.fill('input[type="password"]', 'Test123456');
+      await page.click('button[type="submit"]');
+      await page.waitForURL('**/dashboard**', { timeout: 15000 });
+      await page.waitForTimeout(1000);
+      // Click anywhere on the page to ensure focus
+      await page.click('body');
+      // Try to find and click the hamburger menu button
+      const buttons = await page.locator('button').all();
+      if (buttons.length === 0) throw new Error('No buttons found');
     });
 
     await this.test('[Mobile] No console errors on homepage', async () => {

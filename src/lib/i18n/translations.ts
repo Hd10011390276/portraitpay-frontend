@@ -230,6 +230,19 @@ export const translations = {
         renewal: "🔄 续期",
       },
     },
+    // Sidebar
+    sidebar: {
+      main: "主导航",
+      tools: "工具",
+      dashboard: "控制台",
+      myPortraits: "我的肖像",
+      kycVerification: "KYC 认证",
+      earnings: "收益",
+      withdraw: "提现",
+      reportInfringement: "举报侵权",
+      infringements: "侵权记录",
+      settings: "设置",
+    },
     // Header
     header: {
       accountSettings: "账户设置",
@@ -461,6 +474,19 @@ export const translations = {
         royaltyIncome: "💰 Royalty Income",
         renewal: "🔄 Renewal",
       },
+    },
+    // Sidebar
+    sidebar: {
+      main: "Main",
+      tools: "Tools",
+      dashboard: "Dashboard",
+      myPortraits: "My Portraits",
+      kycVerification: "KYC Verification",
+      earnings: "Earnings",
+      withdraw: "Withdraw",
+      reportInfringement: "Report Infringement",
+      infringements: "Infringements",
+      settings: "Settings",
     },
     // Header
     header: {
