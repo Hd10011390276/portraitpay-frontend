@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       data: {
         email: DEMO_EMAIL,
         name: 'Demo User',
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         language: 'zh-CN',
         emailVerified: new Date(),
         isActive: true,
