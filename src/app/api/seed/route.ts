@@ -43,16 +43,14 @@ export async function POST(request: NextRequest) {
         email: DEMO_EMAIL,
         name: 'Demo User',
         passwordHash: hashedPassword,
-        language: 'zh-CN',
         emailVerified: new Date(),
-        isActive: true,
       },
     });
 
     // Create test portrait
     const portrait = await prisma.portrait.create({
       data: {
-        userId: demoUser.id,
+        ownerId: demoUser.id,
         name: 'Demo Portrait',
         description: 'This is a demo portrait for testing',
         status: 'ACTIVE',
@@ -72,7 +70,6 @@ export async function POST(request: NextRequest) {
           amount: 99.99,
           currency: 'USD',
           status: 'COMPLETED',
-          description: 'License purchase for film production',
         },
         {
           userId: demoUser.id,
@@ -80,7 +77,6 @@ export async function POST(request: NextRequest) {
           amount: 250.00,
           currency: 'USD',
           status: 'COMPLETED',
-          description: 'Monthly royalty payout',
         },
       ],
     });
@@ -103,12 +99,12 @@ export async function POST(request: NextRequest) {
     });
 
     // Enable infringement monitoring
-    await prisma.infringementMonitor.create({
+    await prisma.infringementMonitorConfig.create({
       data: {
         userId: demoUser.id,
-        isEnabled: true,
+        enabled: true,
         similarityThreshold: 0.85,
-        monitoredPlatforms: ['twitter', 'instagram', 'tiktok', 'facebook'],
+        enabledPlatforms: ['twitter', 'instagram', 'tiktok', 'facebook'],
       },
     });
 
