@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { email, password, name, role, phone } = parsed.data;
+    const { email, password, name, role, phone, allowLicensing, allowedScopes, prohibitedContent } = parsed.data;
 
     // Check if user exists
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -53,6 +53,13 @@ export async function POST(req: NextRequest) {
         name,
         passwordHash: hashedPassword,
         role: role as UserRole,
+        portraitSettings: {
+          create: {
+            allowLicensing: allowLicensing ?? true,
+            allowedScopes: allowedScopes ?? [],
+            prohibitedContent: prohibitedContent ?? [],
+          },
+        },
       },
       select: { id: true, email: true, name: true, role: true },
     });

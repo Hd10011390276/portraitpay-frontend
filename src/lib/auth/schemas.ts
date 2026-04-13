@@ -25,6 +25,10 @@ export const RegisterSchema = z.object({
     error: "请选择角色",
   }),
   phone: z.string().optional(),
+  // Portrait usage preferences
+  allowLicensing: z.boolean().default(true),
+  allowedScopes: z.array(z.string()).default([]),
+  prohibitedContent: z.array(z.string()).default([]),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "两次密码不一致",
   path: ["confirmPassword"],

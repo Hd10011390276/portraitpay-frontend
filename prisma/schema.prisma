@@ -71,8 +71,41 @@ model User {
   aicontents      AIContent[]
   ipregistrations IPRegistration[]
 
+  portraitSettings PortraitSettings?
+
   @@index([walletAddress])
   @@index([kycStatus])
+}
+
+// ============================================================
+// PortraitSettings - User portrait usage preferences
+// ============================================================
+
+model PortraitSettings {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Default usage preference: true = allow licensing, false = all rights reserved
+  allowLicensing Boolean @default(true)
+
+  // Allowed usage scopes (empty = no restrictions, all allowed)
+  // Values: FILM, ANIMATION, ADVERTISING, GAMING, PRINT, MERCHANDISE, SOCIAL_MEDIA, EDUCATION, NEWS
+  allowedScopes String[] @default([])
+
+  // Prohibited content types (content NEVER allowed regardless of licensing)
+  // Values: ADULT, POLITICAL, VIOLENCE, HATE, FRAUD, WEAPONS, ILLEGAL
+  prohibitedContent String[] @default([])
+
+  // Default license fee in USD (0 = user decides case by case)
+  defaultLicenseFee Decimal @default(0) @db.Decimal(12, 2)
+
+  // Default territorial scope: global, china, asia, europe, americas
+  defaultTerritorialScope String @default("global")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ============================================================

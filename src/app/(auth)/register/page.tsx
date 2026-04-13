@@ -6,6 +6,7 @@ import { Input } from "@/components/auth/Input";
 import { Button } from "@/components/auth/Button";
 import { RoleSelector } from "@/components/auth/RoleSelector";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import { UsagePreferences } from "@/components/auth/UsagePreferences";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -23,6 +24,9 @@ export default function RegisterPage() {
     phone: "",
     role: "",
   });
+  const [allowLicensing, setAllowLicensing] = useState(true);
+  const [allowedScopes, setAllowedScopes] = useState<string[]>([]);
+  const [prohibitedContent, setProhibitedContent] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const set = (field: keyof typeof form) => (
@@ -71,6 +75,9 @@ export default function RegisterPage() {
           name: form.name,
           phone: form.phone || undefined,
           role: form.role,
+          allowLicensing,
+          allowedScopes,
+          prohibitedContent,
         }),
       });
 
@@ -187,6 +194,15 @@ export default function RegisterPage() {
               value={form.role}
               onChange={(val) => { setForm((prev) => ({ ...prev, role: val })); setErrors((prev) => ({ ...prev, role: "" })); }}
               error={errors.role}
+            />
+
+            <UsagePreferences
+              allowLicensing={allowLicensing}
+              allowedScopes={allowedScopes}
+              prohibitedContent={prohibitedContent}
+              onAllowLicensingChange={setAllowLicensing}
+              onAllowedScopesChange={setAllowedScopes}
+              onProhibitedContentChange={setProhibitedContent}
             />
 
             <Button type="submit" size="lg" loading={loading} className="w-full">
