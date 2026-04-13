@@ -1,0 +1,19 @@
+name: Initialize Demo Account
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed_secret:
+        description: 'Seed API secret key'
+        required: true
+        default: 'portraitpay-seed-secret'
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger seed API
+        run: |
+          curl -X POST https://portraitpayai.com/api/seed \
+            -H "Authorization: Bearer ${{ inputs.seed_secret }}" \
+            -H "Content-Type: application/json"
