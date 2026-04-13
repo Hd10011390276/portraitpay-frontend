@@ -11,6 +11,10 @@ interface NavItem {
   badge?: string | number;
 }
 
+interface SidebarProps {
+  onClose?: () => void;
+}
+
 const navItems: NavItem[] = [
   {
     label: "Dashboard",
@@ -80,7 +84,7 @@ const secondaryItems: NavItem[] = [
   },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) =>
@@ -95,6 +99,17 @@ export function Sidebar() {
           <img src="/logo-dark.png" alt="Logo" className="logo-dark w-8 h-8 object-contain" style={{ borderRadius: "6px" }} />
           <span className="font-bold text-gray-900 dark:text-white text-sm" style={{ letterSpacing: "-0.02em" }}>PortraitPay AI</span>
         </Link>
+        {/* Mobile close button */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="ml-auto p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 sm:hidden"
+          >
+            <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Nav */}

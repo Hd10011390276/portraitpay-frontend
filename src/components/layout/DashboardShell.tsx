@@ -55,8 +55,10 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Sidebar */}
-      <Sidebar />
+      {/* Sidebar - hidden on mobile, shown on desktop */}
+      <div className="hidden sm:block fixed inset-y-0 left-0 z-40">
+        <Sidebar />
+      </div>
 
       {/* Mobile sidebar overlay */}
       {mobileMenuOpen && (
@@ -64,6 +66,13 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
           className="fixed inset-0 z-30 bg-black/50 sm:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
+      )}
+
+      {/* Mobile sidebar drawer */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-y-0 left-0 z-40 sm:hidden">
+          <Sidebar onClose={() => setMobileMenuOpen(false)} />
+        </div>
       )}
 
       {/* Mobile top bar */}
