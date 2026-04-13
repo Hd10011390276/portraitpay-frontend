@@ -1,0 +1,208 @@
+name: Autonomous UI Monitor
+
+on:
+  schedule:
+    # Run every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  monitor-and-fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Install Playwright
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Comprehensive UI Tests
+        id: test
+        run: node tests/e2e/autonomous-monitor.js
+        continue-on-error: true
+
+      - name: Generate Report
+        if: always()
+        run: |
+          echo "# 🤖 PortraitPay AI - Autonomous Monitor Report" > monitor-report.md
+          echo "" >> monitor-report.md
+          echo "**Run Time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> monitor-report.md
+          echo "**Run Number:** ${{ github.run_number }}" >> monitor-report.md
+          echo "**Trigger:** ${{ github.event_name }}" >> monitor-report.md
+          echo "" >> monitor-report.md
+
+          if [ -f test-results.json ]; then
+            echo "## 📊 Test Results Summary" >> monitor-report.md
+            echo '```json' >> monitor-report.md
+            cat test-results.json >> monitor-report.md
+            echo '```' >> monitor-report.md
+            echo "" >> monitor-report.md
+          fi
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-results-${{ github.run_number }}
+          path: |
+            monitor-report.md
+            test-results.json
+            screenshots/
+          retention-days: 7
+
+      - name: Create Issues for Failed Tests
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('test-results.json', 'utf8'));
+
+            const failedTests = results.results?.filter(r => !r.passed) || [];
+
+            if (failedTests.length === 0) {
+              console.log('No failed tests to report');
+              return;
+            }
+
+            // Check for existing open issues
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['autonomous-monitor', 'bug']
+            });
+
+            const existingFailedTests = existingIssues.data.map(i => i.title);
+
+            for (const test of failedTests) {
+              const issueTitle = `🔴 UI Bug: ${test.name}`;
+
+              // Skip if already reported
+              if (existingFailedTests.includes(issueTitle)) {
+                console.log(`Issue already exists: ${issueTitle}`);
+                continue;
+              }
+
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: `## 🐛 Bug Report - Autonomous Monitor
+
+**Test:** ${test.name}
+**Error:** ${test.error || 'Unknown error'}
+**Time:** ${new Date().toISOString()}
+**Run:** #${context.runNumber}
+
+### Core Requirements Impact
+This bug may affect the following core requirements:
+${getRequirementsImpact(test.name)}
+
+### Suggested Fix
+${getSuggestedFix(test.name, test.error)}
+
+---
+*🤖 This issue was automatically created by the PortraitPay Autonomous Monitor*
+`,
+                labels: ['autonomous-monitor', 'bug', 'priority-high', 'auto-assign']
+              });
+
+              console.log(`Created issue: ${issueTitle}`);
+            }
+
+            function getRequirementsImpact(testName) {
+              const impacts = {
+                'Homepage': '- 6. Anyone can register and search portraits\n- 2. Everyone can protect their portrait',
+                'Login': '- 6. Anyone can register and search portraits',
+                'Register': '- 6. Anyone can register and search portraits\n- 2. Everyone can protect their portrait',
+                'Dashboard': '- 1. Personal passive income\n- 2. Earn from portraits',
+                'Language': '- 6. Anyone can register (i18n support)',
+                'Theme': '- 1. Personal passive income (UI accessibility)',
+                'Portrait': '- 2. Everyone can protect their portrait\n- 3. Reform entertainment',
+                'Earnings': '- 1. Personal passive income\n- 2. Earn from portraits',
+                'KYC': '- 2. Everyone can protect their portrait\n- 3. Reform entertainment (verification)',
+              };
+
+              for (const [key, value] of Object.entries(impacts)) {
+                if (testName.includes(key)) return value;
+              }
+              return '- 1-6: Potential impact on multiple core requirements';
+            }
+
+            function getSuggestedFix(testName, error) {
+              if (error?.includes('404') || error?.includes('Not Found')) {
+                return '1. Check if the page/route exists\n2. Verify API routes are properly configured\n3. Ensure all pages are exported correctly';
+              }
+              if (error?.includes('timeout')) {
+                return '1. Check server response time\n2. Verify API is not overloaded\n3. Check database connection';
+              }
+              if (error?.includes('Console errors')) {
+                return '1. Check browser console for JavaScript errors\n2. Verify all dependencies are loaded\n3. Check for runtime exceptions';
+              }
+              return '1. Investigate the specific error\n2. Check related components\n3. Run the test locally to reproduce';
+            }
+
+      - name: Auto-Assign Issues
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Find newly created issues and add them to project
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['auto-assign']
+            });
+
+            for (const issue of issues.data) {
+              // Add comment with fix instructions
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `## 🤖 Auto-Assignment
+
+This issue has been automatically detected by the PortraitPay Autonomous Monitor.
+
+### 6 Core Requirements Reference:
+1. Personal passive income, minimal staff, self-operating
+2. Everyone can protect their portrait and earn from it
+3. Reform entertainment industry (Hollywood)
+4. All personal data stored locally, minimal hardware
+5. Hub for AI video creators, any LLM can check copyright
+6. Anyone can register and search if a portrait can be used
+
+### Next Steps:
+1. Analyze the failed test and error message
+2. Identify the root cause
+3. Implement the fix
+4. Ensure the fix aligns with all 6 core requirements
+5. Commit and push the fix
+
+---
+*🤖 PortraitPay Autonomous Monitor*`
+              });
+            }
+
+      - name: Notify Status
+        if: always()
+        run: |
+          if [ "${{ steps.test.outcome }}" == "success" ]; then
+            echo "✅ All UI checks passed"
+          else
+            echo "⚠️ Some UI checks failed - issues created for review"
+          fi
