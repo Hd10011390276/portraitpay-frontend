@@ -76,7 +76,7 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
       )}
 
       {/* Mobile top bar */}
-      <div className="sm:hidden fixed top-0 left-0 right-0 z-20 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center px-4 gap-3">
+      <div className="sm:hidden fixed top-0 left-0 right-0 z-20 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center px-4 gap-3 shrink-0">
         <button
           onClick={() => setMobileMenuOpen(true)}
           className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -94,9 +94,9 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
       </div>
 
       {/* Main content — offset by sidebar on desktop, topbar on mobile */}
-      <div className="sm:ml-64">
+      <div className="sm:ml-64 pt-14 sm:pt-0">
         <Header user={user} title={title} subtitle={subtitle} action={action} />
-        <main className="p-6 pt-4 sm:pt-6">
+        <main className="p-4 sm:p-6 sm:pt-6">
           {children}
         </main>
       </div>
