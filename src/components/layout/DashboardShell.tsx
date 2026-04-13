@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { LanguageToggle } from "./LanguageToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface User {
   id: string;
@@ -85,7 +87,10 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-              </div>
+        <div className="flex-1" />
+        <LanguageToggle />
+        <ThemeToggle />
+      </div>
 
       {/* Main content — offset by sidebar on desktop, topbar on mobile */}
       <div className="sm:ml-64">
