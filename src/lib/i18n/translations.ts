@@ -18,6 +18,7 @@ export const translations = {
       faq: "常见问题",
       signIn: "登录",
       getStarted: "免费开始",
+      search: "搜索肖像...",
     },
     // Hero
     hero: {
@@ -459,6 +460,18 @@ export const translations = {
       confirmInfringement: "Confirm Infringement",
       falsePositive: "False Positive",
     },
+    // Search
+    search: {
+      title: "搜索肖像",
+      results: "搜索结果",
+      noResults: "没有找到匹配的肖像",
+      tryDifferentKeyword: "试试其他关键词或上传新肖像",
+      searchPlaceholder: "搜索肖像...",
+      allCategories: "全部分类",
+      sortBy: "排序",
+      newest: "最新",
+      certified: "已认证",
+    },
   },
 
   "en-US": {
@@ -470,6 +483,7 @@ export const translations = {
       faq: "FAQ",
       signIn: "Sign In",
       getStarted: "Get Started Free",
+      search: "Search portraits...",
     },
     // Hero
     hero: {
@@ -910,6 +924,18 @@ export const translations = {
       confirming: "Confirming...",
       confirmInfringement: "Confirm Infringement",
       falsePositive: "False Positive",
+    },
+    // Search
+    search: {
+      title: "Search Portraits",
+      results: "Search Results",
+      noResults: "No matching portraits found",
+      tryDifferentKeyword: "Try a different keyword or upload a new portrait",
+      searchPlaceholder: "Search portraits...",
+      allCategories: "All Categories",
+      sortBy: "Sort by",
+      newest: "Newest",
+      certified: "Certified",
     },
   },
 } as const;
