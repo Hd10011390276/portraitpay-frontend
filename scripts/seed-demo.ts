@@ -280,7 +280,7 @@ async function main() {
       idCardName: "DEMO USER",
       idCardExpire: new Date("2030-12-31"),
       faceMatchScore: 0.95,
-      verifiedAt: new Date(),
+      verifierId: "system",
     },
   });
   console.log("   ✓ KYC log created");
