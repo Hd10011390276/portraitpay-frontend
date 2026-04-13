@@ -4,8 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { LanguageToggle } from "./LanguageToggle";
-import ThemeToggle from "@/components/ThemeToggle";
 
 interface User {
   id: string;
@@ -92,10 +90,6 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
             <span className="text-white text-xs font-bold">PP</span>
           </div>
           <span className="font-bold text-gray-900 dark:text-white text-sm truncate">PortraitPay</span>
-        </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <ThemeToggle />
-          <LanguageToggle />
         </div>
       </div>
 

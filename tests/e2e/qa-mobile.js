@@ -203,12 +203,10 @@ class QATestRunner {
       if (url.includes('/login')) throw new Error('Redirected back to login');
     });
 
-    await this.test('[Mobile] Dashboard language toggle works', async () => {
+    await this.test('[Mobile] Dashboard hamburger menu works', async () => {
       await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle' });
-      const enBtn = page.locator('button', { hasText: 'EN' });
-      const zhBtn = page.locator('button', { hasText: '中文' });
-      if (!await enBtn.first().isVisible()) throw new Error('EN button not visible');
-      if (!await zhBtn.first().isVisible()) throw new Error('中文 button not visible');
+      const hamburger = page.locator('button svg[fill="none"]').first();
+      if (!await hamburger.isVisible()) throw new Error('Hamburger menu not visible');
     });
 
     await this.test('[Mobile] No console errors on homepage', async () => {
