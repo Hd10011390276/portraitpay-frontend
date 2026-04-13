@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { LanguageToggle } from "./LanguageToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface User {
   id: string;
@@ -76,7 +78,7 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
       )}
 
       {/* Mobile top bar */}
-      <div className="sm:hidden fixed top-0 left-0 right-0 z-20 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center px-4 gap-3 shrink-0">
+      <div className="sm:hidden fixed top-0 left-0 right-0 z-20 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center px-4 gap-2 shrink-0">
         <button
           onClick={() => setMobileMenuOpen(true)}
           className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -85,18 +87,22 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-bold">PP</span>
           </div>
-          <span className="font-bold text-gray-900 dark:text-white text-sm">PortraitPay</span>
+          <span className="font-bold text-gray-900 dark:text-white text-sm truncate">PortraitPay</span>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <ThemeToggle />
+          <LanguageToggle />
         </div>
       </div>
 
       {/* Main content — offset by sidebar on desktop, topbar on mobile */}
-      <div className="sm:ml-64 pt-14 sm:pt-0">
+      <div className="sm:ml-64">
         <Header user={user} title={title} subtitle={subtitle} action={action} />
-        <main className="p-4 sm:p-6 sm:pt-6">
+        <main className="p-4 sm:p-6">
           {children}
         </main>
       </div>

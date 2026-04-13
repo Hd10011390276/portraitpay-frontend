@@ -91,10 +91,11 @@ class QATestRunner {
 
     await this.test('Dashboard language toggle works', async () => {
       await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle' });
-      const enBtn = page.locator('button', { hasText: 'EN' });
-      const zhBtn = page.locator('button', { hasText: '中文' });
-      if (!await enBtn.first().isVisible()) throw new Error('EN button not visible');
-      if (!await zhBtn.first().isVisible()) throw new Error('中文 button not visible');
+      await page.waitForTimeout(500);
+      const enBtn = page.locator('[aria-label="Switch to English"]').last();
+      const zhBtn = page.locator('[aria-label="切换到中文"]').last();
+      if (!await enBtn.isVisible()) throw new Error('EN button not visible');
+      if (!await zhBtn.isVisible()) throw new Error('中文 button not visible');
     });
 
     await this.test('No console errors on homepage', async () => {
