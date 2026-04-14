@@ -6,8 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth"; // assumed next-auth config
+import { getSession } from "@/lib/auth/session";
 
 const CreatePortraitSchema = z.object({
   title: z.string().min(1).max(200),
@@ -70,9 +69,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
 
-    if (!session?.user?.id) {
+    if (!session?.userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
@@ -98,7 +97,7 @@ export async function POST(request: NextRequest) {
         category,
         tags,
         isPublic,
-        ownerId: session.user.id,
+        ownerId: session.userId,
         status: "DRAFT",
         faceEmbedding: [],
       },

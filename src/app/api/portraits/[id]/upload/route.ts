@@ -7,8 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth/session";
 import { getPresignedUploadUrl, generateImageKey } from "@/lib/storage";
 import { computeImageHash } from "@/lib/blockchain";
 
@@ -22,8 +21,8 @@ const RegisterUploadSchema = z.object({
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSession();
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -39,7 +38,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Portrait not found" }, { status: 404 });
     }
 
-    if (portrait.ownerId !== session.user.id) {
+    if (portrait.ownerId !== session.userId) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
@@ -95,8 +94,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
  */
 export async function GET(request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSession();
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -111,7 +110,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Portrait not found" }, { status: 404 });
     }
 
-    if (portrait.ownerId !== session.user.id) {
+    if (portrait.ownerId !== session.userId) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 

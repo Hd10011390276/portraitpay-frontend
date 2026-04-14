@@ -11,8 +11,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSession } from "@/lib/auth/session";
 import { certifyPortrait, computeImageHash, SUPPORTED_NETWORKS } from "@/lib/blockchain";
 import { uploadToIpfs, uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
 import { getPresignedUploadUrl, generateImageKey } from "@/lib/storage";
@@ -21,8 +20,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSession();
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -39,7 +38,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Portrait not found" }, { status: 404 });
     }
 
-    if (portrait.ownerId !== session.user.id) {
+    if (portrait.ownerId !== session.userId) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
