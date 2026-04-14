@@ -46,26 +46,44 @@ function DashboardContent({ user }: { user: User }) {
   const roleLabels = isZh ? ROLE_LABELS_ZH : ROLE_LABELS_EN;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setStats([
-        { label: t.dashboard.stats.certifiedPortraits, value: "12", delta: isZh ? "+2 本月" : "+2 this month", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
-        { label: t.dashboard.stats.monthlyEarnings, value: "¥3,840", delta: "+¥620", color: "text-green-600", bg: "bg-green-50 dark:bg-green-900/20" },
-        { label: t.dashboard.stats.pendingAuthorizations, value: "3", delta: "", color: "text-yellow-600", bg: "bg-yellow-50 dark:bg-yellow-900/20" },
-        { label: t.dashboard.stats.kycStatus, value: user.role !== "USER" ? t.dashboard.stats.verified : t.dashboard.stats.notVerified, delta: "", color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-900/20" },
-      ]);
-      setRecentPortraits([
-        { id: "1", title: "Official Portrait — Jane D.", status: "ACTIVE", thumbnailUrl: null },
-        { id: "2", title: "Concert Photo — M.W.", status: "UNDER_REVIEW", thumbnailUrl: null },
-        { id: "3", title: "Studio Portrait — S.K.", status: "ACTIVE", thumbnailUrl: null },
-      ]);
-      setRecentTransactions([
-        { id: "1", type: "LICENSE_PURCHASE", amount: 1200, portraitTitle: "Official Portrait — Jane D.", createdAt: new Date().toISOString() },
-        { id: "2", type: "ROYALTY_PAYOUT", amount: 480, portraitTitle: "Studio Portrait — S.K.", createdAt: new Date(Date.now() - 86400000).toISOString() },
-        { id: "3", type: "LICENSE_RENEWAL", amount: 2400, portraitTitle: "Concert Photo — M.W.", createdAt: new Date(Date.now() - 172800000).toISOString() },
-      ]);
-    }, 800);
-    return () => clearTimeout(timer);
+    async function fetchDashboardData() {
+      try {
+        // Fetch user's portraits
+        const portraitsRes = await fetch('/api/v1/portraits');
+        if (portraitsRes.ok) {
+          const portraitsData = await portraitsRes.json();
+          const portraits = portraitsData.data?.slice(0, 5) || [];
+          setRecentPortraits(portraits);
+        }
+
+        // Fetch user's transactions
+        const txRes = await fetch('/api/v1/earnings/transactions');
+        if (txRes.ok) {
+          const txData = await txRes.json();
+          const transactions = txData.data?.slice(0, 5) || [];
+          setRecentTransactions(transactions);
+        }
+
+        // Fetch earnings summary
+        const summaryRes = await fetch('/api/v1/earnings/summary');
+        if (summaryRes.ok) {
+          const summaryData = await summaryRes.json();
+          const summary = summaryData.data || {};
+          setStats([
+            { label: t.dashboard.stats.certifiedPortraits, value: String(summary.certifiedPortraits || 0), delta: "", color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
+            { label: t.dashboard.stats.monthlyEarnings, value: `¥${(summary.availableBalance || 0).toLocaleString()}`, delta: "", color: "text-green-600", bg: "bg-green-50 dark:bg-green-900/20" },
+            { label: t.dashboard.stats.pendingAuthorizations, value: String(summary.pendingAuthorizations || 0), delta: "", color: "text-yellow-600", bg: "bg-yellow-50 dark:bg-yellow-900/20" },
+            { label: t.dashboard.stats.kycStatus, value: user.role !== "USER" ? t.dashboard.stats.verified : t.dashboard.stats.notVerified, delta: "", color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-900/20" },
+          ]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
   }, [t, isZh, user.role]);
 
   const initials = user?.name?.[0] ?? user?.email[0]?.toUpperCase() ?? "?";
@@ -116,17 +134,25 @@ function DashboardContent({ user }: { user: User }) {
               <div className="divide-y divide-gray-50 dark:divide-gray-800">
                 {[...Array(3)].map((_, i) => <SkeletonTableRow key={i} />)}
               </div>
+            ) : recentPortraits.length === 0 ? (
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+                {isZh ? "暂无肖像" : "No portraits yet"}
+              </div>
             ) : (
               <div className="divide-y divide-gray-50 dark:divide-gray-800">
                 {recentPortraits.map((p) => (
                   <div key={p.id} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-xl flex-shrink-0">
-                      👤
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-xl flex-shrink-0 overflow-hidden">
+                      {p.thumbnailUrl ? (
+                        <img src={p.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span>👤</span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{p.title}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{p.title || p.name || 'Untitled'}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {p.status === "ACTIVE" ? t.dashboard.status.onChain : t.dashboard.status.underReview}
+                        {p.status === "ACTIVE" ? t.dashboard.status.onChain : p.status === "UNDER_REVIEW" ? t.dashboard.status.underReview : p.status}
                       </p>
                     </div>
                     <Link href={`/portraits/${p.id}`}
@@ -152,6 +178,10 @@ function DashboardContent({ user }: { user: User }) {
               <div className="divide-y divide-gray-50 dark:divide-gray-800">
                 {[...Array(3)].map((_, i) => <SkeletonTableRow key={i} />)}
               </div>
+            ) : recentTransactions.length === 0 ? (
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+                {isZh ? "暂无交易记录" : "No transactions yet"}
+              </div>
             ) : (
               <div className="divide-y divide-gray-50 dark:divide-gray-800">
                 {recentTransactions.map((tx) => (
@@ -163,12 +193,12 @@ function DashboardContent({ user }: { user: User }) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                        {tx.type === "LICENSE_PURCHASE" ? t.dashboard.transaction.licensePurchase : tx.type === "ROYALTY_PAYOUT" ? t.dashboard.transaction.royaltyIncome : t.dashboard.transaction.renewal}
+                        {tx.type === "LICENSE_PURCHASE" ? t.dashboard.transaction.licensePurchase : tx.type === "ROYALTY_PAYOUT" ? t.dashboard.transaction.royaltyIncome : tx.type === "LICENSE_RENEWAL" ? t.dashboard.transaction.renewal : tx.type}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{tx.portraitTitle}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{tx.portrait?.title || tx.description || '-'}</p>
                     </div>
-                    <p className="text-sm font-bold text-green-600 flex-shrink-0">
-                      +¥{tx.amount.toLocaleString()}
+                    <p className={`text-sm font-bold flex-shrink-0 ${tx.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {tx.amount >= 0 ? '+' : ''}¥{Math.abs(tx.amount).toLocaleString()}
                     </p>
                   </div>
                 ))}
