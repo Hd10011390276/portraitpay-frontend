@@ -25,6 +25,7 @@ interface WithdrawalRecord {
   rejectionReason: string | null;
   createdAt: string;
   completedAt: string | null;
+  paymentMethod?: string;
 }
 
 interface StripeAccountStatus {
@@ -46,6 +47,8 @@ const STATUS_LABEL: Record<string, { text: string; color: string }> = {
 
 const MIN_WITHDRAWAL = 100;
 
+type PaymentMethod = "wechat" | "alipay" | "paypal" | "bank";
+
 function WithdrawPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,13 +60,27 @@ function WithdrawPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [settingUpStripe, setSettingUpStripe] = useState(false);
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   // Form state
   const [amount, setAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("wechat");
+  const [accountId, setAccountId] = useState(""); // WeChat/ Alipay/ PayPal account
+  const [accountName, setAccountName] = useState(""); // Account holder name
   const [bankName, setBankName] = useState("");
   const [bankAccount, setBankAccount] = useState("");
-  const [accountHolder, setAccountHolder] = useState("");
+
+  // Get payment method options based on locale
+  const paymentMethods = locale === "zh-CN"
+    ? [
+        { value: "wechat" as PaymentMethod, label: t.withdraw.weChatPay, icon: "💚" },
+        { value: "alipay" as PaymentMethod, label: t.withdraw.alipay, icon: "🔵" },
+        { value: "bank" as PaymentMethod, label: t.withdraw.bankTransfer, icon: "🏦" },
+      ]
+    : [
+        { value: "paypal" as PaymentMethod, label: t.withdraw.paypal, icon: "🟣" },
+        { value: "bank" as PaymentMethod, label: t.withdraw.bankTransfer, icon: "🏦" },
+      ];
 
   const loadData = useCallback(async () => {
     const [balanceRes, historyRes, stripeRes] = await Promise.all([
@@ -86,7 +103,6 @@ function WithdrawPageContent() {
     setLoading(false);
   }, []);
 
-  // Handle Stripe onboarding return
   useEffect(() => {
     if (searchParams.get("stripe_refresh") === "true") {
       loadData();
@@ -102,18 +118,11 @@ function WithdrawPageContent() {
     if (balance && Number(amount) > balance.availableBalance) {
       return t.withdraw.balanceInsufficient.replace("{balance}", balance.availableBalance.toFixed(2));
     }
-    if (!bankName.trim()) return t.withdraw.pleaseFillBankName;
-    if (!bankAccount.trim() || bankAccount.length < 8) return t.withdraw.pleaseFillBankAccount;
-    if (!accountHolder.trim()) return t.withdraw.pleaseFillAccountHolder;
-    // Check Stripe account is ready
-    if (!stripeAccount?.hasStripeAccount) {
-      return t.withdraw.stripeNotSet;
-    }
-    if (stripeAccount.accountStatus !== "verified") {
-      return t.withdraw.stripeVerifying;
-    }
-    if (!stripeAccount.payoutsEnabled) {
-      return t.withdraw.stripeNoPayouts;
+    if (!accountId.trim()) return t.withdraw.pleaseFillAccountId;
+    if (!accountName.trim()) return t.withdraw.pleaseFillAccountName;
+    if (paymentMethod === "bank") {
+      if (!bankName.trim()) return t.withdraw.pleaseFillBankName;
+      if (!bankAccount.trim() || bankAccount.length < 8) return t.withdraw.pleaseFillBankAccount;
     }
     return null;
   };
@@ -132,7 +141,6 @@ function WithdrawPageContent() {
         setError(data.error ?? t.withdraw.submitFailed);
         return;
       }
-      // Redirect to Stripe onboarding
       window.location.href = data.data.onboardingUrl;
     } catch {
       setError(t.withdraw.networkError);
@@ -159,10 +167,14 @@ function WithdrawPageContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: Number(amount),
-          currency: "CNY",
-          bankName,
-          bankAccount,
-          accountHolder,
+          currency: locale === "zh-CN" ? "CNY" : "USD",
+          paymentMethod,
+          accountId,
+          accountName,
+          ...(paymentMethod === "bank" && {
+            bankName,
+            bankAccount,
+          }),
         }),
       });
 
@@ -174,10 +186,11 @@ function WithdrawPageContent() {
 
       setSuccessMsg(t.withdraw.withdrawSuccess);
       setAmount("");
+      setAccountId("");
+      setAccountName("");
       setBankName("");
       setBankAccount("");
-      setAccountHolder("");
-      loadData(); // Refresh
+      loadData();
     } catch {
       setError(t.withdraw.networkError);
     } finally {
@@ -185,16 +198,21 @@ function WithdrawPageContent() {
     }
   };
 
-  const formatCurrency = (v: number) =>
-    new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(v);
+  const formatCurrency = (v: number) => {
+    if (locale === "zh-CN") {
+      return new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(v);
+    }
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
+  };
 
   const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" });
+    new Date(d).toLocaleDateString(locale === "zh-CN" ? "zh-CN" : "en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
 
-  const isStripeReady =
-    stripeAccount?.hasStripeAccount &&
-    stripeAccount.accountStatus === "verified" &&
-    stripeAccount.payoutsEnabled;
+  const currencySymbol = locale === "zh-CN" ? "¥" : "$";
 
   return (
     <DashboardShell
@@ -213,14 +231,14 @@ function WithdrawPageContent() {
 
         {/* Stripe Account Status Banner */}
         {!loading && (
-          <div className={`rounded-xl p-4 border ${isStripeReady
+          <div className={`rounded-xl p-4 border ${stripeAccount?.hasStripeAccount
               ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
               : "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
             }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isStripeReady ? "bg-green-100" : "bg-yellow-100"}`}>
-                  {isStripeReady ? (
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${stripeAccount?.hasStripeAccount ? "bg-green-100" : "bg-yellow-100"}`}>
+                  {stripeAccount?.hasStripeAccount ? (
                     <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -231,29 +249,14 @@ function WithdrawPageContent() {
                   )}
                 </div>
                 <div>
-                  <p className={`text-sm font-medium ${isStripeReady ? "text-green-800 dark:text-green-300" : "text-yellow-800 dark:text-yellow-300"}`}>
-                    {isStripeReady ? t.withdraw.stripeReady : t.withdraw.stripeNotReady}
+                  <p className={`text-sm font-medium ${stripeAccount?.hasStripeAccount ? "text-green-800 dark:text-green-300" : "text-yellow-800 dark:text-yellow-300"}`}>
+                    {stripeAccount?.hasStripeAccount ? t.withdraw.stripeReady : t.withdraw.stripeNotReady}
                   </p>
-                  <p className={`text-xs ${isStripeReady ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"}`}>
-                    {stripeAccount?.hasStripeAccount
-                      ? stripeAccount.accountStatus === "verified"
-                        ? stripeAccount.payoutsEnabled
-                          ? t.withdraw.stripeReadyDesc
-                          : t.withdraw.stripeNeedsBank
-                        : t.withdraw.stripeVerifying
-                      : t.withdraw.stripeSetupRequired}
+                  <p className={`text-xs ${stripeAccount?.hasStripeAccount ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"}`}>
+                    {stripeAccount?.hasStripeAccount ? t.withdraw.stripeReadyDesc : t.withdraw.stripeSetupRequired}
                   </p>
                 </div>
               </div>
-              {!isStripeReady && (
-                <button
-                  onClick={handleSetupStripe}
-                  disabled={settingUpStripe}
-                  className="px-4 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition disabled:opacity-50"
-                >
-                  {settingUpStripe ? t.withdraw.settingUpStripe : t.withdraw.setupStripe}
-                </button>
-              )}
             </div>
           </div>
         )}
@@ -270,13 +273,16 @@ function WithdrawPageContent() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.amount}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t.withdraw.amount.replace("¥", currencySymbol).replace("$", currencySymbol)}
+              </label>
               <input
                 type="number"
                 min={MIN_WITHDRAWAL}
                 step="0.01"
-                placeholder={t.withdraw.amountPlaceholder.replace("{min}", MIN_WITHDRAWAL.toString())}
+                placeholder={`${currencySymbol}${MIN_WITHDRAWAL}`}
                 className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -288,52 +294,107 @@ function WithdrawPageContent() {
               )}
             </div>
 
+            {/* Payment Method */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.bankName}</label>
-              <input
-                type="text"
-                placeholder={t.withdraw.bankNamePlaceholder}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                value={bankName}
-                onChange={(e) => setBankName(e.target.value)}
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t.withdraw.paymentMethod}</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {paymentMethods.map((method) => (
+                  <button
+                    key={method.value}
+                    type="button"
+                    onClick={() => setPaymentMethod(method.value)}
+                    className={`p-3 rounded-xl border-2 transition-all text-left ${
+                      paymentMethod === method.value
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                        : "border-gray-200 dark:border-gray-700 hover:border-blue-300"
+                    }`}
+                  >
+                    <span className="text-xl mr-2">{method.icon}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{method.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.bankAccount}</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                placeholder={t.withdraw.bankAccountPlaceholder}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                value={bankAccount}
-                onChange={(e) => setBankAccount(e.target.value)}
-              />
-            </div>
+            {/* Account ID (WeChat/Alipay/PayPal) */}
+            {paymentMethod !== "bank" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {paymentMethod === "wechat" ? t.withdraw.weChatPayAccount : paymentMethod === "alipay" ? t.withdraw.alipayAccount : t.withdraw.paypalAccount}
+                </label>
+                <input
+                  type="text"
+                  placeholder={paymentMethod === "wechat" ? t.withdraw.weChatPayIdPlaceholder : paymentMethod === "alipay" ? t.withdraw.alipayIdPlaceholder : t.withdraw.paypalIdPlaceholder}
+                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  value={accountId}
+                  onChange={(e) => setAccountId(e.target.value)}
+                />
+              </div>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.accountHolder}</label>
-              <input
-                type="text"
-                placeholder={t.withdraw.accountHolderPlaceholder}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                value={accountHolder}
-                onChange={(e) => setAccountHolder(e.target.value)}
-              />
-            </div>
+            {/* Account Name */}
+            {paymentMethod !== "bank" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.accountHolderName}</label>
+                <input
+                  type="text"
+                  placeholder={t.withdraw.accountHolderNamePlaceholder}
+                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                />
+              </div>
+            )}
+
+            {/* Bank Transfer Fields */}
+            {paymentMethod === "bank" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.bankName}</label>
+                  <input
+                    type="text"
+                    placeholder={t.withdraw.bankNamePlaceholder}
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    value={bankName}
+                    onChange={(e) => setBankName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.bankAccount}</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder={t.withdraw.bankAccountPlaceholder}
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    value={bankAccount}
+                    onChange={(e) => setBankAccount(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.accountHolder}</label>
+                  <input
+                    type="text"
+                    placeholder={t.withdraw.accountHolderPlaceholder}
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    value={accountName}
+                    onChange={(e) => setAccountName(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
 
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-xs text-gray-500 dark:text-gray-400 space-y-1">
-              <p>• {t.withdraw.withdrawNote1.replace("{min}", MIN_WITHDRAWAL.toString())}</p>
+              <p>• {t.withdraw.withdrawNote1.replace("{min}", MIN_WITHDRAWAL.toString()).replace("¥", currencySymbol)}</p>
               <p>• {t.withdraw.withdrawNote2}</p>
               <p>• {t.withdraw.withdrawNote3}</p>
             </div>
 
             <button
               type="submit"
-              disabled={submitting || loading || !isStripeReady}
+              disabled={submitting || loading}
               className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? t.withdraw.submitting : !isStripeReady ? t.withdraw.stripeRequired : t.withdraw.confirmWithdraw}
+              {submitting ? t.withdraw.submitting : t.withdraw.confirmWithdraw}
             </button>
           </form>
         </div>
@@ -355,7 +416,8 @@ function WithdrawPageContent() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{formatCurrency(w.amount)}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                        {w.bankName} ****{w.bankAccountLast4} · {formatDate(w.createdAt)}
+                        {w.paymentMethod === "wechat" ? "💚 " + t.withdraw.weChatPay : w.paymentMethod === "alipay" ? "🔵 " + t.withdraw.alipay : w.paymentMethod === "paypal" ? "🟣 " + t.withdraw.paypal : "🏦 " + t.withdraw.bankTransfer}
+                        {w.bankAccountLast4 ? ` ****${w.bankAccountLast4}` : ""} · {formatDate(w.createdAt)}
                       </p>
                       {w.rejectionReason && (
                         <p className="text-xs text-red-500 dark:text-red-400 mt-0.5">{t.withdraw.rejectionReason.replace("{reason}", w.rejectionReason)}</p>
