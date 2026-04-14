@@ -108,11 +108,35 @@ function escapeHtml(text: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    // Parse request body
-    const body = await req.json();
+    // Parse request body with fallback for empty/invalid body
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "Invalid request body" },
+        { status: 400 }
+      );
+    }
+
+    // Check for required fields before Zod validation
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { success: false, error: "Request body is required" },
+        { status: 400 }
+      );
+    }
+
+    // Ensure string fields that might be undefined become empty strings
+    const sanitizedBody = {
+      name: String(body.name ?? ""),
+      email: String(body.email ?? ""),
+      subject: String(body.subject ?? ""),
+      message: String(body.message ?? ""),
+    };
 
     // Validate input with Zod
-    const validatedData = ContactFormSchema.parse(body);
+    const validatedData = ContactFormSchema.parse(sanitizedBody);
 
     // Get SMTP configuration from environment variables
     const smtpHost = process.env.SMTP_HOST;
