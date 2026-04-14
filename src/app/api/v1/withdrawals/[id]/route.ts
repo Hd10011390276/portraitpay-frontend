@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
+import { initiateStripePayout } from "@/lib/payments/stripe";
 
 const UpdateWithdrawalSchema = z.object({
   action: z.enum(["cancel", "approve", "reject"]),
@@ -98,6 +99,21 @@ export async function PATCH(request: NextRequest, { params }: Params) {
             { status: 400 }
           );
         }
+
+        // Get user's Stripe customer/connected account ID
+        const user = await prisma.user.findUnique({
+          where: { id: withdrawal.userId },
+          select: { stripeCustomerId: true, email: true },
+        });
+
+        if (!user?.stripeCustomerId) {
+          return NextResponse.json(
+            { success: false, error: "用户未绑定Stripe账户，请先在设置页面绑定Stripe" },
+            { status: 400 }
+          );
+        }
+
+        // Update withdrawal to APPROVED first, then trigger Stripe payout
         await prisma.withdrawal.update({
           where: { id },
           data: {
@@ -121,8 +137,32 @@ export async function PATCH(request: NextRequest, { params }: Params) {
           },
         });
 
-        // TODO: Trigger Stripe payout (async, 1-3 business days)
-        // await initiateStripePayout({ withdrawalId: id, ... });
+        // Trigger Stripe payout (async, 1-3 business days)
+        // Using stub mode if STRIPE_STUB=true for development
+        try {
+          const amountInCents = Math.round(withdrawal.amount.toNumber() * 100);
+          await initiateStripePayout({
+            withdrawalId: id,
+            stripeCustomerId: user.stripeCustomerId,
+            amount: amountInCents,
+            currency: withdrawal.currency.toLowerCase(),
+          });
+        } catch (stripeError) {
+          console.error("[Stripe Payout Error]", stripeError);
+          // Payout failed - revert status to PENDING and log error
+          await prisma.withdrawal.update({
+            where: { id },
+            data: {
+              status: "PENDING",
+              rejectionReason: `Stripe payout创建失败: ${stripeError instanceof Error ? stripeError.message : "Unknown error"}`,
+              processedAt: new Date(),
+            },
+          });
+          return NextResponse.json(
+            { success: false, error: "Stripe payout创建失败，请稍后重试" },
+            { status: 500 }
+          );
+        }
         break;
       }
 
