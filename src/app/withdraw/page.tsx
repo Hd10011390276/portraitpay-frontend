@@ -5,7 +5,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 
 interface EarningsSummary {
@@ -26,6 +26,14 @@ interface WithdrawalRecord {
   completedAt: string | null;
 }
 
+interface StripeAccountStatus {
+  hasStripeAccount: boolean;
+  stripeAccountId: string | null;
+  accountStatus: string | null;
+  payoutsEnabled: boolean;
+  bankAccountConnected: boolean;
+}
+
 const STATUS_LABEL: Record<string, { text: string; color: string }> = {
   PENDING: { text: "待处理", color: "text-yellow-600 bg-yellow-50" },
   PROCESSING: { text: "处理中", color: "text-blue-600 bg-blue-50" },
@@ -39,12 +47,15 @@ const MIN_WITHDRAWAL = 100;
 
 export default function WithdrawPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [balance, setBalance] = useState<EarningsSummary | null>(null);
   const [history, setHistory] = useState<WithdrawalRecord[]>([]);
+  const [stripeAccount, setStripeAccount] = useState<StripeAccountStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [settingUpStripe, setSettingUpStripe] = useState(false);
 
   // Form state
   const [amount, setAmount] = useState("");
@@ -53,9 +64,10 @@ export default function WithdrawPage() {
   const [accountHolder, setAccountHolder] = useState("");
 
   const loadData = useCallback(async () => {
-    const [balanceRes, historyRes] = await Promise.all([
+    const [balanceRes, historyRes, stripeRes] = await Promise.all([
       fetch("/api/v1/earnings/summary"),
       fetch("/api/v1/withdrawals"),
+      fetch("/api/v1/withdrawals/stripe-account"),
     ]);
     if (balanceRes.ok) {
       const d = await balanceRes.json();
@@ -65,8 +77,19 @@ export default function WithdrawPage() {
       const d = await historyRes.json();
       setHistory(d.data ?? []);
     }
+    if (stripeRes.ok) {
+      const d = await stripeRes.json();
+      setStripeAccount(d.data);
+    }
     setLoading(false);
   }, []);
+
+  // Handle Stripe onboarding return
+  useEffect(() => {
+    if (searchParams.get("stripe_refresh") === "true") {
+      loadData();
+    }
+  }, [searchParams, loadData]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -80,7 +103,40 @@ export default function WithdrawPage() {
     if (!bankName.trim()) return "请填写银行名称";
     if (!bankAccount.trim() || bankAccount.length < 8) return "请填写正确的银行账号";
     if (!accountHolder.trim()) return "请填写开户姓名";
+    // Check Stripe account is ready
+    if (!stripeAccount?.hasStripeAccount) {
+      return "请先设置Stripe账户才能提现";
+    }
+    if (stripeAccount.accountStatus !== "verified") {
+      return "Stripe账户正在验证中，请完成验证后再试";
+    }
+    if (!stripeAccount.payoutsEnabled) {
+      return "Stripe账户未启用收款功能，请先完成Stripe注册流程";
+    }
     return null;
+  };
+
+  const handleSetupStripe = async () => {
+    setSettingUpStripe(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/v1/withdrawals/stripe-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnUrl: window.location.href }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Stripe账户创建失败");
+        return;
+      }
+      // Redirect to Stripe onboarding
+      window.location.href = data.data.onboardingUrl;
+    } catch {
+      setError("网络错误，请稍后重试");
+    } finally {
+      setSettingUpStripe(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -133,6 +189,11 @@ export default function WithdrawPage() {
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" });
 
+  const isStripeReady =
+    stripeAccount?.hasStripeAccount &&
+    stripeAccount.accountStatus === "verified" &&
+    stripeAccount.payoutsEnabled;
+
   return (
     <DashboardShell
       title="提现"
@@ -147,6 +208,53 @@ export default function WithdrawPage() {
           </p>
           <p className="text-blue-200 text-xs mt-2">每月1-5日为对账周期，暂停提现</p>
         </div>
+
+        {/* Stripe Account Status Banner */}
+        {!loading && (
+          <div className={`rounded-xl p-4 border ${isStripeReady
+              ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+              : "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+            }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isStripeReady ? "bg-green-100" : "bg-yellow-100"}`}>
+                  {isStripeReady ? (
+                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <p className={`text-sm font-medium ${isStripeReady ? "text-green-800 dark:text-green-300" : "text-yellow-800 dark:text-yellow-300"}`}>
+                    {isStripeReady ? "Stripe账户已就绪" : "Stripe账户未完成设置"}
+                  </p>
+                  <p className={`text-xs ${isStripeReady ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"}`}>
+                    {stripeAccount?.hasStripeAccount
+                      ? stripeAccount.accountStatus === "verified"
+                        ? stripeAccount.payoutsEnabled
+                          ? "可正常进行提现"
+                          : "请在Stripe中添加银行账户以启用收款"
+                        : "Stripe账户验证中..."
+                      : "点击下方按钮完成Stripe账户注册"}
+                  </p>
+                </div>
+              </div>
+              {!isStripeReady && (
+                <button
+                  onClick={handleSetupStripe}
+                  disabled={settingUpStripe}
+                  className="px-4 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition disabled:opacity-50"
+                >
+                  {settingUpStripe ? "跳转中..." : "设置Stripe账户"}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Withdrawal Form */}
         <div className="bg-white dark:bg-gray-900 rounded-xl p-6">
@@ -220,10 +328,10 @@ export default function WithdrawPage() {
 
             <button
               type="submit"
-              disabled={submitting || loading}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+              disabled={submitting || loading || !isStripeReady}
+              className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? "提交中..." : "确认提现"}
+              {submitting ? "提交中..." : !isStripeReady ? "请先设置Stripe账户" : "确认提现"}
             </button>
           </form>
         </div>
