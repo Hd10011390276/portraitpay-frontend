@@ -89,6 +89,7 @@ export default function EarningsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<{ startDate?: string; endDate?: string }>({});
   const [activeTab, setActiveTab] = useState<"all" | "royalty" | "license">("all");
+  const [chartToggle, setChartToggle] = useState<"月" | "周" | "日">("月");
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -144,6 +145,19 @@ export default function EarningsPage() {
     };
     if (!checking) load();
   }, [fetchSummary, fetchTransactions, checking]);
+
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true);
+    try {
+      const txData = await fetchTransactions(newPage);
+      setTransactions(txData.transactions ?? []);
+      setMeta(txData.meta ?? null);
+    } catch {
+      // silently fail
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatCurrency = (amount: number, currency = "CNY") =>
     new Intl.NumberFormat("zh-CN", { style: "currency", currency, minimumFractionDigits: 2 }).format(amount);
@@ -224,7 +238,8 @@ export default function EarningsPage() {
               <div className="flex gap-1">
                 {(["月", "周", "日"] as const).map((toggle) => (
                   <button key={toggle}
-                    className={`px-3 py-1 text-xs rounded-lg transition-colors ${toggle === "月" ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"}`}>
+                    onClick={() => setChartToggle(toggle)}
+                    className={`px-3 py-1 text-xs rounded-lg transition-colors ${chartToggle === toggle ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"}`}>
                     {toggle}
                   </button>
                 ))}
@@ -391,11 +406,15 @@ export default function EarningsPage() {
                     {t.earnings.page.replace("{page}", String(meta.page)).replace("{totalPages}", String(meta.totalPages)).replace("{total}", String(meta.total))}
                   </p>
                   <div className="flex gap-2">
-                    <button disabled={meta.page <= 1}
+                    <button
+                      disabled={meta.page <= 1}
+                      onClick={() => handlePageChange(meta.page - 1)}
                       className="px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                       {t.earnings.prevPage}
                     </button>
-                    <button disabled={meta.page >= meta.totalPages}
+                    <button
+                      disabled={meta.page >= meta.totalPages}
+                      onClick={() => handlePageChange(meta.page + 1)}
                       className="px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                       {t.earnings.nextPage}
                     </button>

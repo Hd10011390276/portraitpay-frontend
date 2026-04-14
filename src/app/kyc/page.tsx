@@ -24,6 +24,8 @@ export default function KYCPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [selectedDocType, setSelectedDocType] = useState<string>("id_card");
+  const [draftSaved, setDraftSaved] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem("pp_user");
@@ -52,12 +54,12 @@ export default function KYCPage() {
     setSubmitError(null);
 
     try {
-      // Upload images to backend - for now just submit with placeholder URLs
       const res = await fetch("/api/v1/kyc/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           level: 2,
+          documentType: selectedDocType,
           idCardFrontUrl: frontPreview,
           idCardBackUrl: backPreview,
         }),
@@ -74,6 +76,19 @@ export default function KYCPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleSaveDraft = () => {
+    // Save draft to localStorage
+    const draft = {
+      documentType: selectedDocType,
+      frontImage: frontPreview,
+      backImage: backPreview,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem("kyc_draft", JSON.stringify(draft));
+    setDraftSaved(true);
+    setTimeout(() => setDraftSaved(false), 3000);
   };
 
   if (checking) {
@@ -122,8 +137,15 @@ export default function KYCPage() {
                   { value: "hk_pass", label: "港澳通行证", icon: "🛂" },
                   { value: "tw_pass", label: "台湾居民证", icon: "✈️" },
                 ].map((opt) => (
-                  <button key={opt.value}
-                    className="flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all text-left">
+                  <button
+                    key={opt.value}
+                    onClick={() => setSelectedDocType(opt.value)}
+                    className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left ${
+                      selectedDocType === opt.value
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                        : "border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500"
+                    }`}
+                  >
                     <span className="text-2xl">{opt.icon}</span>
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{opt.label}</p>
@@ -235,8 +257,11 @@ export default function KYCPage() {
               >
                 {submitting ? t.kyc.submitting || "Submitting..." : t.kyc.submitDocs}
               </button>
-              <button className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm">
-                {t.kyc.saveDraft}
+              <button
+                onClick={handleSaveDraft}
+                className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm"
+              >
+                {draftSaved ? "✅ " + (t.kyc.draftSaved || "已保存") : t.kyc.saveDraft}
               </button>
             </div>
           </div>
