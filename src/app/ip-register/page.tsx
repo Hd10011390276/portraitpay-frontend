@@ -7,6 +7,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -68,15 +69,19 @@ interface ApiResponse<T> {
 
 // ── Constants ───────────────────────────────────────────────────────
 
-const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
-  CHARACTER: "AI 角色/头像",
-  ARTWORK: "AI 艺术作品",
-  MUSIC: "AI 音乐",
-  TEXT: "AI 文本内容",
-  VIDEO: "AI 视频",
-  "3D_MODEL": "3D 模型",
-  OTHER: "其他",
-};
+type IpRegTranslations = ReturnType<typeof useLanguage>["t"]["ipRegister"];
+
+function getContentTypeLabels(t: IpRegTranslations): Record<ContentType, string> {
+  return {
+    CHARACTER: t.character,
+    ARTWORK: t.artwork,
+    MUSIC: t.music,
+    TEXT: t.text,
+    VIDEO: t.video,
+    "3D_MODEL": t.model3d,
+    OTHER: t.other,
+  };
+}
 
 const CONTENT_TYPE_EMOJI: Record<ContentType, string> = {
   CHARACTER: "🎭",
@@ -88,20 +93,24 @@ const CONTENT_TYPE_EMOJI: Record<ContentType, string> = {
   OTHER: "📄",
 };
 
-const CERTIFICATE_TYPE_LABELS: Record<CertificateType, string> = {
-  OWNERSHIP: "所有权证明",
-  LICENSE: "授权许可",
-  CREATION: "创作证明",
-  DERIVATIVE: "衍生作品证明",
-};
+function getCertificateTypeLabels(t: IpRegTranslations): Record<CertificateType, string> {
+  return {
+    OWNERSHIP: t.ownership,
+    LICENSE: t.license,
+    CREATION: t.creation,
+    DERIVATIVE: t.derivative,
+  };
+}
 
-const STATUS_CONFIG: Record<RegStatus, { label: string; color: string; bg: string; badge: string }> = {
-  DRAFT:     { label: "草稿",    color: "text-gray-600", bg: "bg-gray-100",  badge: "📝" },
-  CERTIFIED: { label: "已认证", color: "text-purple-700", bg: "bg-purple-50", badge: "🔗" },
-  ACTIVE:    { label: "有效",    color: "text-green-700", bg: "bg-green-50",  badge: "✅" },
-  REVOKED:   { label: "已撤销",  color: "text-red-600",   bg: "bg-red-50",    badge: "❌" },
-  EXPIRED:   { label: "已过期",  color: "text-yellow-600", bg: "bg-yellow-50", badge: "⏰" },
-};
+function getStatusConfig(t: IpRegTranslations): Record<RegStatus, { label: string; color: string; bg: string; badge: string }> {
+  return {
+    DRAFT:     { label: t.draft,      color: "text-gray-600",    bg: "bg-gray-100",    badge: "📝" },
+    CERTIFIED: { label: t.certified, color: "text-purple-700",  bg: "bg-purple-50",   badge: "🔗" },
+    ACTIVE:    { label: t.active,    color: "text-green-700",   bg: "bg-green-50",    badge: "✅" },
+    REVOKED:   { label: t.revoked,   color: "text-red-600",     bg: "bg-red-50",      badge: "❌" },
+    EXPIRED:   { label: t.expired,   color: "text-yellow-600",  bg: "bg-yellow-50",   badge: "⏰" },
+  };
+}
 
 const GENERATION_TOOLS = [
   "Midjourney v6",
@@ -147,9 +156,10 @@ interface UploadZoneProps {
   onFileSelected: (file: File, hash: string) => void;
   accept?: string;
   maxSizeMB?: number;
+  t: IpRegTranslations;
 }
 
-function UploadZone({ onFileSelected, accept = "image/*", maxSizeMB = 20 }: UploadZoneProps) {
+function UploadZone({ onFileSelected, accept = "image/*", maxSizeMB = 20, t }: UploadZoneProps) {
   const [dragging, setDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -159,7 +169,7 @@ function UploadZone({ onFileSelected, accept = "image/*", maxSizeMB = 20 }: Uplo
 
   const handleFile = async (f: File) => {
     if (f.size > maxSizeMB * 1024 * 1024) {
-      setError(`文件大小不能超过 ${maxSizeMB}MB`);
+      setError(t.fileTooLarge);
       return;
     }
     setError(null);
@@ -169,7 +179,7 @@ function UploadZone({ onFileSelected, accept = "image/*", maxSizeMB = 20 }: Uplo
       setHash(h);
       onFileSelected(f, h);
     } catch {
-      setError("文件哈希计算失败");
+      setError(t.registrationFailed);
     }
     if (f.type.startsWith("image/")) {
       const url = URL.createObjectURL(f);
@@ -211,21 +221,21 @@ function UploadZone({ onFileSelected, accept = "image/*", maxSizeMB = 20 }: Uplo
               onClick={(e) => { e.stopPropagation(); setPreview(null); setFile(null); setHash(null); }}
               className="text-xs text-red-500 hover:underline"
             >
-              移除
+              {t.remove || "移除"}
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
             <div className="text-4xl">📤</div>
-            <p className="font-medium text-gray-700">拖拽文件或点击上传</p>
-            <p className="text-xs text-gray-400">支持 JPG/PNG/GIF/WebP/SVG，最大 {maxSizeMB}MB</p>
+            <p className="font-medium text-gray-700">{t.dragDropUpload}</p>
+            <p className="text-xs text-gray-400">{t.supportedFormats}</p>
           </div>
         )}
       </div>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       {hash && (
         <div className="mt-2 p-2 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-400">SHA-256 哈希（用于链上存证）:</p>
+          <p className="text-xs text-gray-400">{t.contentHash} (SHA-256):</p>
           <p className="text-xs font-mono text-gray-600 break-all">{hash}</p>
         </div>
       )}
@@ -238,9 +248,12 @@ function UploadZone({ onFileSelected, accept = "image/*", maxSizeMB = 20 }: Uplo
 interface CertModalProps {
   registration: IPRegistration;
   onClose: () => void;
+  t: IpRegTranslations;
+  statusConfig: Record<RegStatus, { label: string; color: string; bg: string; badge: string }>;
+  certificateTypeLabels: Record<CertificateType, string>;
 }
 
-function CertificateModal({ registration, onClose }: CertModalProps) {
+function CertificateModal({ registration, onClose, t, statusConfig, certificateTypeLabels }: CertModalProps) {
   const ipfsUrl = registration.certificateIpfsCid
     ? `https://cloudflare-ipfs.com/ipfs/${registration.certificateIpfsCid}`
     : null;
@@ -249,7 +262,7 @@ function CertificateModal({ registration, onClose }: CertModalProps) {
     ? `https://sepolia.etherscan.io/tx/${registration.blockchainTxHash}`
     : null;
 
-  const cfg = STATUS_CONFIG[registration.status] ?? STATUS_CONFIG.DRAFT;
+  const cfg = statusConfig[registration.status] ?? statusConfig.DRAFT;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -260,7 +273,7 @@ function CertificateModal({ registration, onClose }: CertModalProps) {
             <div className="flex items-center gap-3">
               <div className="text-3xl">📜</div>
               <div>
-                <h2 className="text-white font-bold text-lg">AI 版权证书</h2>
+                <h2 className="text-white font-bold text-lg">AI IP {t.certifyOnChain}</h2>
                 <p className="text-purple-200 text-xs font-mono">{registration.certificateNo}</p>
               </div>
             </div>
@@ -274,67 +287,67 @@ function CertificateModal({ registration, onClose }: CertModalProps) {
             {cfg.badge} {cfg.label}
           </span>
           <span className="text-xs text-gray-400">
-            {CERTIFICATE_TYPE_LABELS[registration.certificateType] ?? registration.certificateType}
+            {certificateTypeLabels[registration.certificateType] ?? registration.certificateType}
           </span>
         </div>
 
         {/* Content */}
         <div className="p-6 space-y-4">
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide">作品名称</p>
+            <p className="text-xs text-gray-400 uppercase tracking-wide">{t.ipTitle}</p>
             <p className="font-semibold text-gray-900">{registration.title}</p>
           </div>
 
           {registration.description && (
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">作品描述</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t.description}</p>
               <p className="text-sm text-gray-600">{registration.description}</p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">证书类型</p>
-              <p className="text-sm text-gray-700">{CERTIFICATE_TYPE_LABELS[registration.certificateType]}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t.certificateType}</p>
+              <p className="text-sm text-gray-700">{certificateTypeLabels[registration.certificateType]}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">地域范围</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t.territorialScope}</p>
               <p className="text-sm text-gray-700">{registration.territorialScope}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">权利类型</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t.rightsDeclared}</p>
               <p className="text-sm text-gray-700">{registration.rightsDeclared.join(", ")}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">专有性</p>
-              <p className="text-sm text-gray-700">{registration.exclusivity ? "专有" : "非专有"}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t.exclusivity}</p>
+              <p className="text-sm text-gray-700">{registration.exclusivity ? t.exclusive : t.nonExclusive}</p>
             </div>
           </div>
 
           {registration.certifiedAt && (
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">认证时间</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t.certified} {t.time || ""}</p>
               <p className="text-sm text-gray-700">{new Date(registration.certifiedAt).toLocaleString("zh-CN")}</p>
             </div>
           )}
 
           {registration.blockchainTxHash && (
             <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-              <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">🔗 区块链存证</p>
-              <p className="text-xs text-gray-500">网络: <span className="font-mono text-gray-700">{registration.blockchainNetwork}</span></p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">🔗 {t.certifyOnChain}</p>
+              <p className="text-xs text-gray-500">{t.network}: <span className="font-mono text-gray-700">{registration.blockchainNetwork}</span></p>
               <p className="text-xs text-gray-500 break-all">
                 Tx: <span className="font-mono text-purple-600">{registration.blockchainTxHash}</span>
               </p>
               {txUrl && (
                 <a href={txUrl} target="_blank" rel="noopener noreferrer"
                    className="inline-flex items-center gap-1 text-xs text-purple-600 hover:underline">
-                  在 Etherscan 查看 ↗
+                  {t.viewCertificate || "View"} Etherscan ↗
                 </a>
               )}
               {ipfsUrl && (
                 <a href={ipfsUrl} target="_blank" rel="noopener noreferrer"
                    className="inline-flex items-center gap-1 text-xs text-purple-600 hover:underline ml-3">
-                  在 IPFS 查看 ↗
+                  {t.viewCertificate || "View"} IPFS ↗
                 </a>
               )}
             </div>
@@ -343,12 +356,12 @@ function CertificateModal({ registration, onClose }: CertModalProps) {
 
         {/* Footer */}
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-xs text-gray-400">由 PortraitPay AI 平台认证生成</p>
+          <p className="text-xs text-gray-400">{t.poweredBy || "Powered by"} PortraitPay AI</p>
           <button
             onClick={onClose}
             className="px-4 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
           >
-            关闭
+            {t.close || "关闭"}
           </button>
         </div>
       </div>
@@ -360,6 +373,8 @@ function CertificateModal({ registration, onClose }: CertModalProps) {
 
 export default function IPRegisterPage() {
   const router = useRouter();
+  const { t: i18n, locale } = useLanguage();
+  const ipRegT = i18n.ipRegister;
   const [tab, setTab] = useState<"register" | "list">("register");
   const [contents, setContents] = useState<AIContent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -391,6 +406,10 @@ export default function IPRegisterPage() {
 
   const LICENSE_SCOPES = ["commercial", "editorial", "advertising", "product", "digital", "print", "broadcast"];
 
+  const contentTypeLabels = getContentTypeLabels(ipRegT);
+  const certificateTypeLabels = getCertificateTypeLabels(ipRegT);
+  const statusConfig = getStatusConfig(ipRegT);
+
   const fetchContents = useCallback(async () => {
     setLoading(true);
     try {
@@ -410,8 +429,8 @@ export default function IPRegisterPage() {
 
   const validateForm = () => {
     const errs: Record<string, string> = {};
-    if (!form.title.trim()) errs.title = "请输入作品标题";
-    if (!form.generationTool.trim()) errs.generationTool = "请选择或输入生成工具";
+    if (!form.title.trim()) errs.title = ipRegT.ipTitle + " " + (ipRegT.required || "is required");
+    if (!form.generationTool.trim()) errs.generationTool = ipRegT.generationTool + " " + (ipRegT.required || "is required");
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -450,7 +469,7 @@ export default function IPRegisterPage() {
 
       const json = await res.json();
       if (!json.success) {
-        alert(json.error || "注册失败");
+        alert(json.error || ipRegT.registrationFailed);
         return;
       }
 
@@ -468,32 +487,32 @@ export default function IPRegisterPage() {
       fetchContents();
     } catch (err) {
       console.error("Submit failed:", err);
-      alert("提交失败，请重试");
+      alert(ipRegT.submitFailed || ipRegT.registrationFailed || "Submission failed, please try again");
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleCertify = async (contentId: string) => {
-    if (!confirm("确认在以太坊 Sepolia 链上生成区块链版权证书？\n这将扣除少量 gas 费用。")) return;
+    if (!confirm(ipRegT.certifyConfirmMsg || `Confirm blockchain certification on Ethereum Sepolia?\nGas fees will be deducted.`)) return;
 
     setCertifyingId(contentId);
-    setCertStatus({ id: contentId, message: "正在连接区块链..." });
+    setCertStatus({ id: contentId, message: ipRegT.connectingBlockchain || "Connecting to blockchain..." });
 
     try {
-      setCertStatus({ id: contentId, message: "上传元数据到 IPFS..." });
+      setCertStatus({ id: contentId, message: ipRegT.uploadingIpfs || "Uploading metadata to IPFS..." });
       const res = await fetch(`/api/ip-register/${contentId}/certify`, { method: "POST" });
       const json = await res.json();
 
       if (!json.success) {
-        setCertStatus({ id: contentId, message: `❌ 失败: ${json.error}` });
+        setCertStatus({ id: contentId, message: `❌ ${ipRegT.certifyFailed || "Certification failed"}: ${json.error}` });
         setTimeout(() => setCertStatus(null), 5000);
         return;
       }
 
       setCertStatus({
         id: contentId,
-        message: `✅ 证书生成成功！Tx: ${json.data.blockchainTxHash?.slice(0, 14)}...`,
+        message: `✅ ${ipRegT.certConfirmed || "Certificate confirmed!"} Tx: ${json.data.blockchainTxHash?.slice(0, 14)}...`,
       });
 
       setTimeout(() => {
@@ -502,7 +521,7 @@ export default function IPRegisterPage() {
       }, 3000);
     } catch (err) {
       console.error("Certify failed:", err);
-      setCertStatus({ id: contentId, message: "❌ 网络错误" });
+      setCertStatus({ id: contentId, message: `❌ ${ipRegT.networkError || "Network error"}` });
       setTimeout(() => setCertStatus(null), 5000);
     } finally {
       setCertifyingId(null);
@@ -521,43 +540,43 @@ export default function IPRegisterPage() {
             <div className="flex items-center gap-3">
               <div>
                 <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  🎨 AI IP 版权注册
+                  🎨 {ipRegT.title}
                   <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-700 border border-amber-200 tracking-wide">
                     DEMO
                   </span>
                 </h1>
-                <p className="text-xs text-gray-500">为 AI 生成的角色和内容登记版权，建立权属证明</p>
+                <p className="text-xs text-gray-500">{ipRegT.subtitle}</p>
               </div>
               <div className="ml-auto shrink-0">
                 <div className="flex flex-col items-end gap-1">
                   <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
                     <span>⚠️</span>
-                    <span>区块链存证为演示功能</span>
+                    <span>{ipRegT.demoWarning || "区块链存证为演示功能"}</span>
                   </div>
                 </div>
               </div>
             </div>
             <Link href="/portraits" className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              ← 肖像管理
+              ← {ipRegT.backToPortraits || "肖像管理"}
             </Link>
           </div>
 
           {/* Tabs */}
           <div className="flex items-center gap-1 mt-1 -mb-px">
             {[
-              { key: "register", label: "注册新作品", icon: "✍️" },
-              { key: "list", label: "我的证书", icon: "📋" },
-            ].map((t) => (
+              { key: "register", label: ipRegT.newRegistration, icon: "✍️" },
+              { key: "list", label: ipRegT.myRegistrations, icon: "📋" },
+            ].map((tabItem) => (
               <button
-                key={t.key}
-                onClick={() => setTab(t.key as "register" | "list")}
+                key={tabItem.key}
+                onClick={() => setTab(tabItem.key as "register" | "list")}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-                  tab === t.key
+                  tab === tabItem.key
                     ? "border-purple-600 text-purple-600"
                     : "border-transparent text-gray-400 hover:text-gray-600"
                 }`}
               >
-                {t.icon} {t.label}
+                {tabItem.icon} {tabItem.label}
               </button>
             ))}
           </div>
@@ -572,9 +591,9 @@ export default function IPRegisterPage() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
               {/* Purple gradient header */}
               <div className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 px-8 py-6">
-                <h2 className="text-xl font-bold text-white">注册 AI 创作资产</h2>
+                <h2 className="text-xl font-bold text-white">{ipRegT.registerAssetTitle || ipRegT.title}</h2>
                 <p className="text-purple-100 text-sm mt-1">
-                  完成注册后，可为作品生成区块链版权证书，确立 AI 生成内容的权属证明
+                  {ipRegT.registerAssetDesc || ipRegT.subtitle}
                 </p>
               </div>
 
@@ -584,28 +603,28 @@ export default function IPRegisterPage() {
                 <section>
                   <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                    AI 生成内容
+                    {ipRegT.generationInfo}
                   </h3>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        上传作品文件 <span className="text-red-500">*</span>
+                        {ipRegT.originalFile} <span className="text-red-500">*</span>
                       </label>
-                      <UploadZone onFileSelected={handleFileSelected} maxSizeMB={20} />
+                      <UploadZone onFileSelected={handleFileSelected} maxSizeMB={20} t={ipRegT} />
                       <p className="mt-1.5 text-xs text-gray-400">
-                        支持图片、音视频、3D 模型等。文件 SHA-256 哈希将上链存证。
+                        {ipRegT.supportedFormatsDesc || ipRegT.supportedFormats}
                       </p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        作品标题 <span className="text-red-500">*</span>
+                        {ipRegT.ipTitle} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         value={form.title}
                         onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                        placeholder="例如：赛博朋克少女 · 霓虹城市 v2"
+                        placeholder={ipRegT.ipTitlePlaceholder}
                         maxLength={200}
                         className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
                           errors.title ? "border-red-300 focus:ring-red-200" : "border-gray-200 focus:ring-purple-200 focus:border-purple-300"
@@ -615,11 +634,11 @@ export default function IPRegisterPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">作品描述</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{ipRegT.description}</label>
                       <textarea
                         value={form.description}
                         onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                        placeholder="描述作品的创作背景、用途、风格等..."
+                        placeholder={ipRegT.descriptionPlaceholder}
                         rows={3}
                         maxLength={2000}
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-300 resize-none"
@@ -627,9 +646,9 @@ export default function IPRegisterPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">内容类型</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{ipRegT.contentType}</label>
                       <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                        {(Object.keys(CONTENT_TYPE_LABELS) as ContentType[]).map((type) => (
+                        {(Object.keys(contentTypeLabels) as ContentType[]).map((type) => (
                           <button
                             key={type}
                             type="button"
@@ -641,14 +660,14 @@ export default function IPRegisterPage() {
                             }`}
                           >
                             <span>{CONTENT_TYPE_EMOJI[type]}</span>
-                            <span className="text-center leading-tight">{CONTENT_TYPE_LABELS[type]}</span>
+                            <span className="text-center leading-tight">{contentTypeLabels[type]}</span>
                           </button>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">标签 <span className="text-xs text-gray-400">(逗号分隔)</span></label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{ipRegT.tags || "标签"} <span className="text-xs text-gray-400">(逗号分隔)</span></label>
                       <input
                         type="text"
                         value={form.tags}
@@ -667,19 +686,19 @@ export default function IPRegisterPage() {
                 <section>
                   <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                    AI 生成信息
+                    {ipRegT.generationInfo}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        AI 生成工具 <span className="text-red-500">*</span>
+                        {ipRegT.generationTool} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         list="generation-tools"
                         value={form.generationTool}
                         onChange={(e) => setForm((f) => ({ ...f, generationTool: e.target.value }))}
-                        placeholder="选择或输入 AI 工具名称"
+                        placeholder={ipRegT.generationToolPlaceholder}
                         className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
                           errors.generationTool ? "border-red-300 focus:ring-red-200" : "border-gray-200 focus:ring-purple-200 focus:border-purple-300"
                         }`}
@@ -691,7 +710,7 @@ export default function IPRegisterPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">模型版本</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{ipRegT.modelVersion}</label>
                       <input
                         type="text"
                         value={form.modelVersion}
@@ -702,18 +721,18 @@ export default function IPRegisterPage() {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">生成 Prompt</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{ipRegT.prompt}</label>
                       <textarea
                         value={form.generationPrompt}
                         onChange={(e) => setForm((f) => ({ ...f, generationPrompt: e.target.value }))}
-                        placeholder="描述生成该作品所使用的完整 prompt..."
+                        placeholder={ipRegT.promptPlaceholder}
                         rows={3}
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-200 resize-none font-mono"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">生成日期</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{ipRegT.generationDate}</label>
                       <input
                         type="date"
                         value={form.generationDate}
@@ -767,11 +786,11 @@ export default function IPRegisterPage() {
                 <section>
                   <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                    权利声明
+                    {ipRegT.rightsDeclared}
                   </h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">版权声明文本</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{ipRegT.copyrightNotice || "版权声明"}</label>
                       <textarea
                         value={form.copyrightNotice}
                         onChange={(e) => setForm((f) => ({ ...f, copyrightNotice: e.target.value }))}
@@ -782,7 +801,7 @@ export default function IPRegisterPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">许可使用范围</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">{ipRegT.licenseScope || "许可使用范围"}</label>
                       <div className="flex flex-wrap gap-2">
                         {LICENSE_SCOPES.map((scope) => (
                           <button
@@ -810,8 +829,8 @@ export default function IPRegisterPage() {
                           className="w-4 h-4 text-purple-600 rounded"
                         />
                         <div>
-                          <span className="text-sm font-medium text-gray-700">公有领域声明</span>
-                          <p className="text-xs text-gray-400">放弃版权，进入公有领域</p>
+                          <span className="text-sm font-medium text-gray-700">{ipRegT.publicDomain || "公有领域声明"}</span>
+                          <p className="text-xs text-gray-400">{ipRegT.publicDomainDesc || "放弃版权，进入公有领域"}</p>
                         </div>
                       </label>
 
@@ -823,8 +842,8 @@ export default function IPRegisterPage() {
                           className="w-4 h-4 text-purple-600 rounded"
                         />
                         <div>
-                          <span className="text-sm font-medium text-gray-700">存在第三方权利</span>
-                          <p className="text-xs text-gray-400">该作品可能包含第三方知识产权（如品牌、人物等）</p>
+                          <span className="text-sm font-medium text-gray-700">{ipRegT.thirdPartyRights || "存在第三方权利"}</span>
+                          <p className="text-xs text-gray-400">{ipRegT.thirdPartyRightsDesc || "该作品可能包含第三方知识产权（如品牌、人物等）"}</p>
                         </div>
                       </label>
                     </div>
@@ -841,14 +860,14 @@ export default function IPRegisterPage() {
                     {submitting ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                        注册中...
+                        {ipRegT.registering}
                       </>
                     ) : (
-                      <>🎨 注册作品</>
+                      <>🎨 {ipRegT.registerNow}</>
                     )}
                   </button>
                   <p className="text-xs text-gray-400">
-                    注册免费，生成区块链证书将消耗少量 gas 费用
+                    {ipRegT.registerFreeDesc || ipRegT.registerNow + " — free, gas fees apply"}
                   </p>
                 </div>
               </form>
@@ -873,15 +892,15 @@ export default function IPRegisterPage() {
             ) : contents.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-center">
                 <div className="text-6xl mb-4">🖼️</div>
-                <h2 className="text-xl font-semibold text-gray-700 mb-2">还没有注册作品</h2>
+                <h2 className="text-xl font-semibold text-gray-700 mb-2">{ipRegT.noRegistrations}</h2>
                 <p className="text-gray-400 mb-6 max-w-sm">
-                  上传你的第一个 AI 创作作品，开始建立区块链版权证明
+                  {ipRegT.createFirst}
                 </p>
                 <button
                   onClick={() => setTab("register")}
                   className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium"
                 >
-                  立即注册
+                  {ipRegT.registerNow}
                 </button>
               </div>
             ) : (
@@ -889,10 +908,10 @@ export default function IPRegisterPage() {
                 {/* Stats row */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                   {[
-                    { label: "已注册", value: contents.length, emoji: "📦", color: "text-gray-700" },
-                    { label: "已认证", value: contents.filter(c => latestReg(c)?.status === "CERTIFIED").length, emoji: "🔗", color: "text-purple-700" },
-                    { label: "草稿", value: contents.filter(c => latestReg(c)?.status === "DRAFT").length, emoji: "📝", color: "text-gray-500" },
-                    { label: "AI 角色", value: contents.filter(c => c.contentType === "CHARACTER").length, emoji: "🎭", color: "text-blue-700" },
+                    { label: ipRegT.myRegistrations, value: contents.length, emoji: "📦", color: "text-gray-700" },
+                    { label: ipRegT.certified, value: contents.filter(c => latestReg(c)?.status === "CERTIFIED").length, emoji: "🔗", color: "text-purple-700" },
+                    { label: ipRegT.draft, value: contents.filter(c => latestReg(c)?.status === "DRAFT").length, emoji: "📝", color: "text-gray-500" },
+                    { label: ipRegT.character, value: contents.filter(c => c.contentType === "CHARACTER").length, emoji: "🎭", color: "text-blue-700" },
                   ].map((stat) => (
                     <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-4">
                       <p className="text-xs text-gray-400 mb-1">{stat.emoji} {stat.label}</p>
@@ -905,7 +924,7 @@ export default function IPRegisterPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {contents.map((content) => {
                     const reg = latestReg(content);
-                    const cfg = reg ? (STATUS_CONFIG[reg.status] ?? STATUS_CONFIG.DRAFT) : STATUS_CONFIG.DRAFT;
+                    const cfg = reg ? (statusConfig[reg.status] ?? statusConfig.DRAFT) : statusConfig.DRAFT;
                     const isCertifying = certifyingId === content.id;
 
                     return (
@@ -937,7 +956,7 @@ export default function IPRegisterPage() {
                           {/* Content type badge */}
                           <div className="absolute top-2 left-2">
                             <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-white/80 text-gray-600 backdrop-blur-sm">
-                              {CONTENT_TYPE_EMOJI[content.contentType]} {CONTENT_TYPE_LABELS[content.contentType]}
+                              {CONTENT_TYPE_EMOJI[content.contentType]} {contentTypeLabels[content.contentType]}
                             </span>
                           </div>
                         </div>
@@ -985,7 +1004,7 @@ export default function IPRegisterPage() {
                                 onClick={() => setSelectedCert(reg)}
                                 className="flex-1 px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                               >
-                                📜 证书
+                                📜 {ipRegT.viewCertificate}
                               </button>
                             )}
 
@@ -995,14 +1014,14 @@ export default function IPRegisterPage() {
                                 disabled={isCertifying}
                                 className="flex-1 px-3 py-1.5 text-xs font-medium bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
                               >
-                                {isCertifying ? "🔗 认证中..." : "🔗 DEMO 区块链认证"}
+                                {isCertifying ? "🔗 " + (ipRegT.certifying || "认证中...") : "🔗 DEMO " + ipRegT.certifyOnChain}
                               </button>
                             )}
 
                             <button
                               onClick={() => navigator.clipboard.writeText(content.id)}
                               className="px-3 py-1.5 text-xs font-medium text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                              title="复制 ID"
+                              title={ipRegT.copyId || "复制 ID"}
                             >
                               📋
                             </button>
@@ -1023,6 +1042,9 @@ export default function IPRegisterPage() {
         <CertificateModal
           registration={selectedCert}
           onClose={() => setSelectedCert(null)}
+          t={ipRegT}
+          statusConfig={statusConfig}
+          certificateTypeLabels={certificateTypeLabels}
         />
       )}
     </div>

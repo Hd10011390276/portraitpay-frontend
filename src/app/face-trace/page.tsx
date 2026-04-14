@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import FaceTraceUploader from "@/components/face-trace/FaceTraceUploader";
 import FaceTraceResults from "@/components/face-trace/FaceTraceResults";
 import type { TraceResult, TraceStage } from "@/components/face-trace/FaceTraceUploader";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function FaceTracePage() {
+  const { t } = useLanguage();
   const [results, setResults] = useState<TraceResult[] | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [stage, setStage] = useState<TraceStage>("idle");
@@ -31,9 +33,9 @@ export default function FaceTracePage() {
       <header className="bg-white/80 backdrop-blur border-b border-gray-200 sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <a href="/dashboard" className="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1.5 transition-colors">
-            ← 控制台
+            {t.faceTrace.backToConsole}
           </a>
-          <h1 className="font-semibold text-gray-800 text-sm">人脸溯源</h1>
+          <h1 className="font-semibold text-gray-800 text-sm">{t.faceTrace.title}</h1>
           <div className="w-16" />
         </div>
       </header>
@@ -46,27 +48,27 @@ export default function FaceTracePage() {
           </div>
           <div className="flex items-center justify-center gap-2 mb-3">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              AI 人脸溯源
+              {t.faceTrace.title}
             </h1>
             <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-700 border border-amber-200 tracking-wide">
               DEMO
             </span>
           </div>
           <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-            上传 AI 生成的人像图片，系统将提取人脸向量，与链上已登记的真实名人数据库进行余弦相似度匹配，揭示权属来源。
+            {t.faceTrace.subtitle}
           </p>
           <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
             <span>⚠️</span>
-            <span>当前名人人脸向量为模拟数据，匹配结果仅供演示参考</span>
+            <span>{t.faceTrace.demoWarning}</span>
           </div>
         </div>
 
         {/* Architecture callout */}
         <div className="grid grid-cols-3 gap-3 mb-10">
           {[
-            { step: "01", icon: "📤", title: "拖拽上传", desc: "AI 生成人脸图片" },
-            { step: "02", icon: "🧠", title: "向量提取", desc: "face-api.js 提取 128 维向量" },
-            { step: "03", icon: "⚖️", title: "相似度匹配", desc: "余弦相似度查询名人数据库" },
+            { step: "01", icon: "📤", title: t.faceTrace.dragUpload, desc: t.faceTrace.dragUploadDesc },
+            { step: "02", icon: "🧠", title: t.faceTrace.vectorExtract, desc: t.faceTrace.vectorExtractDesc },
+            { step: "03", icon: "⚖️", title: t.faceTrace.similarityMatch, desc: t.faceTrace.similarityMatchDesc },
           ].map(({ step, icon, title, desc }) => (
             <div
               key={step}
@@ -93,7 +95,7 @@ export default function FaceTracePage() {
                 onClick={handleReset}
                 className="text-xs text-red-500 hover:text-red-700 font-medium shrink-0"
               >
-                重试
+                {t.faceTrace.retry}
               </button>
             </div>
           )}
@@ -113,20 +115,20 @@ export default function FaceTracePage() {
         {/* Info footer */}
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="p-4 bg-white border border-gray-200 rounded-xl">
-            <h3 className="text-sm font-semibold text-gray-800 mb-1.5">🔗 区块链溯源</h3>
+            <h3 className="text-sm font-semibold text-gray-800 mb-1.5">🔗 {t.faceTrace.blockchainTrace}</h3>
             <p className="text-xs text-gray-500 leading-relaxed">
-              所有权属记录均上链存证，可查验，不可篡改。匹配结果可作为侵权取证的技术依据。
+              {t.faceTrace.blockchainTraceDesc}
             </p>
           </div>
           <div className="p-4 bg-white border border-gray-200 rounded-xl">
             <h3 className="text-sm font-semibold text-gray-800 mb-1.5 flex items-center gap-2">
-              🔮 预留接口
-              <span className="px-1.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500">生产环境</span>
+              🔮 {t.faceTrace.reservedInterface}
+              <span className="px-1.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500">{t.faceTrace.productionReady}</span>
             </h3>
             <p className="text-xs text-gray-500 leading-relaxed">
-              真实名人数据库接口（pgvector ANN 查询）已预留，替换{" "}
-              <code className="bg-gray-100 px-1 rounded text-xs">celebrityDb.ts</code>{" "}
-              即可接入生产数据。当前向量为模拟生成。
+              {t.faceTrace.replaceDesc.split("{code}").map((part, i) =>
+                i === 0 ? part : <code key="code" className="bg-gray-100 px-1 rounded text-xs">celebrityDb.ts</code>
+              )}
             </p>
           </div>
         </div>

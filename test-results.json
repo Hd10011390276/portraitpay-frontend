@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-04-13T19:51:10.351Z",
+  "timestamp": "2026-04-14T01:44:07.819Z",
   "totalTests": 22,
-  "passed": 9,
-  "failed": 13,
+  "passed": 22,
+  "failed": 0,
   "results": [
     {
       "name": "Homepage loads",
@@ -35,16 +35,14 @@
     },
     {
       "name": "Search functionality accessible",
-      "passed": false,
-      "error": "Search functionality not found on homepage",
+      "passed": true,
       "coreRequirements": [
         "6-search"
       ]
     },
     {
       "name": "Dashboard loads after login",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "2-portrait-protection",
         "1-passive-income"
@@ -52,8 +50,7 @@
     },
     {
       "name": "Dashboard shows earnings info",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "1-passive-income",
         "2-portrait-protection"
@@ -61,40 +58,35 @@
     },
     {
       "name": "Portraits page accessible",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "2-portrait-protection"
       ]
     },
     {
       "name": "Upload portrait flow accessible",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "2-portrait-protection"
       ]
     },
     {
       "name": "Earnings page loads",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "1-passive-income"
       ]
     },
     {
       "name": "Withdraw page loads",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "1-passive-income"
       ]
     },
     {
       "name": "KYC Verification page loads",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "3-entertainment-reform"
       ]
@@ -108,8 +100,7 @@
     },
     {
       "name": "API routes respond (portrait)",
-      "passed": false,
-      "error": "page.evaluate: TypeError: Failed to fetch\n    at eval (eval at evaluate (:302:30), <anonymous>:2:27)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:",
+      "passed": true,
       "coreRequirements": [
         "5-ai-hub"
       ]
@@ -144,24 +135,21 @@
     },
     {
       "name": "Mobile hamburger menu works",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "1-passive-income"
       ]
     },
     {
       "name": "Mobile dashboard loads correctly",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "1-passive-income"
       ]
     },
     {
       "name": "Report infringement page loads",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "2-portrait-protection",
         "5-ai-hub"
@@ -169,8 +157,7 @@
     },
     {
       "name": "Infringements page loads",
-      "passed": false,
-      "error": "Login failed - no valid demo account",
+      "passed": true,
       "coreRequirements": [
         "2-portrait-protection",
         "5-ai-hub"

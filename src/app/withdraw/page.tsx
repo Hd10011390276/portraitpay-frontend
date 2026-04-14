@@ -7,6 +7,7 @@
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface EarningsSummary {
   availableBalance: number;
@@ -56,6 +57,7 @@ function WithdrawPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [settingUpStripe, setSettingUpStripe] = useState(false);
+  const { t } = useLanguage();
 
   // Form state
   const [amount, setAmount] = useState("");
@@ -95,23 +97,23 @@ function WithdrawPageContent() {
 
   const validateForm = () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) < MIN_WITHDRAWAL) {
-      return `最低提现金额为 ¥${MIN_WITHDRAWAL}`;
+      return t.withdraw.minAmount.replace("{min}", MIN_WITHDRAWAL.toString());
     }
     if (balance && Number(amount) > balance.availableBalance) {
-      return `可提现余额不足，当前可提现 ¥${balance.availableBalance.toFixed(2)}`;
+      return t.withdraw.balanceInsufficient.replace("{balance}", balance.availableBalance.toFixed(2));
     }
-    if (!bankName.trim()) return "请填写银行名称";
-    if (!bankAccount.trim() || bankAccount.length < 8) return "请填写正确的银行账号";
-    if (!accountHolder.trim()) return "请填写开户姓名";
+    if (!bankName.trim()) return t.withdraw.pleaseFillBankName;
+    if (!bankAccount.trim() || bankAccount.length < 8) return t.withdraw.pleaseFillBankAccount;
+    if (!accountHolder.trim()) return t.withdraw.pleaseFillAccountHolder;
     // Check Stripe account is ready
     if (!stripeAccount?.hasStripeAccount) {
-      return "请先设置Stripe账户才能提现";
+      return t.withdraw.stripeNotSet;
     }
     if (stripeAccount.accountStatus !== "verified") {
-      return "Stripe账户正在验证中，请完成验证后再试";
+      return t.withdraw.stripeVerifying;
     }
     if (!stripeAccount.payoutsEnabled) {
-      return "Stripe账户未启用收款功能，请先完成Stripe注册流程";
+      return t.withdraw.stripeNoPayouts;
     }
     return null;
   };
@@ -127,13 +129,13 @@ function WithdrawPageContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Stripe账户创建失败");
+        setError(data.error ?? t.withdraw.submitFailed);
         return;
       }
       // Redirect to Stripe onboarding
       window.location.href = data.data.onboardingUrl;
     } catch {
-      setError("网络错误，请稍后重试");
+      setError(t.withdraw.networkError);
     } finally {
       setSettingUpStripe(false);
     }
@@ -166,18 +168,18 @@ function WithdrawPageContent() {
 
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "提交失败，请重试");
+        setError(data.error ?? t.withdraw.submitFailed);
         return;
       }
 
-      setSuccessMsg("提现申请已提交！预计 1-3 个工作日到账");
+      setSuccessMsg(t.withdraw.withdrawSuccess);
       setAmount("");
       setBankName("");
       setBankAccount("");
       setAccountHolder("");
       loadData(); // Refresh
     } catch {
-      setError("网络错误，请稍后重试");
+      setError(t.withdraw.networkError);
     } finally {
       setSubmitting(false);
     }
@@ -196,17 +198,17 @@ function WithdrawPageContent() {
 
   return (
     <DashboardShell
-      title="提现"
-      subtitle="PortraitPay AI · 收益提现申请"
+      title={t.withdraw.title}
+      subtitle={t.withdraw.subtitle}
     >
       <div className="max-w-3xl space-y-6">
         {/* Balance Card */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
-          <p className="text-blue-100 text-sm mb-1">可提现余额</p>
+          <p className="text-blue-100 text-sm mb-1">{t.withdraw.availableBalance}</p>
           <p className="text-3xl sm:text-4xl font-bold">
             {loading ? "—" : formatCurrency(balance?.availableBalance ?? 0)}
           </p>
-          <p className="text-blue-200 text-xs mt-2">每月1-5日为对账周期，暂停提现</p>
+          <p className="text-blue-200 text-xs mt-2">{t.withdraw.balanceNote}</p>
         </div>
 
         {/* Stripe Account Status Banner */}
@@ -230,16 +232,16 @@ function WithdrawPageContent() {
                 </div>
                 <div>
                   <p className={`text-sm font-medium ${isStripeReady ? "text-green-800 dark:text-green-300" : "text-yellow-800 dark:text-yellow-300"}`}>
-                    {isStripeReady ? "Stripe账户已就绪" : "Stripe账户未完成设置"}
+                    {isStripeReady ? t.withdraw.stripeReady : t.withdraw.stripeNotReady}
                   </p>
                   <p className={`text-xs ${isStripeReady ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"}`}>
                     {stripeAccount?.hasStripeAccount
                       ? stripeAccount.accountStatus === "verified"
                         ? stripeAccount.payoutsEnabled
-                          ? "可正常进行提现"
-                          : "请在Stripe中添加银行账户以启用收款"
-                        : "Stripe账户验证中..."
-                      : "点击下方按钮完成Stripe账户注册"}
+                          ? t.withdraw.stripeReadyDesc
+                          : t.withdraw.stripeNeedsBank
+                        : t.withdraw.stripeVerifying
+                      : t.withdraw.stripeSetupRequired}
                   </p>
                 </div>
               </div>
@@ -249,7 +251,7 @@ function WithdrawPageContent() {
                   disabled={settingUpStripe}
                   className="px-4 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition disabled:opacity-50"
                 >
-                  {settingUpStripe ? "跳转中..." : "设置Stripe账户"}
+                  {settingUpStripe ? t.withdraw.settingUpStripe : t.withdraw.setupStripe}
                 </button>
               )}
             </div>
@@ -258,7 +260,7 @@ function WithdrawPageContent() {
 
         {/* Withdrawal Form */}
         <div className="bg-white dark:bg-gray-900 rounded-xl p-6">
-          <h2 className="font-semibold text-gray-800 dark:text-white mb-5">填写提现信息</h2>
+          <h2 className="font-semibold text-gray-800 dark:text-white mb-5">{t.withdraw.fillWithdrawInfo}</h2>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">{error}</div>
@@ -269,28 +271,28 @@ function WithdrawPageContent() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">提现金额 (¥)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.amount}</label>
               <input
                 type="number"
                 min={MIN_WITHDRAWAL}
                 step="0.01"
-                placeholder={`最低 ¥${MIN_WITHDRAWAL}`}
+                placeholder={t.withdraw.amountPlaceholder.replace("{min}", MIN_WITHDRAWAL.toString())}
                 className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />
               {!loading && balance && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  当前可提现：{formatCurrency(balance.availableBalance)} · 输入全部可填「{balance.availableBalance.toFixed(2)}」
+                  {t.withdraw.currentAvailable.replace("{balance}", formatCurrency(balance.availableBalance)).replace("{balanceFixed}", balance.availableBalance.toFixed(2))}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">银行名称</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.bankName}</label>
               <input
                 type="text"
-                placeholder="例如：中国工商银行"
+                placeholder={t.withdraw.bankNamePlaceholder}
                 className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={bankName}
                 onChange={(e) => setBankName(e.target.value)}
@@ -298,11 +300,11 @@ function WithdrawPageContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">银行账号</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.bankAccount}</label>
               <input
                 type="text"
                 inputMode="numeric"
-                placeholder="请输入银行卡号"
+                placeholder={t.withdraw.bankAccountPlaceholder}
                 className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={bankAccount}
                 onChange={(e) => setBankAccount(e.target.value)}
@@ -310,10 +312,10 @@ function WithdrawPageContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">开户姓名</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.withdraw.accountHolder}</label>
               <input
                 type="text"
-                placeholder="请输入持卡人姓名"
+                placeholder={t.withdraw.accountHolderPlaceholder}
                 className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={accountHolder}
                 onChange={(e) => setAccountHolder(e.target.value)}
@@ -321,9 +323,9 @@ function WithdrawPageContent() {
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-xs text-gray-500 dark:text-gray-400 space-y-1">
-              <p>• 最低提现金额：¥{MIN_WITHDRAWAL}</p>
-              <p>• 到账时间：1-3 个工作日</p>
-              <p>• 实际到账金额 = 申请金额（含Stripe手续费）</p>
+              <p>• {t.withdraw.withdrawNote1.replace("{min}", MIN_WITHDRAWAL.toString())}</p>
+              <p>• {t.withdraw.withdrawNote2}</p>
+              <p>• {t.withdraw.withdrawNote3}</p>
             </div>
 
             <button
@@ -331,7 +333,7 @@ function WithdrawPageContent() {
               disabled={submitting || loading || !isStripeReady}
               className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? "提交中..." : !isStripeReady ? "请先设置Stripe账户" : "确认提现"}
+              {submitting ? t.withdraw.submitting : !isStripeReady ? t.withdraw.stripeRequired : t.withdraw.confirmWithdraw}
             </button>
           </form>
         </div>
@@ -339,11 +341,11 @@ function WithdrawPageContent() {
         {/* History */}
         <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-800 dark:text-white">提现记录</h2>
+            <h2 className="font-semibold text-gray-800 dark:text-white">{t.withdraw.withdrawHistory}</h2>
           </div>
 
           {history.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">暂无提现记录</div>
+            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">{t.withdraw.noHistory}</div>
           ) : (
             <div className="divide-y divide-gray-50 dark:divide-gray-800">
               {history.map((w) => {
@@ -356,7 +358,7 @@ function WithdrawPageContent() {
                         {w.bankName} ****{w.bankAccountLast4} · {formatDate(w.createdAt)}
                       </p>
                       {w.rejectionReason && (
-                        <p className="text-xs text-red-500 dark:text-red-400 mt-0.5">拒绝原因：{w.rejectionReason}</p>
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-0.5">{t.withdraw.rejectionReason.replace("{reason}", w.rejectionReason)}</p>
                       )}
                     </div>
                     <span className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${status.color}`}>

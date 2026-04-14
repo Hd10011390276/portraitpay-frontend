@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { Skeleton, SkeletonStatCard } from "@/components/ui/Skeleton";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface EarningsSummary {
   totalRevenue: number;
@@ -88,6 +89,7 @@ export default function EarningsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<{ startDate?: string; endDate?: string }>({});
   const [activeTab, setActiveTab] = useState<"all" | "royalty" | "license">("all");
+  const { t } = useLanguage();
 
   useEffect(() => {
     const raw = localStorage.getItem("pp_user");
@@ -150,19 +152,23 @@ export default function EarningsPage() {
     new Date(dateStr).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" });
 
   const txTypeLabel: Record<string, { label: string; color: string }> = {
-    ROYALTY_PAYOUT:  { label: "版税收入", color: "text-purple-600 bg-purple-50 dark:bg-purple-900/30" },
-    LICENSE_PURCHASE: { label: "授权购买", color: "text-blue-600 bg-blue-50 dark:bg-blue-900/30" },
-    LICENSE_RENEWAL: { label: "授权续期", color: "text-green-600 bg-green-50 dark:bg-green-900/30" },
+    ROYALTY_PAYOUT:  { label: t.earnings.royaltyShare, color: "text-purple-600 bg-purple-50 dark:bg-purple-900/30" },
+    LICENSE_PURCHASE: { label: t.earnings.licensePurchase, color: "text-blue-600 bg-blue-50 dark:bg-blue-900/30" },
+    LICENSE_RENEWAL: { label: t.earnings.licenseRenewal, color: "text-green-600 bg-green-50 dark:bg-green-900/30" },
   };
 
-  // 6-month chart mock data
+  // 6-month chart mock data (months use locale-appropriate abbreviations)
+  const getMonthLabel = (month: number) => {
+    const d = new Date(2024, month - 1, 1);
+    return d.toLocaleDateString(t.locale === "en-US" ? "en-US" : "zh-CN", { month: "short" });
+  };
   const chartData = [
-    { label: "10月", value: 2800 },
-    { label: "11月", value: 4200 },
-    { label: "12月", value: 3600 },
-    { label: "1月", value: 5100 },
-    { label: "2月", value: 4800 },
-    { label: "3月", value: 3840 },
+    { label: getMonthLabel(10), value: 2800 },
+    { label: getMonthLabel(11), value: 4200 },
+    { label: getMonthLabel(12), value: 3600 },
+    { label: getMonthLabel(1), value: 5100 },
+    { label: getMonthLabel(2), value: 4800 },
+    { label: getMonthLabel(3), value: 3840 },
   ];
 
   if (checking) {
@@ -175,12 +181,12 @@ export default function EarningsPage() {
 
   return (
     <DashboardShell
-      title="收益中心"
-      subtitle="PortraitPay AI · 授权收益明细"
+      title={t.earnings.title}
+      subtitle={t.earnings.subtitle}
       action={
         <a href="/withdraw"
           className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-          💰 申请提现
+          💰 {t.earnings.applyWithdraw}
         </a>
       }
     >
@@ -198,10 +204,10 @@ export default function EarningsPage() {
             ? [...Array(4)].map((_, i) => <SkeletonStatCard key={i} />)
             : summary && (
               <>
-                <StatCard label="历史总收益" value={formatCurrency(summary.totalRevenue)} color="text-green-600" />
-                <StatCard label="本月收益" value={formatCurrency(summary.monthRevenue)} color="text-blue-600" delta="+12.5%" />
-                <StatCard label="可提现余额" value={formatCurrency(summary.availableBalance)} color="text-purple-600" highlight delta="随时可提" />
-                <StatCard label="已提现总额" value={formatCurrency(summary.totalWithdrawals)} color="text-gray-600" />
+                <StatCard label={t.earnings.historyTotalRevenue} value={formatCurrency(summary.totalRevenue)} color="text-green-600" />
+                <StatCard label={t.earnings.thisMonthRevenue} value={formatCurrency(summary.monthRevenue)} color="text-blue-600" delta="+12.5%" />
+                <StatCard label={t.earnings.availableBalance} value={formatCurrency(summary.availableBalance)} color="text-purple-600" highlight delta="随时可提" />
+                <StatCard label={t.earnings.withdrawnTotal} value={formatCurrency(summary.totalWithdrawals)} color="text-gray-600" />
               </>
             )}
         </div>
@@ -212,14 +218,14 @@ export default function EarningsPage() {
           <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
               <div>
-                <h2 className="font-semibold text-gray-900 dark:text-white">收益趋势</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">近 6 个月授权收益</p>
+                <h2 className="font-semibold text-gray-900 dark:text-white">{t.earnings.earningsTrend}</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.earnings.last6Months}</p>
               </div>
               <div className="flex gap-1">
-                {["月", "周", "日"].map((t) => (
-                  <button key={t}
-                    className={`px-3 py-1 text-xs rounded-lg transition-colors ${t === "月" ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"}`}>
-                    {t}
+                {(["月", "周", "日"] as const).map((toggle) => (
+                  <button key={toggle}
+                    className={`px-3 py-1 text-xs rounded-lg transition-colors ${toggle === "月" ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"}`}>
+                    {toggle}
                   </button>
                 ))}
               </div>
@@ -240,12 +246,12 @@ export default function EarningsPage() {
           {/* Quick info */}
           <div className="space-y-4">
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">收益构成</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{t.earnings.earningsComposition}</h3>
               <div className="space-y-3">
                 {[
-                  { label: "授权购买", pct: 55, color: "bg-blue-500" },
-                  { label: "版税分成", pct: 30, color: "bg-purple-500" },
-                  { label: "授权续期", pct: 15, color: "bg-green-500" },
+                  { label: t.earnings.licensePurchase, pct: 55, color: "bg-blue-500" },
+                  { label: t.earnings.royaltyShare, pct: 30, color: "bg-purple-500" },
+                  { label: t.earnings.licenseRenewal, pct: 15, color: "bg-green-500" },
                 ].map((item) => (
                   <div key={item.label}>
                     <div className="flex justify-between text-xs mb-1">
@@ -261,13 +267,13 @@ export default function EarningsPage() {
             </div>
 
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-xl border border-blue-100 dark:border-blue-900/50 p-5">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">💡 提升收益</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">💡 {t.earnings.boostEarnings}</h3>
               <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                完成 KYC 认证可解锁企业级授权，设置更有竞争力的定价策略。
+                {t.earnings.boostEarningsDesc}
               </p>
               <Link href="/kyc"
                 className="mt-3 inline-flex items-center text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline">
-                去认证 →
+                {t.earnings.goCertify}
               </Link>
             </div>
           </div>
@@ -277,7 +283,7 @@ export default function EarningsPage() {
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* Header + filters */}
           <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-900 dark:text-white">收益明细</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">{t.earnings.earningsDetail}</h2>
             <div className="flex items-center gap-3">
               {/* Type filter tabs */}
               <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">
@@ -285,7 +291,7 @@ export default function EarningsPage() {
                   <button key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-3 py-1 text-xs rounded-md transition-colors ${activeTab === tab ? "bg-white dark:bg-gray-700 shadow-sm font-medium text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"}`}>
-                    {tab === "all" ? "全部" : tab === "royalty" ? "版税" : "授权"}
+                    {tab === "all" ? t.earnings.all : tab === "royalty" ? t.earnings.royalty : t.earnings.license}
                   </button>
                 ))}
               </div>
@@ -314,11 +320,11 @@ export default function EarningsPage() {
           ) : transactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="text-5xl mb-4">📭</div>
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">暂无收益记录</h3>
-              <p className="text-sm text-gray-400">上传肖像并完成认证后，即可开始获得授权收益</p>
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">{t.earnings.noEarnings}</h3>
+              <p className="text-sm text-gray-400">{t.earnings.uploadPortraitToStart}</p>
               <Link href="/portraits/upload"
                 className="mt-4 px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                立即上传肖像
+                {t.earnings.uploadNow}
               </Link>
             </div>
           ) : (
@@ -327,11 +333,11 @@ export default function EarningsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
-                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">肖像</th>
-                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">类型</th>
-                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">购买方</th>
-                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">日期</th>
-                      <th className="text-right px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">金额</th>
+                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t.earnings.portrait}</th>
+                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t.earnings.type}</th>
+                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t.earnings.buyer}</th>
+                      <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t.earnings.date}</th>
+                      <th className="text-right px-5 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t.earnings.amount}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -368,7 +374,7 @@ export default function EarningsPage() {
                           <td className="px-5 py-4 text-right">
                             <p className="text-sm font-bold text-green-600">+{formatCurrency(tx.amount)}</p>
                             {tx.grossAmount && (
-                              <p className="text-xs text-gray-400">含税 ¥{tx.grossAmount.toLocaleString()}</p>
+                              <p className="text-xs text-gray-400">{t.earnings.taxIncluded.replace("{amount}", tx.grossAmount.toLocaleString())}</p>
                             )}
                           </td>
                         </tr>
@@ -382,16 +388,16 @@ export default function EarningsPage() {
               {meta && meta.totalPages > 1 && (
                 <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-gray-800">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    第 {meta.page} / {meta.totalPages} 页，共 {meta.total} 条
+                    {t.earnings.page.replace("{page}", String(meta.page)).replace("{totalPages}", String(meta.totalPages)).replace("{total}", String(meta.total))}
                   </p>
                   <div className="flex gap-2">
                     <button disabled={meta.page <= 1}
                       className="px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                      上一页
+                      {t.earnings.prevPage}
                     </button>
                     <button disabled={meta.page >= meta.totalPages}
                       className="px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                      下一页
+                      {t.earnings.nextPage}
                     </button>
                   </div>
                 </div>

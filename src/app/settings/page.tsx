@@ -18,40 +18,40 @@ function SettingsContent() {
     e.preventDefault();
     setSaving(true);
     await new Promise((r) => setTimeout(r, 800));
-    toast({ type: "success", title: "设置已保存" });
+    toast({ type: "success", title: t.settings.settingsSaved });
     setSaving(false);
   };
 
   return (
     <DashboardShell
-      title="账户设置"
-      subtitle="管理您的账户偏好设置和通知"
+      title={t.settings.title}
+      subtitle={t.settings.subtitle}
     >
       <div className="max-w-3xl">
         <form onSubmit={handleSave} className="space-y-6">
           {/* Notification Settings */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-5">通知设置</h2>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-5">{t.settings.notificationSettings}</h2>
             <div className="space-y-4">
               {[
                 {
                   id: "emailNotifications",
-                  label: "邮件通知",
-                  desc: "接收关于账户安全的邮件通知（如异地登录）",
+                  label: t.settings.emailNotifications,
+                  desc: t.settings.emailNotificationsDesc,
                   checked: emailNotifications,
                   onChange: setEmailNotifications,
                 },
                 {
                   id: "infringementAlerts",
-                  label: "侵权警报",
-                  desc: "当我们的 AI 检测到疑似侵权行为时发送通知",
+                  label: t.settings.infringementAlerts,
+                  desc: t.settings.infringementAlertsDesc,
                   checked: infringementAlerts,
                   onChange: setInfringementAlerts,
                 },
                 {
                   id: "marketingEmails",
-                  label: "产品更新与优惠",
-                  desc: "接收新功能公告和限时优惠信息",
+                  label: t.settings.marketingEmails,
+                  desc: t.settings.marketingEmailsDesc,
                   checked: marketingEmails,
                   onChange: setMarketingEmails,
                 },
@@ -83,10 +83,10 @@ function SettingsContent() {
 
           {/* Account Info */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-5">账户信息</h2>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-5">{t.settings.accountInfo}</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">邮箱地址</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t.settings.emailAddress}</label>
                 <input
                   type="email"
                   defaultValue="user@example.com"
@@ -94,7 +94,7 @@ function SettingsContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">显示名称</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t.settings.displayName}</label>
                 <input
                   type="text"
                   defaultValue="用户名"
@@ -106,18 +106,18 @@ function SettingsContent() {
 
           {/* Danger Zone */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-red-200 dark:border-red-900/50 p-6">
-            <h2 className="text-base font-semibold text-red-600 dark:text-red-400 mb-5">危险区域</h2>
+            <h2 className="text-base font-semibold text-red-600 dark:text-red-400 mb-5">{t.settings.dangerZone}</h2>
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">注销账户</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">永久删除您的账户和所有数据。区块链记录除外。</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{t.settings.deleteAccount}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t.settings.deleteAccountDesc}</p>
                 </div>
                 <button
                   type="button"
                   className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition shrink-0"
                 >
-                  注销账户
+                  {t.settings.deleteAccount}
                 </button>
               </div>
             </div>
@@ -133,10 +133,10 @@ function SettingsContent() {
               {saving ? (
                 <>
                   <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                  保存中...
+                  {t.settings.saving}
                 </>
               ) : (
-                "保存设置"
+                t.settings.saveSettings
               )}
             </button>
           </div>

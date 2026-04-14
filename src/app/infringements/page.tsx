@@ -11,31 +11,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { useLanguage } from "@/context/LanguageContext";
 
 type ReportStatus = "PENDING_REVIEW" | "VALIDATED" | "REJECTED" | "SETTLED" | "LEGAL_ACTION";
 type AlertStatus = "PENDING" | "CONFIRMED" | "FALSE_POSITIVE" | "EXPIRED";
 
-const STATUS_LABELS: Record<ReportStatus | AlertStatus, { label: string; color: string }> = {
-  PENDING_REVIEW: { label: "待审核", color: "bg-yellow-100 text-yellow-800" },
-  VALIDATED:     { label: "已确认侵权", color: "bg-red-100 text-red-800" },
-  REJECTED:       { label: "不成立", color: "bg-gray-100 text-gray-600" },
-  SETTLED:        { label: "已和解", color: "bg-blue-100 text-blue-800" },
-  LEGAL_ACTION:   { label: "法律程序", color: "bg-purple-100 text-purple-800" },
-  PENDING:        { label: "待确认", color: "bg-yellow-100 text-yellow-800" },
-  CONFIRMED:      { label: "已确认侵权", color: "bg-red-100 text-red-800" },
-  FALSE_POSITIVE: { label: "误报", color: "bg-gray-100 text-gray-600" },
-  EXPIRED:        { label: "已过期", color: "bg-gray-100 text-gray-400" },
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  UNAUTHORIZED_USE: "未经授权使用",
-  EXPIRED_LICENSE: "授权过期",
-  SCOPE_VIOLATION: "超范围使用",
-  RESALE: "二次转售",
-  DEEPFAKE: "AI换脸/合成",
-};
-
 export default function InfringementsPage() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"reports" | "alerts" | "settings">("reports");
   const [reports, setReports] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -106,7 +88,7 @@ export default function InfringementsPage() {
       body: JSON.stringify(configForm),
     });
     const json = await res.json();
-    if (json.success) alert("设置已保存！");
+    if (json.success) alert(t.infringements.settingsSaved);
   }
 
   async function confirmAlert(alertId: string, decision: "CONFIRMED" | "FALSE_POSITIVE") {
@@ -125,23 +107,23 @@ export default function InfringementsPage() {
 
   return (
     <DashboardShell
-      title="侵权管理"
-      subtitle="查看和管理您的侵权举报及系统告警"
+      title={t.infringements.title}
+      subtitle={t.infringements.subtitle}
       action={
         <Link
           href="/report"
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
-          + 提交新举报
+          + {t.infringements.submitNew}
         </Link>
       }
     >
       {/* Tabs */}
       <div className="mb-6 flex gap-1 rounded-lg bg-gray-200 dark:bg-gray-800 p-1">
         {[
-          { key: "reports", label: "我的举报" },
-          { key: "alerts", label: "系统告警" },
-          { key: "settings", label: "监测设置" },
+          { key: "reports", label: t.infringements.myReports },
+          { key: "alerts", label: t.infringements.systemAlerts },
+          { key: "settings", label: t.infringements.monitorSettings },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -161,29 +143,35 @@ export default function InfringementsPage() {
       {activeTab === "reports" && (
         <div className="space-y-4">
           {loading ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">加载中...</p>
+            <p className="text-center text-gray-500 dark:text-gray-400">{t.infringements.loading}</p>
           ) : reports.length === 0 ? (
             <div className="rounded-lg bg-white dark:bg-gray-900 py-16 text-center text-gray-500 dark:text-gray-400">
-              暂无举报记录。
-              <Link href="/report" className="ml-2 text-blue-600 dark:text-blue-400 underline">立即举报</Link>
+              {t.infringements.noReports}
+              <Link href="/report" className="ml-2 text-blue-600 dark:text-blue-400 underline">{t.infringements.reportNow}</Link>
             </div>
           ) : (
             reports.map((report) => {
-              const status = STATUS_LABELS[report.status as ReportStatus] ?? { label: report.status, color: "bg-gray-100 dark:bg-gray-800" };
+              const statusLabel = t.infringements[report.status as ReportStatus] ?? report.status;
               return (
                 <Link key={report.id} href={`/infringements/${report.id}`}>
                   <div className="flex items-center justify-between rounded-lg bg-white dark:bg-gray-900 p-5 shadow-sm hover:shadow-md transition border border-gray-100 dark:border-gray-800">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
-                          {status.label}
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                          report.status === "PENDING_REVIEW" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                          report.status === "VALIDATED" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" :
+                          report.status === "REJECTED" ? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" :
+                          report.status === "SETTLED" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" :
+                          "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
+                        }`}>
+                          {statusLabel}
                         </span>
                         <span className="text-xs text-gray-400 dark:text-gray-500">{report.source}</span>
                       </div>
-                      <p className="truncate font-medium text-gray-900 dark:text-white">{report.portrait?.title ?? "肖像"}</p>
+                      <p className="truncate font-medium text-gray-900 dark:text-white">{report.portrait?.title ?? t.portraits.details}</p>
                       <p className="mt-0.5 truncate text-sm text-gray-500 dark:text-gray-400">{report.description}</p>
                       <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                        {new Date(report.createdAt).toLocaleString("zh-CN")} &nbsp;|&nbsp; ID: {report.id.slice(0, 8)}...
+                        {new Date(report.createdAt).toLocaleString()} &nbsp;|&nbsp; ID: {report.id.slice(0, 8)}...
                       </p>
                     </div>
                     <div className="ml-4 flex-shrink-0 text-gray-400 dark:text-gray-500">›</div>
@@ -199,26 +187,31 @@ export default function InfringementsPage() {
       {activeTab === "alerts" && (
         <div className="space-y-4">
           {loading ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">加载中...</p>
+            <p className="text-center text-gray-500 dark:text-gray-400">{t.infringements.loading}</p>
           ) : alerts.length === 0 ? (
             <div className="rounded-lg bg-white dark:bg-gray-900 py-16 text-center text-gray-500 dark:text-gray-400">
-              暂无系统告警。
+              {t.infringements.noAlerts}
             </div>
           ) : (
             alerts.map((alert) => {
-              const status = STATUS_LABELS[alert.status as AlertStatus] ?? { label: alert.status, color: "bg-gray-100 dark:bg-gray-800" };
+              const statusLabel = t.infringements[alert.status as AlertStatus] ?? alert.status;
               return (
                 <div key={alert.id} className="rounded-lg bg-white dark:bg-gray-900 p-5 shadow-sm border border-gray-100 dark:border-gray-800">
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.color}`}>
-                          {status.label}
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                          alert.status === "PENDING" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                          alert.status === "CONFIRMED" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" :
+                          alert.status === "FALSE_POSITIVE" ? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" :
+                          "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+                        }`}>
+                          {statusLabel}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">{alert.sourceName}</span>
                         {alert.similarityScore && (
                           <span className="text-xs text-red-600 dark:text-red-400 font-medium">
-                            相似度 {(alert.similarityScore * 100).toFixed(1)}%
+                            {t.infringements.similarity} {(alert.similarityScore * 100).toFixed(1)}%
                           </span>
                         )}
                       </div>
@@ -228,7 +221,7 @@ export default function InfringementsPage() {
                         {alert.sourceUrl}
                       </a>
                       <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                        {new Date(alert.createdAt).toLocaleString("zh-CN")}
+                        {new Date(alert.createdAt).toLocaleString()}
                       </p>
                     </div>
                     {alert.status === "PENDING" && (
@@ -237,13 +230,13 @@ export default function InfringementsPage() {
                           onClick={() => confirmAlert(alert.id, "CONFIRMED")}
                           className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
                         >
-                          确认侵权
+                          {t.infringements.confirmedInfringement}
                         </button>
                         <button
                           onClick={() => confirmAlert(alert.id, "FALSE_POSITIVE")}
                           className="rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                         >
-                          误报
+                          {t.infringements.falsePositive}
                         </button>
                       </div>
                     )}
@@ -258,12 +251,12 @@ export default function InfringementsPage() {
       {/* ── Settings Tab ── */}
       {activeTab === "settings" && (
         <form onSubmit={saveConfig} className="space-y-6 rounded-xl bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-800">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">监测配置</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t.infringements.monitoringConfig}</h2>
 
           <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-800">
             <div>
-              <p className="font-medium text-gray-900 dark:text-white">开启侵权监测</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">系统将自动扫描互联网上的疑似侵权内容</p>
+              <p className="font-medium text-gray-900 dark:text-white">{t.infringements.enableMonitoring}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t.infringements.enableMonitoringDesc}</p>
             </div>
             <input
               type="checkbox"
@@ -275,9 +268,9 @@ export default function InfringementsPage() {
 
           <div>
             <label className="block font-medium text-gray-900 dark:text-white">
-              相似度阈值：{Math.round(configForm.similarityThreshold * 100)}%
+              {t.infringements.similarityThreshold}：{Math.round(configForm.similarityThreshold * 100)}%
             </label>
-            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">低于此相似度的结果将被自动过滤（建议 85%）</p>
+            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">{t.infringements.similarityThresholdDesc}</p>
             <input
               type="range"
               min="0.5"
@@ -290,30 +283,30 @@ export default function InfringementsPage() {
           </div>
 
           <div className="space-y-3">
-            <p className="font-medium text-gray-900 dark:text-white">通知渠道</p>
+            <p className="font-medium text-gray-900 dark:text-white">{t.infringements.notificationChannel}</p>
             <label className="flex items-center gap-3">
               <input type="checkbox" checked={configForm.notifyEmail}
                 onChange={(e) => setConfigForm((f) => ({ ...f, notifyEmail: e.target.checked }))}
                 className="h-4 w-4" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">邮件通知</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t.infringements.emailNotification}</span>
             </label>
             <label className="flex items-center gap-3">
               <input type="checkbox" checked={configForm.notifySms}
                 onChange={(e) => setConfigForm((f) => ({ ...f, notifySms: e.target.checked }))}
                 className="h-4 w-4" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">短信通知（预留）</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t.infringements.smsNotification}</span>
             </label>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">免打扰开始时间</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t.infringements.quietHoursStart}</label>
               <input type="time" value={configForm.quietHoursStart}
                 onChange={(e) => setConfigForm((f) => ({ ...f, quietHoursStart: e.target.value }))}
                 className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">免打扰结束时间</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t.infringements.quietHoursEnd}</label>
               <input type="time" value={configForm.quietHoursEnd}
                 onChange={(e) => setConfigForm((f) => ({ ...f, quietHoursEnd: e.target.value }))}
                 className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
@@ -326,15 +319,15 @@ export default function InfringementsPage() {
                 onChange={(e) => setConfigForm((f) => ({ ...f, highPriorityMuteExempt: e.target.checked }))}
                 className="h-4 w-4" />
               <div>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">高优先级告警不受免打扰限制</span>
-                <p className="text-xs text-gray-500 dark:text-gray-400">相似度 ≥ 95% 的告警将在任何时间发送通知</p>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{t.infringements.highPriorityExempt}</span>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t.infringements.highPriorityExemptDesc}</p>
               </div>
             </label>
           </div>
 
           <button type="submit"
             className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700">
-            保存设置
+            {t.infringements.saveSettings}
           </button>
         </form>
       )}

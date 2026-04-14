@@ -11,13 +11,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { useLanguage } from "@/context/LanguageContext";
 
 const INFRINGEMENT_TYPES = [
-  { value: "UNAUTHORIZED_USE", label: "未经授权使用" },
-  { value: "EXPIRED_LICENSE", label: "授权已过期" },
-  { value: "SCOPE_VIOLATION", label: "超出授权范围使用" },
-  { value: "RESALE", label: "二次转售/非法转让" },
-  { value: "DEEPFAKE", label: "AI换脸/深度合成" },
+  { value: "UNAUTHORIZED_USE", labelZh: "未经授权使用", labelEn: "Unauthorized Use" },
+  { value: "EXPIRED_LICENSE", labelZh: "授权已过期", labelEn: "License Expired" },
+  { value: "SCOPE_VIOLATION", labelZh: "超出授权范围使用", labelEn: "Scope Violation" },
+  { value: "RESALE", labelZh: "二次转售/非法转让", labelEn: "Resale/Illegal Transfer" },
+  { value: "DEEPFAKE", labelZh: "AI换脸/深度合成", labelEn: "Deepfake" },
 ];
 
 interface FormData {
@@ -31,6 +32,8 @@ interface FormData {
 
 export default function ReportPage() {
   const router = useRouter();
+  const { t, locale } = useLanguage();
+  const isZh = locale === "zh-CN";
   const [form, setForm] = useState<FormData>({
     portraitId: "",
     type: "UNAUTHORIZED_USE",
@@ -75,14 +78,14 @@ export default function ReportPage() {
       const json = await res.json();
 
       if (!res.ok) {
-        setError(json.error ?? "提交失败，请重试");
+        setError(json.error ?? t.report.error);
         return;
       }
 
-      setSuccess(`侵权举报已提交！举报编号：${json.data.id}`);
+      setSuccess(`${t.report.submitSuccess.replace("{id}", json.data.id)}`);
       setTimeout(() => router.push(`/infringements/${json.data.id}`), 2000);
     } catch {
-      setError("网络错误，请检查网络连接后重试");
+      setError(t.report.networkError);
     } finally {
       setSubmitting(false);
     }
@@ -90,8 +93,8 @@ export default function ReportPage() {
 
   return (
     <DashboardShell
-      title="提交侵权举报"
-      subtitle="发现有人在未经授权的情况下使用了您的肖像？请填写以下信息提交侵权举报"
+      title={t.report.title}
+      subtitle={t.report.subtitle}
     >
       <div className="max-w-2xl mx-auto">
         {/* Form */}
@@ -99,16 +102,16 @@ export default function ReportPage() {
           {/* Portrait ID */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              您的肖像 ID <span className="text-red-500">*</span>
+              {t.report.portraitIdRequired} <span className="text-red-500">*</span>
             </label>
             <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">
-              前往「我的肖像」页面复制您要维权的肖像 ID
+              {t.report.portraitIdHint}
             </p>
             <input
               type="text"
               value={form.portraitId}
               onChange={(e) => setForm((f) => ({ ...f, portraitId: e.target.value }))}
-              placeholder="例如：clx8k2f3j0001qsrr9abcd123"
+              placeholder={t.report.portraitIdPlaceholder}
               className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               required
             />
@@ -117,15 +120,15 @@ export default function ReportPage() {
           {/* Infringement Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              侵权类型 <span className="text-red-500">*</span>
+              {t.report.infringementTypeRequired} <span className="text-red-500">*</span>
             </label>
             <select
               value={form.type}
               onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
               className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             >
-              {INFRINGEMENT_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>{t.label}</option>
+              {INFRINGEMENT_TYPES.map((t_item) => (
+                <option key={t_item.value} value={t_item.value}>{isZh ? t_item.labelZh : t_item.labelEn}</option>
               ))}
             </select>
           </div>
@@ -133,9 +136,9 @@ export default function ReportPage() {
           {/* Infringing URL */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              发现侵权的链接
+              {t.report.detectedUrl}
             </label>
-            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">请粘贴包含侵权内容的页面 URL</p>
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{t.report.detectedUrlHint}</p>
             <input
               type="url"
               value={form.detectedUrl}
@@ -148,30 +151,32 @@ export default function ReportPage() {
           {/* Evidence URLs */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              证据截图链接 <span className="text-red-500">*</span>
+              {t.report.evidenceUrlsRequired} <span className="text-red-500">*</span>
             </label>
             <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">
-              请上传侵权截图到图床，粘贴每行一个 URL（最多10张）
+              {t.report.evidenceUrlsHint}
             </p>
             <textarea
               value={form.evidenceUrls}
               onChange={(e) => setForm((f) => ({ ...f, evidenceUrls: e.target.value }))}
-              placeholder={"https://example.com/screenshot1.jpg\nhttps://example.com/screenshot2.jpg"}
+              placeholder={t.report.evidenceUrlsPlaceholder}
               rows={4}
               className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               required
             />
             {evidenceUrls.length > 0 && (
-              <p className="mt-1 text-xs text-green-600 dark:text-green-400">已填写 {evidenceUrls.length} 个证据链接</p>
+              <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+                {isZh ? `已填写 ${evidenceUrls.length} 个证据链接` : `Filled ${evidenceUrls.length} evidence links`}
+              </p>
             )}
           </div>
 
           {/* Original Image URL */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              原始肖像图链接（选填）
+              {t.report.originalImageUrl}
             </label>
-            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">如有原始肖像照片，请提供链接以便核实</p>
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{t.report.originalImageUrlHint}</p>
             <input
               type="url"
               value={form.originalImageUrl}
@@ -184,19 +189,21 @@ export default function ReportPage() {
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              详细描述 <span className="text-red-500">*</span>
+              {t.report.descriptionRequired} <span className="text-red-500">*</span>
             </label>
-            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">请描述侵权内容的具体情况，至少 10 个字符</p>
+            <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{t.report.descriptionHint}</p>
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="请详细描述发现的侵权行为，例如：此用户在XX平台发布了使用我肖像的AI生成图..."
+              placeholder={t.report.descriptionPlaceholder}
               rows={5}
               className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               required
             />
             <p className={`mt-1 text-xs ${form.description.length >= 10 ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"}`}>
-              {form.description.length} / 10 字符（最低要求）
+              {isZh
+                ? `${form.description.length} / 10 字符（最低要求）`
+                : `${form.description.length} / 10 characters (minimum required)`}
             </p>
           </div>
 
@@ -214,16 +221,15 @@ export default function ReportPage() {
             disabled={!isValid || submitting}
             className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 dark:disabled:bg-gray-700"
           >
-            {submitting ? "提交中..." : "提交侵权举报"}
+            {submitting ? t.report.submitting : t.report.submit}
           </button>
         </form>
 
         {/* Disclaimer */}
         <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500">
-          提交举报即表示您确认上述信息真实有效。恶意举报将被追究法律责任。
-          举报详情请查阅{" "}
+          {t.report.disclaimer}{" "}
           <a href="/terms" className="underline">
-            侵权处理规则
+            {t.report.infringementRules}
           </a>
           。
         </p>
