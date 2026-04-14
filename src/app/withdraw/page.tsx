@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 
@@ -45,7 +45,7 @@ const STATUS_LABEL: Record<string, { text: string; color: string }> = {
 
 const MIN_WITHDRAWAL = 100;
 
-export default function WithdrawPage() {
+function WithdrawPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [balance, setBalance] = useState<EarningsSummary | null>(null);
@@ -369,6 +369,26 @@ export default function WithdrawPage() {
           )}
         </div>
       </div>
+</div>
     </DashboardShell>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <DashboardShell title="提现" subtitle="PortraitPay AI · 收益提现申请">
+      <div className="animate-pulse space-y-4">
+        <div className="h-32 bg-gray-200 dark:bg-gray-800 rounded-2xl" />
+        <div className="h-48 bg-gray-200 dark:bg-gray-800 rounded-xl" />
+      </div>
+    </DashboardShell>
+  );
+}
+
+export default function WithdrawPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <WithdrawPageContent />
+    </Suspense>
   );
 }
