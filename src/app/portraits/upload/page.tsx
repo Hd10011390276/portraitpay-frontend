@@ -10,11 +10,13 @@ import { useRouter } from "next/navigation";
 import UploadZone from "@/components/portrait/UploadZone";
 import ImageCropper from "@/components/portrait/ImageCropper";
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Stage = "form" | "upload" | "certify" | "done";
 
 export default function UploadPortraitPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [stage, setStage] = useState<Stage>("form");
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [portraitId, setPortraitId] = useState<string | null>(null);
@@ -41,9 +43,9 @@ export default function UploadPortraitPage() {
 
   const validateForm = () => {
     const errs: Record<string, string> = {};
-    if (!form.title.trim()) errs.title = "Title is required";
-    if (form.title.length > 200) errs.title = "Title must be under 200 characters";
-    if (!croppedFile) errs.image = "Please upload and crop a portrait image";
+    if (!form.title.trim()) errs.title = t.upload.titleRequiredError;
+    if (form.title.length > 200) errs.title = t.upload.titleLengthError;
+    if (!croppedFile) errs.image = t.upload.imageRequiredError;
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -132,8 +134,8 @@ export default function UploadPortraitPage() {
 
   return (
     <DashboardShell
-      title="Upload Portrait"
-      subtitle="Register a new portrait for blockchain certification"
+      title={t.upload.title}
+      subtitle={t.upload.subtitle}
     >
       <div className="max-w-3xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
@@ -141,7 +143,7 @@ export default function UploadPortraitPage() {
           {/* ── Image Upload ── */}
           <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              📸 Portrait Image
+              📸 {t.upload.portraitImage}
             </h2>
 
             <UploadZone
@@ -156,15 +158,14 @@ export default function UploadPortraitPage() {
             {/* Image hash preview */}
             {imageHash && (
               <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <p className="text-xs text-gray-400 dark:text-gray-500">SHA-256 (for on-chain certification):</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{t.upload.sha256Label}</p>
                 <p className="text-xs font-mono text-gray-600 dark:text-gray-400 break-all mt-0.5">{imageHash}</p>
               </div>
             )}
 
             <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
               <p className="text-xs text-blue-700 dark:text-blue-400">
-                💡 <strong>Tip:</strong> For best results, use a clear frontal portrait with good lighting.
-                The image will be cropped to a square and certified on Ethereum Sepolia.
+                {t.upload.uploadTip}
               </p>
             </div>
           </section>
@@ -172,20 +173,20 @@ export default function UploadPortraitPage() {
           {/* ── Metadata ── */}
           <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              📝 Portrait Details
+              📝 {t.upload.details || 'Portrait Details'}
             </h2>
 
             <div className="flex flex-col gap-4">
               {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Title <span className="text-red-500">*</span>
+                  {t.upload.titleRequired}
                 </label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                  placeholder="e.g. Official Portrait of Jane Doe"
+                  placeholder={t.upload.titlePlaceholder}
                   maxLength={200}
                   className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 ${
                     errors.title
@@ -199,11 +200,11 @@ export default function UploadPortraitPage() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.upload.descriptionLabel}</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  placeholder="Optional description of the portrait..."
+                  placeholder={t.upload.descriptionPlaceholder}
                   rows={3}
                   maxLength={2000}
                   className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600 resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
@@ -213,32 +214,32 @@ export default function UploadPortraitPage() {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.upload.categoryLabel}</label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 >
-                  <option value="general">General</option>
-                  <option value="celebrity">Celebrity / Public Figure</option>
-                  <option value="artist">Artist / Creative</option>
-                  <option value="athlete">Athlete</option>
-                  <option value="business">Business Professional</option>
-                  <option value="political">Political Figure</option>
-                  <option value="other">Other</option>
+                  <option value="general">{t.upload.categoryGeneral}</option>
+                  <option value="celebrity">{t.upload.categoryCelebrity}</option>
+                  <option value="artist">{t.upload.categoryArtist}</option>
+                  <option value="athlete">{t.upload.categoryAthlete}</option>
+                  <option value="business">{t.upload.categoryBusiness}</option>
+                  <option value="political">{t.upload.categoryPolitical}</option>
+                  <option value="other">{t.upload.categoryOther}</option>
                 </select>
               </div>
 
               {/* Tags */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Tags <span className="text-xs text-gray-400">(comma-separated)</span>
+                  {t.upload.tagsLabel} <span className="text-xs text-gray-400">(comma-separated)</span>
                 </label>
                 <input
                   type="text"
                   value={form.tags}
                   onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
-                  placeholder="actor, entertainment, drama..."
+                  placeholder={t.upload.tagsPlaceholder}
                   className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
               </div>
@@ -259,8 +260,8 @@ export default function UploadPortraitPage() {
                   />
                 </button>
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Public listing</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">Allow others to discover this portrait</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t.upload.publicListing}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{t.upload.publicListingDesc}</p>
                 </div>
               </div>
             </div>
@@ -273,7 +274,7 @@ export default function UploadPortraitPage() {
               disabled={stage === "upload"}
               className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto"
             >
-              {stage === "upload" ? "Uploading..." : "Create Portrait"}
+              {stage === "upload" ? t.upload.uploading : t.upload.createPortrait}
             </button>
 
             {stage === "upload" && progress && (
@@ -288,7 +289,7 @@ export default function UploadPortraitPage() {
               onClick={() => router.push("/portraits")}
               className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
             >
-              Cancel
+              {t.upload.cancel}
             </button>
           </div>
 
