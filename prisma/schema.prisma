@@ -40,6 +40,10 @@ model User {
   otpCode    String?
   otpExpires DateTime?
 
+  // Password reset fields
+  resetToken    String?
+  resetExpires  DateTime?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?

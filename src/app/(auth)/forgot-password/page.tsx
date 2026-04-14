@@ -12,10 +12,32 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     if (!email.trim()) return;
     setSubmitting(true);
-    // TODO: call /api/auth/forgot-password when implemented
-    await new Promise((r) => setTimeout(r, 1000));
-    setSubmitted(true);
-    setSubmitting(false);
+
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Failed to send reset email. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Always show success to prevent email enumeration
+      setSubmitted(true);
+    } catch (error) {
+      console.error("[ForgotPassword] Error:", error);
+      alert("An error occurred. Please try again later.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
