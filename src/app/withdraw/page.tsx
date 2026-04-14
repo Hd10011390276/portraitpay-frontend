@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 
@@ -369,7 +369,6 @@ function WithdrawPageContent() {
           )}
         </div>
       </div>
-</div>
     </DashboardShell>
   );
 }
