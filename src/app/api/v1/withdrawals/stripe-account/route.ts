@@ -8,9 +8,14 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-  apiVersion: "2025-02-24.acacia",
-});
+function getStripe(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY is not configured");
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-02-24.acacia",
+  });
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,7 +52,8 @@ export async function GET(request: NextRequest) {
     let bankAccountConnected = false;
 
     try {
-      const account = await stripe.accounts.retrieve(user.stripeCustomerId);
+      const stripeClient = getStripe();
+      const account = await stripeClient.accounts.retrieve(user.stripeCustomerId);
       accountStatus = account.details_submitted ? "verified" : "pending_verification";
       payoutsEnabled = account.payouts_enabled ?? false;
       bankAccountConnected = (account.external_accounts?.data?.length ?? 0) > 0;
@@ -104,7 +110,8 @@ export async function POST(request: NextRequest) {
 
     // Create a new Stripe Express account if user doesn't have one
     if (!stripeAccountId) {
-      const account = await stripe.accounts.create({
+      const stripeClient = getStripe();
+      const account = await stripeClient.accounts.create({
         type: "express",
         email: user.email,
         metadata: { userId: session.userId },
@@ -127,7 +134,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create account link for onboarding/KYC
-    const accountLink = await stripe.accountLinks.create({
+    const stripeClient = getStripe();
+    const accountLink = await stripeClient.accountLinks.create({
       account: stripeAccountId,
       refresh_url: `${finalReturnUrl}?stripe_refresh=true`,
       return_url: finalReturnUrl,
