@@ -13,9 +13,14 @@ import { MIN_WITHDRAWAL_AMOUNT } from "@/lib/revenue/types";
 const CreateWithdrawalSchema = z.object({
   amount: z.number().positive(`最低提现金额为 ¥${MIN_WITHDRAWAL_AMOUNT}`),
   currency: z.string().default("CNY"),
-  bankName: z.string().min(1, "请填写银行名称"),
-  bankAccount: z.string().min(1, "请填写银行账号"),
-  accountHolder: z.string().min(1, "请填写开户姓名"),
+  paymentMethod: z.enum(["wechat", "alipay", "paypal", "bank"]).default("bank"),
+  // For digital wallets
+  accountId: z.string().optional(), // WeChat/ Alipay/ PayPal account
+  accountName: z.string().optional(), // Account holder name
+  // For bank transfer
+  bankName: z.string().optional(),
+  bankAccount: z.string().optional(),
+  accountHolder: z.string().optional(),
 });
 
 // ─── GET ──────────────────────────────────────────────────────────────────────
@@ -89,7 +94,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { amount, currency, bankName, bankAccount, accountHolder } = parsed.data;
+    const { amount, currency, paymentMethod, accountId, accountName, bankName, bankAccount, accountHolder } = parsed.data;
+
+    // Get the appropriate fields based on payment method
+    const finalAccountId = accountId || "";
+    const finalAccountName = accountName || accountHolder || "";
+    const finalBankName = bankName || (paymentMethod !== "bank" ? paymentMethod.toUpperCase() : "");
+    const finalBankAccount = bankAccount || accountId || "";
+    const finalAccountHolder = accountHolder || accountName || "";
 
     // Validate withdrawal eligibility
     const validation = await validateWithdrawal(session.userId, amount, currency);
@@ -106,10 +118,11 @@ export async function POST(request: NextRequest) {
         userId: session.userId,
         amount,
         currency,
-        bankName,
-        bankAccountLast4: bankAccount.slice(-4),
-        accountHolder,
+        bankName: finalBankName,
+        bankAccountLast4: finalBankAccount.slice(-4),
+        accountHolder: finalAccountHolder,
         status: "PENDING",
+        // Store payment method in bankName for digital wallets
         // bankAccount full is encrypted in production — store hashed
       },
     });
