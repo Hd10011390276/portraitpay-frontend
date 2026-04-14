@@ -17,6 +17,13 @@ export default function KYCPage() {
   const { t } = useLanguage();
   const [user, setUser] = useState<{ id: string; email: string; name: string | null; role: string } | null>(null);
   const [checking, setChecking] = useState(true);
+  const [frontImage, setFrontImage] = useState<File | null>(null);
+  const [backImage, setBackImage] = useState<File | null>(null);
+  const [frontPreview, setFrontPreview] = useState<string | null>(null);
+  const [backPreview, setBackPreview] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem("pp_user");
@@ -24,6 +31,50 @@ export default function KYCPage() {
     try { setUser(JSON.parse(raw)); } catch { window.location.href = "/login"; }
     finally { setChecking(false); }
   }, []);
+
+  const handleFileChange = (side: "front" | "back", file: File) => {
+    if (side === "front") {
+      setFrontImage(file);
+      setFrontPreview(URL.createObjectURL(file));
+    } else {
+      setBackImage(file);
+      setBackPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!frontImage) {
+      setSubmitError(t.kyc.frontSide + " is required");
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Upload images to backend - for now just submit with placeholder URLs
+      const res = await fetch("/api/v1/kyc/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          level: 2,
+          idCardFrontUrl: frontPreview,
+          idCardBackUrl: backPreview,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Submission failed");
+      }
+
+      setSubmitSuccess(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (checking) {
     return (
@@ -85,16 +136,29 @@ export default function KYCPage() {
 
             {/* Front / Back upload */}
             <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                { label: t.kyc.frontSide, sub: t.kyc.frontSideSub },
-                { label: t.kyc.backSide, sub: t.kyc.backSideSub },
-              ].map((side) => (
-                <div key={side.label} className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {side.label} <span className="text-red-500">*</span>
-                  </label>
+              {/* Front side */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t.kyc.frontSide} <span className="text-red-500">*</span>
+                </label>
+                {frontPreview ? (
+                  <div className="relative">
+                    <img src={frontPreview} alt="Front" className="w-full h-48 object-cover rounded-xl border border-gray-200" />
+                    <button
+                      onClick={() => { setFrontImage(null); setFrontPreview(null); }}
+                      className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full text-sm hover:bg-red-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
                   <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer group">
-                    <input type="file" accept="image/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => e.target.files?.[0] && handleFileChange("front", e.target.files[0])}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
                     <div className="flex flex-col items-center justify-center py-8 px-4">
                       <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
                         📷
@@ -103,8 +167,42 @@ export default function KYCPage() {
                       <p className="text-xs text-gray-400 mt-1">{t.kyc.maxFileSize}</p>
                     </div>
                   </div>
-                </div>
-              ))}
+                )}
+              </div>
+
+              {/* Back side */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t.kyc.backSide}
+                </label>
+                {backPreview ? (
+                  <div className="relative">
+                    <img src={backPreview} alt="Back" className="w-full h-48 object-cover rounded-xl border border-gray-200" />
+                    <button
+                      onClick={() => { setBackImage(null); setBackPreview(null); }}
+                      className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full text-sm hover:bg-red-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer group">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => e.target.files?.[0] && handleFileChange("back", e.target.files[0])}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="flex flex-col items-center justify-center py-8 px-4">
+                      <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                        📷
+                      </div>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t.kyc.clickToUpload}</p>
+                      <p className="text-xs text-gray-400 mt-1">{t.kyc.maxFileSize}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Tips */}
@@ -117,9 +215,25 @@ export default function KYCPage() {
               </ul>
             </div>
 
+            {submitError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {submitError}
+              </div>
+            )}
+
+            {submitSuccess && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                ✅ {t.kyc.submitSuccess || "KYC submitted successfully!"}
+              </div>
+            )}
+
             <div className="flex items-center gap-3 pt-2">
-              <button className="flex-1 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
-                {t.kyc.submitDocs}
+              <button
+                onClick={handleSubmit}
+                disabled={submitting || !frontImage}
+                className="flex-1 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? t.kyc.submitting || "Submitting..." : t.kyc.submitDocs}
               </button>
               <button className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm">
                 {t.kyc.saveDraft}
