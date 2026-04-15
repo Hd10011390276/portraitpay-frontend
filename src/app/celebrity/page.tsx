@@ -158,25 +158,31 @@ export default function CelebrityPage() {
       <main className="max-w-4xl mx-auto px-4 py-12">
         {/* Hero */}
         <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-2xl p-8 mb-10 text-white">
-          <div className="flex items-start gap-4">
-            <div className="text-4xl">🌟</div>
-            <div>
-              <h1 className="text-2xl font-bold mb-1">{t.celebrity.title}</h1>
-              <p className="text-purple-100 text-sm leading-relaxed">
-                {t.celebrity.subtitle}
-              </p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="text-4xl">🌟</div>
+              <div>
+                <span className="text-xs font-medium bg-white/20 px-3 py-1 rounded-full">{t.celebrity.heroTag}</span>
+                <h1 className="text-2xl font-bold mt-2">{t.celebrity.title}</h1>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold">{t.celebrity.socialProof}</div>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4 mt-6">
+          <p className="text-purple-100 text-sm leading-relaxed mb-6">
+            {t.celebrity.subtitle}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: "🔐", label: isZh ? "肖像权保护" : "Portrait Rights Protection", sub: isZh ? "区块链存证，永久溯源" : "Blockchain certificate, permanent traceability" },
-              { icon: "💰", label: isZh ? "商业化变现" : "Monetization", sub: isZh ? "授权收益透明分账" : "Transparent revenue sharing" },
-              { icon: "🤝", label: isZh ? "合规授权" : "Compliant Licensing", sub: isZh ? "智能合约保障权益" : "Smart contracts protect rights" },
+              { icon: "🚨", label: t.celebrity.scenario1, sub: t.celebrity.scenario1Desc },
+              { icon: "⚠️", label: t.celebrity.scenario2, sub: t.celebrity.scenario2Desc },
+              { icon: "💼", label: t.celebrity.scenario3, sub: t.celebrity.scenario3Desc },
             ].map((s) => (
-              <div key={s.label} className="bg-white/10 rounded-xl p-3 text-center backdrop-blur-sm">
-                <div className="text-xl mb-1">{s.icon}</div>
-                <p className="text-sm font-semibold">{s.label}</p>
-                <p className="text-xs text-purple-200">{s.sub}</p>
+              <div key={s.label} className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <div className="text-xl mb-2">{s.icon}</div>
+                <p className="text-sm font-semibold mb-1">{s.label}</p>
+                <p className="text-xs text-purple-200 leading-relaxed">{s.sub}</p>
               </div>
             ))}
           </div>
@@ -361,7 +367,7 @@ export default function CelebrityPage() {
                 {[
                   { icon: "🔐", text: t.celebrity.blockchainCert },
                   { icon: "💰", text: t.celebrity.royaltyRevenue },
-                  { icon: "🛡️", text: t.celebrity.infringementMonitor },
+                  { icon: "⚖️", text: t.celebrity.lawyerSupport },
                   { icon: "📊", text: t.celebrity.dataDashboard },
                   { icon: "📜", text: t.celebrity.officialLicense },
                   { icon: "🤝", text: t.celebrity.enterpriseLiaison },
@@ -377,36 +383,40 @@ export default function CelebrityPage() {
             {/* Process */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <h3 className="font-bold text-gray-900 mb-4">{t.celebrity.processTitle}</h3>
-              <ol className="space-y-3">
+              <ol className="space-y-4">
                 {[
                   { step: "1", text: t.celebrity.processStep1 },
                   { step: "2", text: t.celebrity.processStep2 },
                   { step: "3", text: t.celebrity.processStep3 },
-                  { step: "4", text: t.celebrity.processStep4 },
-                  { step: "5", text: t.celebrity.processStep5 },
                 ].map((item) => (
                   <li key={item.step} className="flex items-start gap-3 text-sm text-gray-700">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-100 text-purple-700 text-xs font-bold flex items-center justify-center">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center">
                       {item.step}
                     </span>
-                    <span className="pt-0.5">{item.text}</span>
+                    <span className="pt-0.5 font-medium">{item.text}</span>
                   </li>
                 ))}
               </ol>
             </div>
 
             {/* CTA */}
-            <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100">
-              <p className="text-sm text-purple-800 font-medium mb-2">{t.celebrity.alreadyArtist}</p>
-              <p className="text-xs text-purple-600 mb-3">
-                {t.celebrity.loginDesc}
-              </p>
+            <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-6 text-white">
+              <p className="text-sm font-medium mb-3">{t.celebrity.ctaButton}</p>
               <Link
-                href="/login"
-                className="block w-full py-2.5 bg-purple-600 text-white rounded-xl text-sm font-medium text-center hover:bg-purple-700 transition"
+                href="/register?type=celebrity"
+                className="block w-full py-3 bg-white text-purple-700 rounded-xl text-sm font-semibold text-center hover:bg-purple-50 transition"
               >
-                {t.celebrity.artistLogin}
+                {t.celebrity.submitApplication}
               </Link>
+              <div className="mt-4 pt-4 border-t border-white/20">
+                <p className="text-xs text-purple-200 mb-2">{t.celebrity.alreadyArtist}</p>
+                <Link
+                  href="/login"
+                  className="text-sm text-white/80 hover:text-white underline"
+                >
+                  {t.celebrity.artistLogin}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

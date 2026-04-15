@@ -9,6 +9,7 @@ const PUBLIC_PATHS = [
   "/privacy",
   "/contact",
   "/kyc",
+  "/celebrity",
   "/enterprise/authorization/apply",
 ];
 

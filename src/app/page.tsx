@@ -85,45 +85,20 @@ const IconMoney = ({ className, style }: IconProps) => (
   </svg>
 );
 
-// ─── FAQ Accordion Item ──────────────────────────────────────────
+// ─── FAQ Accordion Item (Expanded by default) ─────────────────────
 function FAQItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid var(--border-default)" }}>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px 0",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          textAlign: "left",
-          gap: "16px",
-        }}
-      >
+    <div style={{ borderBottom: "1px solid var(--border-default)", paddingBottom: "20px", marginBottom: "20px" }}>
+      <div style={{ marginBottom: "12px" }}>
         <span style={{ fontSize: "16px", fontWeight: 600, color: "var(--text-primary)" }}>
           {question}
         </span>
-        <span style={{
-          color: "var(--text-tertiary)",
-          transform: open ? "rotate(180deg)" : "rotate(0deg)",
-          transition: "transform 200ms ease-out",
-          flexShrink: 0,
-        }}>
-          <IconChevronDown className="w-5 h-5" />
-        </span>
-      </button>
-      {open && (
-        <div style={{ paddingBottom: "20px" }}>
-          <p style={{ fontSize: "15px", color: "var(--text-secondary)", lineHeight: 1.7 }}>
-            {answer}
-          </p>
-        </div>
-      )}
+      </div>
+      <div>
+        <p style={{ fontSize: "15px", color: "var(--text-secondary)", lineHeight: 1.7 }}>
+          {answer}
+        </p>
+      </div>
     </div>
   );
 }
@@ -519,10 +494,10 @@ export default function HomePage() {
                 display: "none",
               }} className="hidden-mobile" />
 
-              <StepItem number="1" title={t.howItWorks.step1} desc={t.features.feature1Desc} />
-              <StepItem number="2" title={t.howItWorks.step2} desc={t.features.feature3Desc} />
-              <StepItem number="3" title={t.howItWorks.step3} desc={t.features.feature2Desc} />
-              <StepItem number="4" title={t.howItWorks.step4} desc={t.features.feature4Desc} />
+              <StepItem number="1" title={t.howItWorks.step1} desc={t.howItWorks.step1Desc} />
+              <StepItem number="2" title={t.howItWorks.step2} desc={t.howItWorks.step2Desc} />
+              <StepItem number="3" title={t.howItWorks.step3} desc={t.howItWorks.step3Desc} />
+              <StepItem number="4" title={t.howItWorks.step4} desc={t.howItWorks.step4Desc} />
             </div>
           </div>
         </section>
