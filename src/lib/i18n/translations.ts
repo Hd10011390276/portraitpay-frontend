@@ -273,7 +273,7 @@ export const translations = {
     register: {
       createAccount: "创建账户",
       alreadyHaveAccount: "已有账户？登录",
-      joinPortraitPay: "加入 PortraitPay 开始保护您的肖像权",
+      joinPortraitPay: "加入 PortraitPay AI 开始保护您的肖像权",
       fullName: "姓名",
       name: "姓名",
       enterRealName: "请输入真实姓名",
@@ -1111,7 +1111,7 @@ export const translations = {
     register: {
       createAccount: "Create Account",
       alreadyHaveAccount: "Already have an account? Sign In",
-      joinPortraitPay: "Join PortraitPay to protect your portrait rights",
+      joinPortraitPay: "Join PortraitPay AI to protect your portrait rights",
       fullName: "Full Name",
       name: "Full Name",
       enterRealName: "Enter your real name",

@@ -13,8 +13,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "PortraitPay — 你的肖像 你的权利",
-    template: "%s | PortraitPay",
+    default: "PortraitPay AI — 你的肖像 你的权利",
+    template: "%s | PortraitPay AI",
   },
   description: "AI驱动的人脸溯源与肖像版权保护平台。保护你的数字身份，授权你的肖像权益。",
   keywords: ["人脸识别", "肖像版权", "区块链", "AI", "数字身份"],
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "zh_CN",
     url: "https://portraitpayai.com",
-    siteName: "PortraitPay",
-    title: "PortraitPay — 你的肖像 你的权利",
+    siteName: "PortraitPay AI",
+    title: "PortraitPay AI — 你的肖像 你的权利",
     description: "AI驱动的人脸溯源与肖像版权保护平台",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PortraitPay — 你的肖像 你的权利",
+    title: "PortraitPay AI — 你的肖像 你的权利",
     description: "AI驱动的人脸溯源与肖像版权保护平台",
   },
 };

@@ -119,7 +119,7 @@ export default function RegisterPage() {
         <div className="text-center px-2">
           <Link href="/" className="inline-block">
             <div className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2 hover:opacity-80 transition-opacity">
-              PortraitPay
+              PortraitPay AI
             </div>
           </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
