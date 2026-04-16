@@ -11,6 +11,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 const MonitorConfigSchema = z.object({
   enabled: z.boolean().default(true),
   similarityThreshold: z.number().min(0.5).max(1.0).default(0.85),
