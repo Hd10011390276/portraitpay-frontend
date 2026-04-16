@@ -16,6 +16,8 @@ import { z } from "zod";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // Zod schema for forgot password validation
 const ForgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),

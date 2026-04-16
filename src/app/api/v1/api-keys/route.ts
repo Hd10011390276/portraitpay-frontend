@@ -12,6 +12,8 @@ import { getSession } from "@/lib/auth/session";
 import { createApiKey, revokeApiKey, isValidApiKeyFormat } from "@/lib/api-keys";
 import { logAudit } from "@/lib/audit/service";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/v1/api-keys - List user's API keys
 export async function GET(request: NextRequest) {
   try {

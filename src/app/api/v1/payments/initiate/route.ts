@@ -15,6 +15,8 @@ import { getSession } from "@/lib/auth/session";
 import { createPaymentIntent } from "@/lib/payments/stripe";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const InitiatePaymentSchema = z.object({
   authorizationId: z.string().min(1),
   amount: z.number().positive().int(),

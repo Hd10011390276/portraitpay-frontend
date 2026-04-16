@@ -16,6 +16,8 @@ import { certifyPortrait, computeImageHash, SUPPORTED_NETWORKS } from "@/lib/blo
 import { uploadToIpfs, uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
 import { getPresignedUploadUrl, generateImageKey } from "@/lib/storage";
 
+export const dynamic = "force-dynamic";
+
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, context: RouteContext) {

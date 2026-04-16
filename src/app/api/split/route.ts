@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const SplitRecordSchema = z.object({
   portraitId: z.string().min(1, "Portrait ID is required"),
   authorizationId: z.string().min(1, "Authorization ID is required").optional(),

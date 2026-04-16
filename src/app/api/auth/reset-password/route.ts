@@ -11,6 +11,8 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // Zod schema for reset password validation
 const ResetPasswordSchema = z.object({
   token: z.string().min(1, "Token is required"),

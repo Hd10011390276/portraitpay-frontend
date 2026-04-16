@@ -15,6 +15,8 @@ import { prisma } from "@/lib/prisma";
 import { verifyApiKey, checkRateLimit, isValidApiKeyFormat } from "@/lib/api-keys";
 import { createPaymentIntent } from "@/lib/payments/stripe";
 
+export const dynamic = "force-dynamic";
+
 export const runtime = "nodejs";
 
 // Valid usage scopes

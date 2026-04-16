@@ -8,6 +8,8 @@ import { kycService } from "@/lib/kyc/service";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 
+export const dynamic = "force-dynamic";
+
 // ─── POST — 提交艺人专项申请 ─────────────────────────────────
 
 export async function POST(req: NextRequest) {

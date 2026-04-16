@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // Simple admin auth check — in production use proper session middleware
 async function requireAdmin(token?: string | null): Promise<boolean> {
   if (!token) return false;

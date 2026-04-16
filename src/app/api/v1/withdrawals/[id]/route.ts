@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { initiateStripePayout } from "@/lib/payments/stripe";
 
+export const dynamic = "force-dynamic";
+
 const UpdateWithdrawalSchema = z.object({
   action: z.enum(["cancel", "approve", "reject"]),
   reason: z.string().optional(),

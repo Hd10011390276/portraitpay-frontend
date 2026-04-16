@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import Stripe from "stripe";
 
+export const dynamic = "force-dynamic";
+
 function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) {
     throw new Error("STRIPE_SECRET_KEY is not configured");

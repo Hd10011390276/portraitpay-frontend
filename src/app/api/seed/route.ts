@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
+export const dynamic = "force-dynamic";
+
 const prisma = new PrismaClient();
 
 const DEMO_EMAIL = 'demo@portraitpayai.com';

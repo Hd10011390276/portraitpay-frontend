@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleStripeWebhook } from "@/lib/payments/stripe";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.text();

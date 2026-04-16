@@ -12,6 +12,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyApiKey, checkRateLimit, isValidApiKeyFormat } from "@/lib/api-keys";
 
+export const dynamic = "force-dynamic";
+
 export const runtime = "nodejs";
 
 // GET /api/v1/verify-portrait - Check portrait usage rights

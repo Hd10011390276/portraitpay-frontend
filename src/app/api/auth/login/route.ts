@@ -5,6 +5,8 @@ import { EmailLoginSchema } from "@/lib/auth/schemas";
 import { signTokenPair } from "@/lib/auth/jwt";
 import { logAudit } from "@/lib/audit/service";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

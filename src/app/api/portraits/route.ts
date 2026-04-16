@@ -8,6 +8,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 
+export const dynamic = "force-dynamic";
+
 const CreatePortraitSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),

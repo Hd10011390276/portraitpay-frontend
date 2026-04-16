@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const UsageRequestSchema = z.object({
   portraitId: z.string().min(1, "Portrait ID is required"),
   requesterEmail: z.string().email("Valid email is required"),

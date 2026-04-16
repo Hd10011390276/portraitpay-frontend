@@ -15,6 +15,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth/jwt";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // This endpoint uses SSE (Server-Sent Events) which is natively supported
 // by Next.js API routes without requiring a custom server.
 // WebSocket/Socket.IO can be added on top for production clusters.

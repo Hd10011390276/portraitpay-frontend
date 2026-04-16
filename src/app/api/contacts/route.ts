@@ -7,6 +7,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { sendContactNotification, ContactEmailData } from "@/lib/email";
 
+export const dynamic = "force-dynamic";
+
 const GeneralContactSchema = z.object({
   type: z.literal("GENERAL"),
   name: z.string().min(1, "姓名不能为空").max(100),

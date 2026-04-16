@@ -10,6 +10,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runMonitoringCycle } from "@/lib/infringement/scanner";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   // ── Security: verify cron secret in production ───────────────────────────
   const cronSecret = process.env.CRON_SECRET;

@@ -13,6 +13,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 // Zod schema for contact form validation
 const ContactFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),

@@ -11,6 +11,8 @@ import { getSession } from "@/lib/auth/session";
 import { getPresignedUploadUrl, generateImageKey } from "@/lib/storage";
 import { computeImageHash } from "@/lib/blockchain";
 
+export const dynamic = "force-dynamic";
+
 type RouteContext = { params: Promise<{ id: string }> };
 
 const RegisterUploadSchema = z.object({
