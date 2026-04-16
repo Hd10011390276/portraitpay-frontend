@@ -45,7 +45,7 @@ export function Header({ user, title, subtitle, action }: HeaderProps) {
     }
   };
 
-  const initials = user?.name?.[0] ?? user?.email[0]?.toUpperCase() ?? "?";
+  const initials = user?.name?.[0] ?? user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
     <header className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 hidden sm:block">

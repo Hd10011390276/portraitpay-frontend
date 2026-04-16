@@ -611,6 +611,18 @@ export const translations = {
       infringements: "侵权记录",
       settings: "设置",
     },
+    // Header
+    header: {
+      notifications: "通知",
+      noNotifications: "没有新通知",
+      viewAll: "查看全部通知",
+      accountSettings: "账户设置",
+      signOut: "退出登录",
+      signingOut: "退出中...",
+      logoutSuccess: "已成功退出",
+      logoutFailed: "退出失败",
+      pleaseRetry: "请重试",
+    },
     // Login
     login: {
       title: "登录",
@@ -1450,6 +1462,18 @@ export const translations = {
       reportInfringement: "Report Infringement",
       infringements: "Infringements",
       settings: "Settings",
+    },
+    // Header
+    header: {
+      notifications: "Notifications",
+      noNotifications: "No new notifications",
+      viewAll: "View all notifications",
+      accountSettings: "Account Settings",
+      signOut: "Sign Out",
+      signingOut: "Signing out...",
+      logoutSuccess: "Successfully signed out",
+      logoutFailed: "Sign out failed",
+      pleaseRetry: "Please try again",
     },
     // Login
     login: {
