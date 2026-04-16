@@ -2,651 +2,349 @@
 
 import Link from "next/link";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
-import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/context/LanguageContext";
-import { useState } from "react";
-import { translations } from "@/lib/i18n/translations";
 
-// ─── Icons (inline SVG) ─────────────────────────────────────────
-type IconProps = { className?: string; style?: React.CSSProperties };
-const IconShield = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-    <path d="m9 12 2 2 4-4"/>
-  </svg>
-);
-const IconLock = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-  </svg>
-);
-const IconGlobe = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="2" y1="12" x2="22" y2="12"/>
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-  </svg>
-);
-const IconZap = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-  </svg>
-);
-const IconBarChart = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="20" x2="18" y2="10"/>
-    <line x1="12" y1="20" x2="12" y2="4"/>
-    <line x1="6" y1="20" x2="6" y2="14"/>
-  </svg>
-);
-const IconUsers = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-    <circle cx="9" cy="7" r="4"/>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-  </svg>
-);
-const IconArrowRight = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="5" y1="12" x2="19" y2="12"/>
-    <polyline points="12 5 19 12 12 19"/>
-  </svg>
-);
-const IconCheck = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-);
-const IconChevronDown = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="6 9 12 15 18 9"/>
-  </svg>
-);
-const IconFace = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-    <line x1="9" y1="9" x2="9.01" y2="9" strokeWidth="3" strokeLinecap="round"/>
-    <line x1="15" y1="9" x2="15.01" y2="9" strokeWidth="3" strokeLinecap="round"/>
-  </svg>
-);
-const IconChain = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-  </svg>
-);
-const IconMoney = ({ className, style }: IconProps) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" y1="1" x2="12" y2="23"/>
-    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-  </svg>
-);
-
-// ─── FAQ Accordion Item (Expanded by default) ─────────────────────
-function FAQItem({ question, answer }: { question: string; answer: string }) {
-  return (
-    <div style={{ borderBottom: "1px solid var(--border-default)", paddingBottom: "20px", marginBottom: "20px" }}>
-      <div style={{ marginBottom: "12px" }}>
-        <span style={{ fontSize: "16px", fontWeight: 600, color: "var(--text-primary)" }}>
-          {question}
-        </span>
-      </div>
-      <div>
-        <p style={{ fontSize: "15px", color: "var(--text-secondary)", lineHeight: 1.7 }}>
-          {answer}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Step Item ──────────────────────────────────────────────────
-function StepItem({ number, title, desc }: { number: string; title: string; desc: string }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "16px" }}>
-      <div style={{
-        width: "56px", height: "56px",
-        borderRadius: "var(--radius-full)",
-        background: "var(--accent-light)",
-        border: "2px solid var(--accent-primary)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: "18px", fontWeight: 700,
-        color: "var(--accent-primary)",
-        flexShrink: 0,
-      }}>
-        {number}
-      </div>
-      <div>
-        <h3 style={{ fontSize: "17px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "8px" }}>{title}</h3>
-        <p style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.6 }}>{desc}</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Feature Card ───────────────────────────────────────────────
-function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
-  return (
-    <div className="card" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <div style={{
-        width: "44px", height: "44px",
-        borderRadius: "var(--radius-md)",
-        background: "var(--accent-light)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "var(--accent-primary)",
-      }}>
-        {icon}
-      </div>
-      <div>
-        <h3 style={{ fontSize: "16px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "8px" }}>{title}</h3>
-        <p style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.65 }}>{desc}</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Stat Item ──────────────────────────────────────────────────
-function StatItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ textAlign: "center" }}>
-      <div style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
-        {value}
-      </div>
-      <div style={{ fontSize: "13px", color: "var(--text-tertiary)", marginTop: "6px", fontWeight: 500 }}>
-        {label}
-      </div>
-    </div>
-  );
-}
-
-// ─── Pricing Card ────────────────────────────────────────────────
-function PricingCard({ title, price, period, desc, features, cta, badge, highlighted }: {
-  title: string; price: string; period?: string; desc: string;
-  features: string[]; cta: string; badge?: string; highlighted?: boolean;
-}) {
-  return (
-    <div style={{
-      background: highlighted ? "var(--accent-primary)" : "var(--surface)",
-      border: highlighted ? "none" : "1px solid var(--border-default)",
-      borderRadius: "var(--radius-xl)",
-      padding: "32px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "24px",
-      boxShadow: highlighted ? "var(--shadow-lg)" : "var(--shadow-sm)",
-      flex: 1,
-    }}>
-      {badge && (
-        <span className="badge" style={{
-          background: highlighted ? "rgba(255,255,255,0.2)" : "var(--accent-light)",
-          color: highlighted ? "white" : "var(--accent-primary)",
-          alignSelf: "flex-start",
-        }}>
-          {badge}
-        </span>
-      )}
-      <div>
-        <h3 style={{ fontSize: "18px", fontWeight: 600, color: highlighted ? "white" : "var(--text-primary)", marginBottom: "4px" }}>
-          {title}
-        </h3>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginBottom: "8px" }}>
-          <span style={{ fontSize: "40px", fontWeight: 700, color: highlighted ? "white" : "var(--text-primary)", letterSpacing: "-0.03em" }}>
-            {price}
-          </span>
-          {period && (
-            <span style={{ fontSize: "14px", color: highlighted ? "rgba(255,255,255,0.7)" : "var(--text-tertiary)" }}>
-              /{period}
-            </span>
-          )}
-        </div>
-        <p style={{ fontSize: "14px", color: highlighted ? "rgba(255,255,255,0.75)" : "var(--text-secondary)" }}>
-          {desc}
-        </p>
-      </div>
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", flex: 1 }}>
-        {features.map((f, i) => (
-          <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "14px", color: highlighted ? "white" : "var(--text-secondary)" }}>
-            <span style={{ color: highlighted ? "white" : "var(--success)", flexShrink: 0, marginTop: "1px" }}>
-              <IconCheck className="w-4 h-4" />
-            </span>
-            {f}
-          </li>
-        ))}
-      </ul>
-      <Link href="/register" style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "12px 24px",
-        borderRadius: "var(--radius-md)",
-        fontSize: "15px",
-        fontWeight: 600,
-        textDecoration: "none",
-        transition: "all 150ms ease-out",
-        background: highlighted ? "white" : "var(--accent-primary)",
-        color: highlighted ? "var(--accent-primary)" : "white",
-      }}>
-        {cta}
-      </Link>
-    </div>
-  );
-}
-
-// ─── Main Page ──────────────────────────────────────────────────
 export default function HomePage() {
-  const { locale } = useLanguage();
-  const t = locale === "zh-CN" ? translations["zh-CN"] : translations["en-US"];
+  const { t, locale } = useLanguage();
 
   return (
-    <>
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(24px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .hero-headline { animation: fadeUp 0.5s ease-out forwards; }
-        .hero-sub { animation: fadeUp 0.5s 0.1s ease-out both; }
-        .hero-cta { animation: fadeUp 0.5s 0.2s ease-out both; }
-        .hero-stats { animation: fadeUp 0.5s 0.3s ease-out both; }
-        .section-fade { opacity: 0; transform: translateY(16px); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
-        .section-fade.visible { opacity: 1; transform: translateY(0); }
-      `}</style>
-
-      {/* ── Navigation ─────────────────────────────────────── */}
-      <header className="nav-glass" style={{ position: "sticky", top: 0, zIndex: 100 }}>
-        <div className="container" style={{ height: "var(--header-height)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          {/* Logo */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
-            <img src="/logo.png" alt="Logo" className="logo-light" style={{ width: "32px", height: "32px", objectFit: "contain", borderRadius: "6px" }} />
-            <img src="/logo-dark.png" alt="Logo" className="logo-dark" style={{ width: "32px", height: "32px", objectFit: "contain", borderRadius: "6px" }} />
-            <span style={{ fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>PortraitPay AI</span>
-          </Link>
-
-          {/* Desktop Nav */}
-          <nav style={{ display: "flex", alignItems: "center", gap: "32px" }} className="hidden-mobile">
-            <a href="#features" style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-secondary)", textDecoration: "none" }}
-               onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
-               onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}>{t.nav.features}</a>
-            <a href="#how-it-works" style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-secondary)", textDecoration: "none" }}
-               onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
-               onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}>{t.nav.howItWorks}</a>
-            <a href="#pricing" style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-secondary)", textDecoration: "none" }}
-               onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
-               onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}>{t.nav.pricing}</a>
-            <a href="#faq" style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-secondary)", textDecoration: "none" }}
-               onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
-               onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}>{t.nav.faq}</a>
-          </nav>
-
-          {/* Search */}
-          <form action="/search" method="get" style={{ display: "flex", alignItems: "center" }}>
-            <div style={{ position: "relative" }}>
-              <svg style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "var(--text-tertiary)", pointerEvents: "none" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                name="q"
-                placeholder={t.nav.search}
-                style={{
-                  width: "180px",
-                  padding: "8px 12px 8px 34px",
-                  borderRadius: "var(--radius-md)",
-                  border: "1px solid var(--border-default)",
-                  background: "var(--surface)",
-                  fontSize: "13px",
-                  color: "var(--text-primary)",
-                  outline: "none",
-                  transition: "border-color 150ms, box-shadow 150ms",
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = "var(--accent-primary)";
-                  e.target.style.boxShadow = "0 0 0 3px var(--accent-light)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "var(--border-default)";
-                  e.target.style.boxShadow = "none";
-                }}
-              />
+    <div className="min-h-screen bg-white dark:bg-gray-950">
+      {/* ── Navbar ─────────────────────────────────────────────────────── */}
+      <header className="fixed inset-x-0 top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="PortraitPay AI" className="w-8 h-8 rounded-lg" />
+              <span className="font-bold text-gray-900 dark:text-white">PortraitPay AI</span>
             </div>
-          </form>
-
-          {/* Right side */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <LanguageToggle />
-            <ThemeToggle />
-            <Link href="/login" className="btn btn-secondary btn-sm hidden-mobile">{t.nav.signIn}</Link>
+            <nav className="hidden md:flex items-center gap-8">
+              {[
+                { key: "features", label: t.nav.features },
+                { key: "howItWorks", label: t.nav.howItWorks },
+                { key: "pricing", label: t.nav.pricing },
+                { key: "faq", label: t.nav.faq },
+              ].map((item) => (
+                <a key={item.key} href={`#${item.key}`}
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <div className="flex items-center gap-3">
+              <LanguageToggle />
+              <Link href="/login"
+                className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                {t.nav.signIn}
+              </Link>
+              <Link href="/register"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                {t.nav.getStarted}
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
-      <main>
-        {/* ── Hero ──────────────────────────────────────────── */}
-        <section style={{
-          background: "var(--bg-primary)",
-          padding: "120px 0 96px",
-          textAlign: "center",
-        }}>
-          <div className="container">
+      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-950 dark:to-purple-950/20 -z-10" />
+        <div className="absolute top-20 right-0 w-96 h-96 bg-purple-200 dark:bg-purple-900/10 rounded-full blur-3xl -z-10 opacity-40" />
+        <div className="absolute top-40 left-10 w-72 h-72 bg-blue-200 dark:bg-blue-900/10 rounded-full blur-3xl -z-10 opacity-40" />
+
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-3xl mx-auto text-center space-y-8">
             {/* Badge */}
-            <div className="hero-headline" style={{ marginBottom: "24px" }}>
-              <span style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "6px 14px",
-                borderRadius: "var(--radius-full)",
-                background: "var(--accent-light)",
-                border: "1px solid rgba(37,99,235,0.15)",
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "var(--accent-primary)",
-              }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent-primary)", display: "inline-block" }} />
-                {t.hero.badge}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-sm font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
               </span>
+              {t.hero.badge}
             </div>
 
             {/* Headline */}
-            <h1 className="hero-headline" style={{
-              fontSize: "var(--text-hero)",
-              fontWeight: 700,
-              color: "var(--text-primary)",
-              letterSpacing: "-0.03em",
-              lineHeight: 1.05,
-              marginBottom: "24px",
-              maxWidth: "720px",
-              whiteSpace: "pre-line",
-              margin: "0 auto 24px",
-            }}>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight whitespace-pre-line">
               {t.hero.headline}
             </h1>
 
             {/* Sub */}
-            <p className="hero-sub" style={{
-              fontSize: "18px",
-              color: "var(--text-secondary)",
-              lineHeight: 1.65,
-              maxWidth: "560px",
-              margin: "0 auto 40px",
-            }}>
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
               {t.hero.sub}
             </p>
 
             {/* CTAs */}
-            <div className="hero-cta" style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "64px" }}>
-              <Link href="/register" className="btn btn-primary btn-lg">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/register"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5">
                 {t.hero.cta1}
+                <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
               </Link>
-              <Link href="#how-it-works" className="btn btn-secondary btn-lg">
+              <Link href="#how-it-works"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700 hover:-translate-y-0.5">
                 {t.hero.cta2}
-                <span style={{ width: "16px", height: "16px", display: "inline-flex", flexShrink: 0 }}><IconArrowRight /></span>
               </Link>
             </div>
 
-            {/* Stats bar */}
-            <div className="hero-stats" style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "48px",
-              padding: "20px 40px",
-              background: "var(--surface)",
-              border: "1px solid var(--border-default)",
-              borderRadius: "var(--radius-2xl)",
-              boxShadow: "var(--shadow-sm)",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}>
-              <StatItem label={t.heroStats.certified} value="847" />
-              <div style={{ width: "1px", height: "32px", background: "var(--border-default)" }} />
-              <StatItem label={t.heroStats.totalRevenue} value="¥12.4k" />
-              <div style={{ width: "1px", height: "32px", background: "var(--border-default)" }} />
-              <StatItem label={t.heroStats.pending} value="23" />
-              <div style={{ width: "1px", height: "32px", background: "var(--border-default)" }} />
-              <StatItem label={t.heroStats.chainStatus} value="Sepolia" />
-            </div>
-          </div>
-        </section>
-
-        {/* ── Features ───────────────────────────────────────── */}
-        <section id="features" style={{ background: "var(--bg-secondary)", padding: "96px 0" }}>
-          <div className="container">
-            <div style={{ textAlign: "center", marginBottom: "64px" }}>
-              <p className="text-overline" style={{ marginBottom: "12px" }}>Features</p>
-              <h2 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
-                {t.features.title}
-              </h2>
-              <p style={{ fontSize: "17px", color: "var(--text-secondary)", maxWidth: "520px", margin: "0 auto" }}>
-                {t.features.sub}
+            {/* Social proof */}
+            <div className="flex flex-col items-center gap-3 pt-4">
+              <div className="flex -space-x-2">
+                {["JD", "MW", "SK", "AL", "RK"].map((initials, i) => (
+                  <div key={i}
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold border-2 border-white dark:border-gray-950">
+                    {initials}
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="font-semibold text-gray-900 dark:text-white">2,400+</span> {t.hero.socialProof}
               </p>
             </div>
-
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "20px",
-            }}>
-              <FeatureCard
-                icon={<IconShield style={{ width: "22px", height: "22px" }} />}
-                title={t.features.feature1Title}
-                desc={t.features.feature1Desc}
-              />
-              <FeatureCard
-                icon={<IconChain style={{ width: "22px", height: "22px" }} />}
-                title={t.features.feature2Title}
-                desc={t.features.feature2Desc}
-              />
-              <FeatureCard
-                icon={<IconLock style={{ width: "22px", height: "22px" }} />}
-                title={t.features.feature3Title}
-                desc={t.features.feature3Desc}
-              />
-              <FeatureCard
-                icon={<IconMoney style={{ width: "22px", height: "22px" }} />}
-                title={t.features.feature4Title}
-                desc={t.features.feature4Desc}
-              />
-              <FeatureCard
-                icon={<IconBarChart style={{ width: "22px", height: "22px" }} />}
-                title={t.features.feature5Title}
-                desc={t.features.feature5Desc}
-              />
-              <FeatureCard
-                icon={<IconUsers style={{ width: "22px", height: "22px" }} />}
-                title={t.features.feature6Title}
-                desc={t.features.feature6Desc}
-              />
-            </div>
           </div>
-        </section>
 
-        {/* ── How It Works ───────────────────────────────────── */}
-        <section id="how-it-works" style={{ background: "var(--bg-primary)", padding: "96px 0" }}>
-          <div className="container">
-            <div style={{ textAlign: "center", marginBottom: "64px" }}>
-              <p className="text-overline" style={{ marginBottom: "12px" }}>How it Works</p>
-              <h2 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
-                {t.howItWorks.title}
-              </h2>
-              <p style={{ fontSize: "17px", color: "var(--text-secondary)", maxWidth: "520px", margin: "0 auto" }}>
-                {t.howItWorks.sub}
-              </p>
-            </div>
-
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "32px",
-              position: "relative",
-            }}>
-              {/* Connector lines (desktop only) */}
-              <div style={{
-                position: "absolute",
-                top: "28px",
-                left: "10%",
-                right: "10%",
-                height: "1px",
-                background: "var(--border-default)",
-                zIndex: 0,
-                display: "none",
-              }} className="hidden-mobile" />
-
-              <StepItem number="1" title={t.howItWorks.step1} desc={t.howItWorks.step1Desc} />
-              <StepItem number="2" title={t.howItWorks.step2} desc={t.howItWorks.step2Desc} />
-              <StepItem number="3" title={t.howItWorks.step3} desc={t.howItWorks.step3Desc} />
-              <StepItem number="4" title={t.howItWorks.step4} desc={t.howItWorks.step4Desc} />
-            </div>
-          </div>
-        </section>
-
-        {/* ── Pricing ───────────────────────────────────────── */}
-        <section id="pricing" style={{ background: "var(--bg-secondary)", padding: "96px 0" }}>
-          <div className="container">
-            <div style={{ textAlign: "center", marginBottom: "64px" }}>
-              <p className="text-overline" style={{ marginBottom: "12px" }}>Pricing</p>
-              <h2 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
-                {t.pricing.title}
-              </h2>
-              <p style={{ fontSize: "17px", color: "var(--text-secondary)", maxWidth: "520px", margin: "0 auto" }}>
-                {t.pricing.sub}
-              </p>
-            </div>
-
-            <div style={{
-              display: "flex",
-              gap: "24px",
-              maxWidth: "800px",
-              margin: "0 auto",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}>
-              <PricingCard
-                title={t.pricing.freeTitle}
-                price={t.pricing.freePrice}
-                period={t.pricing.freePeriod}
-                desc={t.pricing.freeDesc}
-                features={[
-                  t.pricing.freeLi1,
-                  t.pricing.freeLi2,
-                  t.pricing.freeLi3,
-                ]}
-                cta={t.nav.getStarted}
-              />
-              <PricingCard
-                title={t.pricing.proTitle}
-                price={t.pricing.proPrice}
-                desc={t.pricing.proDesc}
-                features={[
-                  t.pricing.proLi1,
-                  t.pricing.proLi2,
-                  t.pricing.proLi3,
-                ]}
-                cta={t.pricing.contactUs}
-                badge={t.pricing.proBadge}
-                highlighted
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ── FAQ ────────────────────────────────────────────── */}
-        <section id="faq" style={{ background: "var(--bg-primary)", padding: "96px 0" }}>
-          <div className="container" style={{ maxWidth: "720px" }}>
-            <div style={{ textAlign: "center", marginBottom: "56px" }}>
-              <p className="text-overline" style={{ marginBottom: "12px" }}>FAQ</p>
-              <h2 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
-                {t.faq.title}
-              </h2>
-            </div>
-
-            <div>
-              <FAQItem question={t.faq.q1} answer={t.faq.a1} />
-              <FAQItem question={t.faq.q2} answer={t.faq.a2} />
-              <FAQItem question={t.faq.q3} answer={t.faq.a3} />
-              <FAQItem question={t.faq.q4} answer={t.faq.a4} />
-              <FAQItem question={t.faq.q5} answer={t.faq.a5} />
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA ────────────────────────────────────────────── */}
-        <section style={{
-          background: "var(--bg-secondary)",
-          padding: "96px 0",
-          textAlign: "center",
-        }}>
-          <div className="container">
-            <div style={{
-              maxWidth: "560px",
-              margin: "0 auto",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "24px",
-            }}>
-              <h2 style={{
-                fontSize: "var(--text-h2)",
-                fontWeight: 700,
-                color: "var(--text-primary)",
-                letterSpacing: "-0.02em",
-              }}>
-                {t.cta.title}
-              </h2>
-              <p style={{ fontSize: "17px", color: "var(--text-secondary)", lineHeight: 1.65 }}>
-                {t.cta.sub}
-              </p>
-              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
-                <Link href="/register" className="btn btn-primary btn-lg">
-                  {t.cta.cta1}
-                </Link>
-                <Link href="/login" className="btn btn-secondary btn-lg">
-                  {t.cta.cta2}
-                </Link>
+          {/* Hero visual */}
+          <div className="mt-16 max-w-4xl mx-auto relative">
+            <div className="bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden">
+              <div className="flex items-center gap-1.5 px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
+                <div className="flex-1 text-center text-xs text-gray-400">PortraitPay Dashboard</div>
+              </div>
+              <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: "Portraits Certified", value: "24", delta: "+3" },
+                  { label: "Total Earnings", value: "¥12,840", delta: "+¥1,200" },
+                  { label: "Pending Authorizations", value: "5", delta: "" },
+                  { label: "Blockchain Status", value: "✅ Live", delta: "" },
+                ].map((stat) => (
+                  <div key={stat.label} className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-100 dark:border-gray-800">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{stat.label}</p>
+                    <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                    {stat.delta && <p className="text-xs text-green-600 mt-0.5">{stat.delta}</p>}
+                  </div>
+                ))}
+              </div>
+              <div className="p-6 pt-0 grid grid-cols-3 gap-4">
+                {[
+                  { title: "Portrait of Jane D.", status: "✅ Certified On-chain", tx: "0x7a3f...c9e2" },
+                  { title: "Artist Portrait — M.W.", status: "🔍 Under Review", tx: "" },
+                  { title: "Celebrity Portrait — S.K.", status: "✅ Certified On-chain", tx: "0xb2d1...f8a0" },
+                ].map((card) => (
+                  <div key={card.title} className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div className="h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center text-3xl">👤</div>
+                    <div className="p-3">
+                      <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{card.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{card.status}</p>
+                      {card.tx && <p className="text-xs font-mono text-gray-400 mt-1">{card.tx}</p>}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Footer ─────────────────────────────────────────── */}
-        <footer style={{
-          background: "var(--bg-primary)",
-          borderTop: "1px solid var(--border-default)",
-          padding: "40px 0",
-        }}>
-          <div className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <img
-                src="/logo.png"
-                alt="PortraitPay AI Logo"
-                className="logo-light"
-                style={{ width: "24px", height: "24px", objectFit: "contain", borderRadius: "4px" }}
-              />
-              <img
-                src="/logo-dark.png"
-                alt="PortraitPay AI Logo"
-                className="logo-dark"
-                style={{ width: "24px", height: "24px", objectFit: "contain", borderRadius: "4px" }}
-              />
-              <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-primary)" }}>
-                PortraitPay AI
-              </span>
-            </div>
-            <p style={{ fontSize: "13px", color: "var(--text-tertiary)", margin: 0 }}>
-              {t.footer.copyright}
+      {/* ── Features ────────────────────────────────────────────────────── */}
+      <section id="features" className="py-24 px-4 bg-gray-50 dark:bg-gray-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              {t.features.title}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              {t.features.sub}
             </p>
-            <div style={{ display: "flex", gap: "24px" }}>
-              <Link href="/privacy" style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{t.footer.privacy}</Link>
-              <Link href="/terms" style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{t.footer.terms}</Link>
-              <Link href="/contact" style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{t.footer.contact}</Link>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {t.features.items.map((feature) => (
+              <div key={feature.title}
+                className={`bg-gradient-to-br ${feature.color} rounded-2xl p-6 border ${feature.border} hover:shadow-lg transition-shadow`}>
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">{feature.desc}</p>
+                {feature.cta && (
+                  <Link href={feature.ctaHref!}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors">
+                    {feature.cta} →
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ────────────────────────────────────────────────── */}
+      <section id="how-it-works" className="py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              {t.howItWorks.title}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              {t.howItWorks.sub}
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {t.howItWorks.steps.map((item, i) => (
+              <div key={item.step} className="relative">
+                {i < 3 && (
+                  <div className="hidden lg:block absolute top-10 left-full w-full h-px bg-gradient-to-r from-gray-300 dark:from-gray-700 to-transparent -translate-x-1/2" />
+                )}
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-3xl shadow-sm">
+                      {item.icon}
+                    </div>
+                    <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+                      {item.step}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pricing ─────────────────────────────────────────────────────── */}
+      <section id="pricing" className="py-24 px-4 bg-gray-50 dark:bg-gray-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              {t.pricing.title}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              {t.pricing.sub}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {t.pricing.plans.map((plan) => (
+              <div key={plan.name}
+                className={`rounded-2xl p-8 border-2 transition-shadow hover:shadow-xl
+                  ${plan.highlight
+                    ? "bg-gradient-to-b from-blue-50 to-white dark:from-blue-950/40 dark:to-gray-900 border-blue-500 dark:border-blue-500 shadow-lg"
+                    : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:shadow-lg"
+                  }`}>
+                {plan.highlight && (
+                  <span className="inline-block px-3 py-1 text-xs font-semibold bg-blue-600 text-white rounded-full mb-4">
+                    {locale === "zh-CN" ? "最受欢迎" : "Most Popular"}
+                  </span>
+                )}
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
+                  {plan.period && <span className="text-gray-500 dark:text-gray-400 text-sm">{plan.period}</span>}
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{plan.desc}</p>
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={plan.name === "Enterprise" || plan.name === "企业版" ? "/contact" : "/register"}
+                  className={`block w-full text-center px-6 py-3 rounded-xl font-semibold transition-all
+                    ${plan.highlight
+                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}>
+                  {plan.cta}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ─────────────────────────────────────────────────────────── */}
+      <section id="faq" className="py-24 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              {t.faq.title}
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {t.faq.items.map((faq) => (
+              <details key={faq.q} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer text-gray-900 dark:text-white font-medium">
+                  {faq.q}
+                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="px-6 pb-4 text-gray-600 dark:text-gray-400 text-sm leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ──────────────────────────────────────────────────── */}
+      <section className="py-24 px-4">
+        <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-10 sm:p-16 text-center text-white relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white" />
+          </div>
+          <div className="relative">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.cta.title}</h2>
+            <p className="text-blue-100 text-lg mb-8 max-w-xl mx-auto">
+              {t.cta.sub}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/register"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-white text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
+                {t.cta.cta1}
+              </Link>
+              <Link href="/login"
+                className="inline-flex items-center justify-center px-8 py-3.5 text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/10 transition-colors">
+                {t.cta.cta2}
+              </Link>
             </div>
           </div>
-        </footer>
-      </main>
-    </>
+        </div>
+      </section>
+
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
+      <footer className="border-t border-gray-100 dark:border-gray-800 py-12 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="PortraitPay AI" className="w-7 h-7 rounded-lg" />
+            <span className="text-gray-500 dark:text-gray-400 text-sm">{t.footer.copyright}</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              {t.footer.privacy}
+            </Link>
+            <Link href="/terms"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              {t.footer.terms}
+            </Link>
+            <Link href="/contact"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              {t.footer.contact}
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
-
-
