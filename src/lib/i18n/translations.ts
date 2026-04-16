@@ -643,18 +643,7 @@ export const translations = {
         loginFailed: "登录失败，请重试",
       },
     },
-    // Register
-    register: {
-      title: "注册",
-      subtitle: "创建新账户",
-      name: "姓名",
-      email: "邮箱",
-      password: "密码",
-      confirmPassword: "确认密码",
-      submit: "注册",
-      submitting: "注册中...",
-      register: "立即注册",
-      hasAccount: "已有账户？",
+    // Search账户？",
       signIn: "立即登录",
       error: "注册失败，请重试",
       passwordMismatch: "两次密码输入不一致",
@@ -1498,22 +1487,6 @@ export const translations = {
         sendFailed: "Failed to send, please try again",
         loginFailed: "Login failed, please try again",
       },
-    },
-    // Register
-    register: {
-      title: "Register",
-      subtitle: "Create a new account",
-      name: "Name",
-      email: "Email",
-      password: "Password",
-      confirmPassword: "Confirm Password",
-      submit: "Register",
-      submitting: "Registering...",
-      register: "Register Now",
-      hasAccount: "Already have an account?",
-      signIn: "Sign in now",
-      error: "Registration failed, please try again",
-      passwordMismatch: "Passwords do not match",
     },
     // Search
     search: {
