@@ -22,7 +22,7 @@ export const translations = {
     // Hero
     hero: {
       badge: "已在以太坊 Sepolia 测试网上线",
-      headline: "你的肖像。\n你的权利。\n上链。",
+      headline: "你的肖像\n你的权利",
       sub: "在以太坊区块链上注册你的肖像权，带有不可变时间戳、IPFS 存储和智能合约许可。一次注册，永远拥有。",
       cta1: "免费注册 — 立即开始",
       cta2: "了解如何使用",
@@ -832,7 +832,7 @@ export const translations = {
     // Hero
     hero: {
       badge: "Now live on Ethereum Sepolia Testnet",
-      headline: "Your Portrait.\nYour Rights.\nOn Chain.",
+      headline: "Your Portrait\nYour Rights",
       sub: "Register your portrait rights on the Ethereum blockchain with immutable timestamps, IPFS storage, and smart-contract licensing. Own your image identity — once and for all.",
       cta1: "Start Free — Register Now",
       cta2: "See How It Works",
