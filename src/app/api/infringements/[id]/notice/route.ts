@@ -24,6 +24,9 @@ import { renderNotice, renderNoticeHtml, NoticeType } from "@/lib/infringement/n
 import { submitForNotarization as notarizeEvidence } from "@/lib/infringement/notarization";
 import { uploadJsonToIpfs } from "@/lib/ipfs";
 
+export const dynamic = "force-dynamic";
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CreateNoticeSchema = z.object({

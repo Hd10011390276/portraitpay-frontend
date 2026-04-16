@@ -9,6 +9,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
+
 const ReviewSchema = z.object({
   decision: z.enum(["VALIDATED", "REJECTED", "SETTLED", "LEGAL_ACTION"]),
   resolution: z.string().optional(),

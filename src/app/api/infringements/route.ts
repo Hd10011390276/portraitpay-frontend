@@ -10,6 +10,9 @@ import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 import { buildEvidenceSetHash } from "@/lib/infringement/evidence";
 
+export const dynamic = "force-dynamic";
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Schemas
 // ─────────────────────────────────────────────────────────────────────────────

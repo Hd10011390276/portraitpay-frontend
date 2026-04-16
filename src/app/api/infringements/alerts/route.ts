@@ -12,6 +12,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 // POST — Owner decision on an alert
 // Body: { alertId: string, decision: "CONFIRMED" | "FALSE_POSITIVE" }

@@ -7,6 +7,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
+
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: NextRequest, context: RouteContext) {

@@ -203,6 +203,36 @@ export const translations = {
       terms: "服务条款",
       contact: "联系我们",
     },
+    // Auth / Login
+    auth: {
+      welcomeBack: "欢迎回来",
+      signInToContinue: "登录以继续使用 PortraitPay",
+      emailLogin: "邮箱登录",
+      phoneOtp: "手机验证码",
+    },
+    // Register
+    register: {
+      createAccount: "创建账户",
+      alreadyHaveAccount: "已有账户？登录",
+      fullName: "姓名",
+      email: "邮箱",
+      phone: "手机号",
+      password: "密码",
+      confirmPassword: "确认密码",
+      agreeTerms: "我已阅读并同意",
+      termsOfService: "服务条款",
+      privacyPolicy: "隐私政策",
+      registerButton: "注册",
+      nameRequired: "请输入姓名",
+      emailRequired: "请输入邮箱",
+      emailInvalid: "邮箱格式不正确",
+      phoneRequired: "请输入手机号",
+      phoneInvalid: "手机号格式不正确",
+      passwordRequired: "请输入密码",
+      passwordLength: "密码至少8位",
+      passwordMismatch: "两次密码不一致",
+      agreeRequired: "请勾选同意条款",
+    },
     // Upload page
     upload: {
       title: "上传肖像",
@@ -857,6 +887,36 @@ export const translations = {
       privacy: "Privacy Policy",
       terms: "Terms of Service",
       contact: "Contact Us",
+    },
+    // Auth / Login
+    auth: {
+      welcomeBack: "Welcome Back",
+      signInToContinue: "Sign in to continue using PortraitPay",
+      emailLogin: "Email Login",
+      phoneOtp: "Phone OTP",
+    },
+    // Register
+    register: {
+      createAccount: "Create Account",
+      alreadyHaveAccount: "Already have an account? Sign In",
+      fullName: "Full Name",
+      email: "Email",
+      phone: "Phone Number",
+      password: "Password",
+      confirmPassword: "Confirm Password",
+      agreeTerms: "I have read and agree to the",
+      termsOfService: "Terms of Service",
+      privacyPolicy: "Privacy Policy",
+      registerButton: "Register",
+      nameRequired: "Please enter your name",
+      emailRequired: "Please enter your email",
+      emailInvalid: "Please enter a valid email",
+      phoneRequired: "Please enter your phone number",
+      phoneInvalid: "Phone number format is invalid",
+      passwordRequired: "Please enter your password",
+      passwordLength: "Password must be at least 8 characters",
+      passwordMismatch: "Passwords do not match",
+      agreeRequired: "You must agree to the terms",
     },
     // Upload page
     upload: {

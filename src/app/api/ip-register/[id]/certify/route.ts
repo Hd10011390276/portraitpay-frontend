@@ -16,6 +16,9 @@ import { authOptions } from "@/lib/auth";
 import { certifyPortrait, computeImageHash, SUPPORTED_NETWORKS } from "@/lib/blockchain";
 import { uploadToIpfs, uploadJsonToIpfs } from "@/lib/ipfs";
 
+export const dynamic = "force-dynamic";
+
+
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, context: RouteContext) {

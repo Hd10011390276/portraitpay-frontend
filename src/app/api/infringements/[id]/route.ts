@@ -10,6 +10,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
+
 const UpdateInfringementSchema = z.object({
   description: z.string().min(10).optional(),
   evidenceUrls: z.array(z.string().url()).min(1).optional(),

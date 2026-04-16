@@ -9,6 +9,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
+
 // Schema for updating user profile
 const UpdateUserSchema = z.object({
   displayName: z.string().min(1).max(100).optional(),

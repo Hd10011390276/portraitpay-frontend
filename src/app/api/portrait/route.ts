@@ -9,6 +9,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
+
 const CreatePortraitSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
