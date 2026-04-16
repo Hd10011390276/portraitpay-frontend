@@ -148,19 +148,6 @@ function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: stri
   );
 }
 
-// ─── Stat Item ──────────────────────────────────────────────────
-function StatItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ textAlign: "center" }}>
-      <div style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
-        {value}
-      </div>
-      <div style={{ fontSize: "13px", color: "var(--text-tertiary)", marginTop: "6px", fontWeight: 500 }}>
-        {label}
-      </div>
-    </div>
-  );
-}
 
 // ─── Pricing Card ────────────────────────────────────────────────
 function PricingCard({ title, price, period, desc, features, cta, badge, highlighted }: {
@@ -354,28 +341,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Stats bar */}
-            <div className="hero-stats" style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "48px",
-              padding: "20px 40px",
-              background: "var(--surface)",
-              border: "1px solid var(--border-default)",
-              borderRadius: "var(--radius-2xl)",
-              boxShadow: "var(--shadow-sm)",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}>
-              <StatItem label={t.heroStats.certified} value="847" />
-              <div style={{ width: "1px", height: "32px", background: "var(--border-default)" }} />
-              <StatItem label={t.heroStats.totalRevenue} value="¥12.4k" />
-              <div style={{ width: "1px", height: "32px", background: "var(--border-default)" }} />
-              <StatItem label={t.heroStats.pending} value="23" />
-              <div style={{ width: "1px", height: "32px", background: "var(--border-default)" }} />
-              <StatItem label={t.heroStats.chainStatus} value="Sepolia" />
             </div>
-          </div>
         </section>
 
         {/* ── Features ───────────────────────────────────────── */}
