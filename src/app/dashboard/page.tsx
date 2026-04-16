@@ -211,9 +211,9 @@ function DashboardContent({ user }: { user: User }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: t.dashboard.uploadPortrait, href: "/portraits/upload", icon: "📤", desc: t.dashboard.uploadDesc },
-            { label: isZh ? "查看收益" : "View Earnings", href: "/earnings", icon: "💰", desc: t.dashboard.viewEarningsDesc },
-            { label: isZh ? "申请认证" : "Apply KYC", href: "/kyc", icon: "🔐", desc: t.dashboard.applyCertificationDesc },
-            { label: isZh ? "举报侵权" : "Report", href: "/report", icon: "🚨", desc: t.dashboard.reportInfringementDesc },
+            { label: t.dashboard.quickAction.viewEarnings, href: "/earnings", icon: "💰", desc: t.dashboard.viewEarningsDesc },
+            { label: t.dashboard.quickAction.applyKyc, href: "/kyc", icon: "🔐", desc: t.dashboard.applyCertificationDesc },
+            { label: t.dashboard.quickAction.reportInfringement, href: "/report", icon: "🚨", desc: t.dashboard.reportInfringementDesc },
           ].map((action) => (
             <Link key={action.href} href={action.href}
               className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all">

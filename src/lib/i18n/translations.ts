@@ -408,9 +408,15 @@ export const translations = {
       viewEarningsDesc: "查看你的收益历史",
       applyCertificationDesc: "完成身份认证",
       reportInfringementDesc: "报告侵权行为",
+      quickAction: {
+        viewEarnings: "查看收益",
+        applyKyc: "申请认证",
+        reportInfringement: "举报侵权",
+      },
       userCard: {
         nameNotSet: "未设置姓名",
         completeKyc: "完成 KYC 认证",
+        accountSettings: "账户设置",
       },
     },
     // Settings
@@ -594,14 +600,16 @@ export const translations = {
     },
     // Sidebar
     sidebar: {
+      main: "主要功能",
+      tools: "工具",
       dashboard: "控制台",
-      portraits: "肖像管理",
-      faceTrace: "人脸追踪",
+      myPortraits: "我的肖像",
+      kycVerification: "KYC 认证",
       earnings: "收益记录",
+      withdraw: "提现",
+      reportInfringement: "举报侵权",
       infringements: "侵权记录",
       settings: "设置",
-      withdraw: "提现",
-      kyc: "身份认证",
     },
     // Login
     login: {
@@ -1256,9 +1264,15 @@ export const translations = {
       viewEarningsDesc: "View your earnings history",
       applyCertificationDesc: "Complete identity verification",
       reportInfringementDesc: "Report infringement",
+      quickAction: {
+        viewEarnings: "View Earnings",
+        applyKyc: "Apply KYC",
+        reportInfringement: "Report",
+      },
       userCard: {
         nameNotSet: "Name not set",
         completeKyc: "Complete KYC verification",
+        accountSettings: "Account Settings",
       },
     },
     // Settings
@@ -1442,14 +1456,16 @@ export const translations = {
     },
     // Sidebar
     sidebar: {
+      main: "Main",
+      tools: "Tools",
       dashboard: "Dashboard",
-      portraits: "Portraits",
-      faceTrace: "Face Trace",
+      myPortraits: "My Portraits",
+      kycVerification: "KYC Verification",
       earnings: "Earnings",
+      withdraw: "Withdraw",
+      reportInfringement: "Report Infringement",
       infringements: "Infringements",
       settings: "Settings",
-      withdraw: "Withdraw",
-      kyc: "Identity",
     },
     // Login
     login: {
