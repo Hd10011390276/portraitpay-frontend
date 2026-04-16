@@ -643,11 +643,6 @@ export const translations = {
         loginFailed: "登录失败，请重试",
       },
     },
-    // Search账户？",
-      signIn: "立即登录",
-      error: "注册失败，请重试",
-      passwordMismatch: "两次密码输入不一致",
-    },
     // Search
     search: {
       title: "搜索肖像",
