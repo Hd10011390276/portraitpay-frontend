@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/portraits/[id]/certify
@@ -17,8 +16,8 @@ import { getSession } from "@/lib/auth/session";
 import { certifyPortrait, computeImageHash, SUPPORTED_NETWORKS } from "@/lib/blockchain";
 import { uploadToIpfs, uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
 import { getPresignedUploadUrl, generateImageKey } from "@/lib/storage";
-
 export const dynamic = "force-dynamic";
+
 
 type RouteContext = { params: Promise<{ id: string }> };
 

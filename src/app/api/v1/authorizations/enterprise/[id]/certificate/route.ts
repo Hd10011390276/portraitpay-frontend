@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET /api/v1/authorizations/enterprise/:id/certificate
@@ -8,8 +7,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCertificatePDF } from "@/lib/enterprise/certificate";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-
 export const dynamic = "force-dynamic";
+
 
 export async function GET(
   req: NextRequest,

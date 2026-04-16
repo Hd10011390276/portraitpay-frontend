@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/v1/kyc/submit
@@ -7,8 +6,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { kycService } from "@/lib/kyc/service";
 import { getSession } from "@/lib/auth/session";
-
 export const dynamic = "force-dynamic";
+
 
 export async function POST(req: NextRequest) {
   try {

@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET /api/v1/earnings/transactions
@@ -8,8 +7,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { getEarningsTransactions } from "@/lib/revenue/service";
-
 export const dynamic = "force-dynamic";
+
 
 export async function GET(request: NextRequest) {
   try {

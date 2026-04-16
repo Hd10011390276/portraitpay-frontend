@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * PATCH /api/v1/admin/enterprise/:id/review
@@ -7,8 +6,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { reviewEnterprise } from "@/lib/enterprise/service";
 import { getSession } from "@/lib/auth/session";
-
 export const dynamic = "force-dynamic";
+
 
 export async function PATCH(
   req: NextRequest,

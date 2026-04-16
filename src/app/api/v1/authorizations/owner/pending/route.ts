@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET /api/v1/authorizations/owner/pending
@@ -7,8 +6,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { listOwnerApplications } from "@/lib/enterprise/authService";
 import { getSession } from "@/lib/auth/session";
-
 export const dynamic = "force-dynamic";
+
 
 export async function GET(req: NextRequest) {
   try {

@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET /api/v1/kyc/status
@@ -7,8 +6,8 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { kycService } from "@/lib/kyc/service";
 import { getSession } from "@/lib/auth/session";
-
 export const dynamic = "force-dynamic";
+
 
 export async function GET() {
   try {

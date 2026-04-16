@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/portraits/[id]/upload
@@ -12,8 +11,8 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { getPresignedUploadUrl, generateImageKey } from "@/lib/storage";
 import { computeImageHash } from "@/lib/blockchain";
-
 export const dynamic = "force-dynamic";
+
 
 type RouteContext = { params: Promise<{ id: string }> };
 

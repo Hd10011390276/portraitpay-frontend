@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * DELETE /api/v1/agency/artist/:id
@@ -8,8 +7,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { removeArtistFromAgency } from "@/lib/enterprise/agencyService";
 import { getEnterpriseProfile } from "@/lib/enterprise/service";
 import { getSession } from "@/lib/auth/session";
-
 export const dynamic = "force-dynamic";
+
 
 export async function DELETE(
   req: NextRequest,

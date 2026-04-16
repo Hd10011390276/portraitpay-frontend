@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * /api/admin/contacts — 管理员获取所有联系记录
@@ -7,8 +6,8 @@ export const dynamic = "force-dynamic";
  */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
 export const dynamic = "force-dynamic";
+
 
 // Simple admin auth check — in production use proper session middleware
 async function requireAdmin(token?: string | null): Promise<boolean> {

@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST   /api/v1/kyc/celebrity        — 提交艺人申请
@@ -9,8 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { kycService } from "@/lib/kyc/service";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
-
 export const dynamic = "force-dynamic";
+
 
 // ─── POST — 提交艺人专项申请 ─────────────────────────────────
 

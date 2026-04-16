@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/face-trace/trace
@@ -20,8 +19,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { queryCelebrityDb } from "@/lib/face-trace/celebrityDb";
-
 export const dynamic = "force-dynamic";
+
 
 export const runtime = "nodejs";
 

@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/face/search — Search for similar faces
@@ -9,8 +8,8 @@ export const dynamic = "force-dynamic";
  */
 
 import { NextRequest, NextResponse } from "next/server";
-
 export const dynamic = "force-dynamic";
+
 
 export const runtime = "nodejs";
 

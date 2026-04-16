@@ -1,10 +1,9 @@
-export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { SendOtpSchema } from "@/lib/auth/schemas";
 import { createOtp } from "@/lib/auth/otp";
-
 export const dynamic = "force-dynamic";
+
 
 export async function POST(req: NextRequest) {
   try {

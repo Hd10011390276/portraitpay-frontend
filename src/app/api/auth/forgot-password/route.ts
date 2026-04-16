@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/auth/forgot-password — Send password reset email
@@ -17,8 +16,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
-
 export const dynamic = "force-dynamic";
+
 
 // Zod schema for forgot password validation
 const ForgotPasswordSchema = z.object({

@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET  /api/route - Health check for portrait usage request API
@@ -10,8 +9,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-
 export const dynamic = "force-dynamic";
+
 
 const UsageRequestSchema = z.object({
   portraitId: z.string().min(1, "Portrait ID is required"),

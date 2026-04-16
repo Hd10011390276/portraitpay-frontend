@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * /api/v1/verify-portrait - Verify Portrait Usage Rights
@@ -13,8 +12,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyApiKey, checkRateLimit, isValidApiKeyFormat } from "@/lib/api-keys";
-
 export const dynamic = "force-dynamic";
+
 
 export const runtime = "nodejs";
 

@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET /api/v1/notifications/stream
@@ -16,8 +15,8 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth/jwt";
 import { prisma } from "@/lib/prisma";
-
 export const dynamic = "force-dynamic";
+
 
 // This endpoint uses SSE (Server-Sent Events) which is natively supported
 // by Next.js API routes without requiring a custom server.

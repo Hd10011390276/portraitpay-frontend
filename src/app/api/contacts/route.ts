@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/contacts — 提交联系表单
@@ -8,8 +7,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { sendContactNotification, ContactEmailData } from "@/lib/email";
-
 export const dynamic = "force-dynamic";
+
 
 const GeneralContactSchema = z.object({
   type: z.literal("GENERAL"),

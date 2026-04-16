@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET /api/v1/kyc/logs
@@ -10,8 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { kycService } from "@/lib/kyc/service";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-
 export const dynamic = "force-dynamic";
+
 
 export async function GET(req: NextRequest) {
   try {

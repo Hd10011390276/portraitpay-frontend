@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
@@ -6,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { EmailLoginSchema } from "@/lib/auth/schemas";
 import { signTokenPair } from "@/lib/auth/jwt";
 import { logAudit } from "@/lib/audit/service";
-
 export const dynamic = "force-dynamic";
+
 
 export async function POST(req: NextRequest) {
   try {

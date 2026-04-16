@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/contact — Simple contact form submission
@@ -14,8 +13,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
 export const dynamic = "force-dynamic";
+
 
 // Zod schema for contact form validation
 const ContactFormSchema = z.object({

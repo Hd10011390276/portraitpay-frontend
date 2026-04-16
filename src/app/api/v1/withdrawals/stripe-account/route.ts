@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET  /api/v1/withdrawals/stripe-account - Get user's Stripe account status
@@ -9,8 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import Stripe from "stripe";
-
 export const dynamic = "force-dynamic";
+
 
 function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) {

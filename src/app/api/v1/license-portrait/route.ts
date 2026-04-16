@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * /api/v1/license-portrait - License a Portrait for AI/Commercial Use
@@ -16,8 +15,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyApiKey, checkRateLimit, isValidApiKeyFormat } from "@/lib/api-keys";
 import { createPaymentIntent } from "@/lib/payments/stripe";
-
 export const dynamic = "force-dynamic";
+
 
 export const runtime = "nodejs";
 

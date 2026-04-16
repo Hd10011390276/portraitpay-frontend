@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * GET  /api/v1/withdrawals     - List user's withdrawal applications
@@ -11,8 +10,8 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { validateWithdrawal } from "@/lib/revenue/service";
 import { MIN_WITHDRAWAL_AMOUNT } from "@/lib/revenue/types";
-
 export const dynamic = "force-dynamic";
+
 
 const CreateWithdrawalSchema = z.object({
   amount: z.number().positive(`最低提现金额为 ¥${MIN_WITHDRAWAL_AMOUNT}`),

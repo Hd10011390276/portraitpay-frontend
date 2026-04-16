@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/v1/kyc/webhook
@@ -9,8 +8,8 @@ export const dynamic = "force-dynamic";
  */
 import { NextRequest, NextResponse } from "next/server";
 import { kycService } from "@/lib/kyc/service";
-
 export const dynamic = "force-dynamic";
+
 
 /** 从请求头推断提供商 */
 function detectProvider(req: NextRequest): string {

@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 /**
  * POST /api/v1/webhooks/stripe
@@ -7,8 +6,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { handleStripeWebhook } from "@/lib/payments/stripe";
-
 export const dynamic = "force-dynamic";
+
 
 export async function POST(request: NextRequest) {
   try {
