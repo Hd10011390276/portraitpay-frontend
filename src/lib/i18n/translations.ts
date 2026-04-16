@@ -842,6 +842,18 @@ export const translations = {
     features: {
       title: "Everything you need to protect your portrait rights",
       sub: "From upload to on-chain certification in minutes. Fully automated, cryptographically secure.",
+      feature1Title: "Blockchain Certification",
+      feature1Desc: "Mint your portrait as an on-chain asset on Ethereum Sepolia. Immutable timestamps, tamper-proof records.",
+      feature2Title: "IPFS Storage",
+      feature2Desc: "Your portrait and metadata stored on IPFS — decentralized, redundant, and censorship-resistant forever.",
+      feature3Title: "Smart Licensing",
+      feature3Desc: "Define who can use your portrait, for how long, and at what price. Enforced automatically by smart contract.",
+      feature4Title: "Royalty Collection",
+      feature4Desc: "Earn automatically when your portrait is licensed. Every transaction routed through smart contract with split ratios.",
+      feature5Title: "Infringement Detection",
+      feature5Desc: "AI-powered image scanning monitors the web for unauthorized use of your certified portraits 24/7.",
+      feature6Title: "KYC Verified Profiles",
+      feature6Desc: "Enterprise-grade identity verification for celebrities, artists, and public figures. Whitelisted on-chain.",
       items: [
         {
           icon: "🔗",
@@ -932,6 +944,21 @@ export const translations = {
     pricing: {
       title: "Simple, transparent pricing",
       sub: "Start free. Scale as you grow. No hidden fees.",
+      freeTitle: "Free",
+      freePrice: "¥0",
+      freePeriod: "forever",
+      freeDesc: "For individual creators getting started",
+      freeLi1: "5 portrait uploads",
+      freeLi2: "Basic KYC (self-attested)",
+      freeLi3: "Community support",
+      proTitle: "Pro",
+      proPrice: "¥99",
+      proDesc: "For professional artists and influencers",
+      proLi1: "Unlimited portraits",
+      proLi2: "Full KYC verification",
+      proLi3: "Priority support",
+      contactUs: "Contact Sales",
+      proBadge: "Most Popular",
       plans: [
         {
           name: "Free",
