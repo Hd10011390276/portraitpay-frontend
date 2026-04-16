@@ -1,12 +1,18 @@
 /**
- * Email utility — SendGrid / Alibaba Cloud Mail
- * 邮件发送工具，支持 SendGrid 和阿里云邮件推送
+ * Email utility — Nodemailer + SMTP (腾讯企业邮箱 / exmail.qq.com)
+ * 邮件发送工具，通过 nodemailer 调用 SMTP 发送
  *
  * 环境变量配置:
- * - SENDGRID_API_KEY / ALIYUN_ACCESS_KEY / ALIYUN_ACCESS_SECRET
- * - EMAIL_FROM / EMAIL_FROM_NAME
- * - ADMIN_EMAIL (通知收件人)
+ * - SMTP_HOST     (默认: smtp.exmail.qq.com)
+ * - SMTP_PORT     (默认: 465)
+ * - SMTP_USER     (发件邮箱，如 contact@portraitpayai.com)
+ * - SMTP_PASS     (SMTP 授权码)
+ * - EMAIL_FROM    (发件地址，同 SMTP_USER)
+ * - EMAIL_FROM_NAME  (发件人名称，默认 PortraitPay AI)
+ * - ADMIN_EMAIL   (通知邮件收件人)
  */
+
+import nodemailer from "nodemailer";
 
 export interface EmailOptions {
   to: string | string[];
@@ -30,81 +36,55 @@ export interface ContactEmailData {
 }
 
 // ============================================================
-// SendGrid adapter
+// Nodemailer transporter (reused across calls)
 // ============================================================
-async function sendViaSendGrid(opts: EmailOptions): Promise<void> {
-  const apiKey = process.env.SENDGRID_API_KEY;
-  if (!apiKey) throw new Error("SENDGRID_API_KEY not configured");
+let _transporter: nodemailer.Transporter | null = null;
 
-  const from = process.env.EMAIL_FROM ?? "noreply@portraitpayai.com";
-  const fromName = process.env.EMAIL_FROM_NAME ?? "PortraitPay AI";
+function getTransporter(): nodemailer.Transporter {
+  if (_transporter) return _transporter;
 
-  const body = {
-    personalizations: [
-      {
-        to: (Array.isArray(opts.to) ? opts.to : [opts.to]).map((t) => ({ email: t })),
-        subject: opts.subject,
-      },
-    ],
-    from: { email: from, name: fromName },
-    content: [
-      { type: "text/plain", value: opts.text ?? opts.html.replace(/<[^>]+>/g, "") },
-      { type: "text/html", value: opts.html },
-    ],
-  };
+  const host = process.env.SMTP_HOST ?? "smtp.exmail.qq.com";
+  const port = parseInt(process.env.SMTP_PORT ?? "465", 10);
+  const user = process.env.SMTP_USER ?? "";
+  const pass = process.env.SMTP_PASS ?? "";
 
-  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
+  if (!user || !pass) {
+    throw new Error("SMTP credentials not configured: SMTP_USER / SMTP_PASS environment variables are required");
+  }
+
+  _transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465, // true for 465 (SSL), false for other ports
+    auth: {
+      user,
+      pass,
     },
-    body: JSON.stringify(body),
   });
 
-  if (!res.ok && res.status !== 200 && res.status !== 202) {
-    const text = await res.text();
-    throw new Error(`SendGrid error ${res.status}: ${text}`);
-  }
+  return _transporter;
 }
 
 // ============================================================
-// Alibaba Cloud Mail adapter
+// SMTP sender
 // ============================================================
-async function sendViaAliyun(opts: EmailOptions): Promise<void> {
-  const accessKey = process.env.ALIYUN_ACCESS_KEY;
-  const accessSecret = process.env.ALIYUN_ACCESS_SECRET;
-  if (!accessKey || !accessSecret) throw new Error("Aliyun credentials not configured");
+async function sendViaSMTP(opts: EmailOptions): Promise<void> {
+  const transporter = getTransporter();
 
-  // Simple DirectMail API call — in production use @alicloud/dm SDK
-  const accountName = process.env.ALIYUN_MAIL_ACCOUNT ?? process.env.EMAIL_FROM;
-  const region = process.env.ALIYUN_MAIL_REGION ?? "cn-hangzhou";
+  const from = process.env.EMAIL_FROM ?? process.env.SMTP_USER ?? "noreply@portraitpayai.com";
+  const fromName = process.env.EMAIL_FROM_NAME ?? "PortraitPay AI";
 
-  const payload = {
-    AccountName: accountName,
-    AddressType: 1,
-    ToAddress: Array.isArray(opts.to) ? opts.to.join(",") : opts.to,
-    Subject: opts.subject,
-    HtmlBody: opts.html,
-    TextBody: opts.text ?? opts.html.replace(/<[^>]+>/g, ""),
-  };
+  const toAddresses = Array.isArray(opts.to) ? opts.to : [opts.to];
 
-  // Sign request with Aliyun OpenAPI (simplified — use SDK in production)
-  const endpoint = `https://dm.${region}.aliyuncs.com`;
-  const res = await fetch(`${endpoint}/singleapi/mail/send`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Auth-Version": "2017-06-22",
-      // Note: in production, sign with Aliyun_ROARequest or use SDK
-    },
-    body: JSON.stringify(payload),
+  const info = await transporter.sendMail({
+    from: `"${fromName}" <${from}>`,
+    to: toAddresses.join(", "),
+    subject: opts.subject,
+    text: opts.text,
+    html: opts.html,
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Aliyun Mail error ${res.status}: ${text}`);
-  }
+  console.log("[Email] Sent via SMTP:", info.messageId);
 }
 
 // ============================================================
@@ -146,8 +126,7 @@ function buildContactNotificationEmail(data: ContactEmailData): { subject: strin
     .map(([k, v]) => `<tr><td style="padding:8px 12px;font-weight:bold;color:#666;white-space:nowrap">${k}</td><td style="padding:8px 12px">${v}</td></tr>`)
     .join("");
 
-  const html = `
-<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
@@ -181,13 +160,7 @@ function buildContactNotificationEmail(data: ContactEmailData): { subject: strin
 // Main send function
 // ============================================================
 export async function sendEmail(opts: EmailOptions): Promise<void> {
-  const provider = process.env.EMAIL_PROVIDER ?? "sendgrid";
-
-  if (provider === "aliyun") {
-    await sendViaAliyun(opts);
-  } else {
-    await sendViaSendGrid(opts);
-  }
+  await sendViaSMTP(opts);
 }
 
 export async function sendContactNotification(data: ContactEmailData): Promise<void> {
