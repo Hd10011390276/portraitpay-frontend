@@ -359,6 +359,12 @@ export const translations = {
       tagsPlaceholder: "添加标签，用逗号分隔",
       publicListing: "公开列表",
       publicListingDesc: "允许他人在市场上发现此肖像",
+      selectImage: "选择图片",
+      dropzone: "拖拽图片到此处，或点击选择",
+      uploading: "上传中...",
+      success: "上传成功",
+      error: "上传失败，请重试",
+      supported: "支持 JPG、PNG、WebP 格式",
     },
     // Legal / Privacy
     legal: {
@@ -555,17 +561,6 @@ export const translations = {
       upload: "上传肖像",
       noPortraits: "暂无肖像，请上传",
       uploadNew: "上传新肖像",
-    },
-    // Upload
-    upload: {
-      title: "上传肖像",
-      subtitle: "上传清晰的肖像照片",
-      selectImage: "选择图片",
-      dropzone: "拖拽图片到此处，或点击选择",
-      uploading: "上传中...",
-      success: "上传成功",
-      error: "上传失败，请重试",
-      supported: "支持 JPG、PNG、WebP 格式",
     },
     // KYC
     kyc: {
@@ -1211,6 +1206,12 @@ export const translations = {
       tagsPlaceholder: "Add tags, separated by commas",
       publicListing: "Public Listing",
       publicListingDesc: "Allow others to discover this portrait in the marketplace",
+      selectImage: "Select Image",
+      dropzone: "Drag image here, or click to select",
+      uploading: "Uploading...",
+      success: "Upload successful",
+      error: "Upload failed, please try again",
+      supported: "Supports JPG, PNG, WebP formats",
     },
     // Legal / Privacy
     legal: {
@@ -1407,17 +1408,6 @@ export const translations = {
       upload: "Upload Portrait",
       noPortraits: "No portraits yet, please upload",
       uploadNew: "Upload New Portrait",
-    },
-    // Upload
-    upload: {
-      title: "Upload Portrait",
-      subtitle: "Upload a clear portrait photo",
-      selectImage: "Select Image",
-      dropzone: "Drag image here, or click to select",
-      uploading: "Uploading...",
-      success: "Upload successful",
-      error: "Upload failed, please try again",
-      supported: "Supports JPG, PNG, WebP formats",
     },
     // KYC
     kyc: {
