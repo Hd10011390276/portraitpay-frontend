@@ -1,32 +1,6 @@
 "use client";
+import { useLanguage } from "@/context/LanguageContext";
 import { UserRole } from "@/lib/auth/schemas";
-
-const ROLES = [
-  {
-    value: "USER",
-    label: "普通用户",
-    description: "浏览和购买数字艺术品",
-    icon: "👤",
-  },
-  {
-    value: "ARTIST",
-    label: "艺人",
-    description: "上传和出售个人艺术作品",
-    icon: "🎨",
-  },
-  {
-    value: "AGENCY",
-    label: "经纪公司",
-    description: "管理旗下艺人账号和作品",
-    icon: "🏢",
-  },
-  {
-    value: "ENTERPRISE",
-    label: "企业",
-    description: "批量采购和企业级合作",
-    icon: "🏭",
-  },
-] as const;
 
 interface RoleSelectorProps {
   value?: string;
@@ -35,13 +9,42 @@ interface RoleSelectorProps {
 }
 
 export function RoleSelector({ value, onChange, error }: RoleSelectorProps) {
+  const { t } = useLanguage();
+
+  const roles = [
+    {
+      value: "USER",
+      label: t.register.roleUser,
+      description: t.register.roleUserDesc,
+      icon: "👤",
+    },
+    {
+      value: "ARTIST",
+      label: t.register.roleArtist,
+      description: t.register.roleArtistDesc,
+      icon: "🎨",
+    },
+    {
+      value: "AGENCY",
+      label: t.register.roleAgency,
+      description: t.register.roleAgencyDesc,
+      icon: "🏢",
+    },
+    {
+      value: "ENTERPRISE",
+      label: t.register.roleEnterprise,
+      description: t.register.roleEnterpriseDesc,
+      icon: "🏭",
+    },
+  ];
+
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        选择角色
+        {t.register.selectRole}
       </label>
       <div className="grid grid-cols-2 gap-3">
-        {ROLES.map((role) => (
+        {roles.map((role) => (
           <button
             key={role.value}
             type="button"
