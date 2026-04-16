@@ -32,6 +32,18 @@ export const translations = {
     features: {
       title: "保护你肖像权所需的一切",
       sub: "从上传到链上认证，只需几分钟。完全自动化，密码学安全。",
+      feature1Title: "区块链认证",
+      feature1Desc: "在以太坊 Sepolia 上将你的肖像铸造成链上资产。不可变时间戳，防篡改记录。",
+      feature2Title: "IPFS 存储",
+      feature2Desc: "你的肖像和元数据存储在 IPFS 上——去中心化、冗余备份、抗审查。",
+      feature3Title: "智能许可",
+      feature3Desc: "设定谁可以使用你的肖像、使用期限和价格。智能合约自动执行。",
+      feature4Title: "版税自动收取",
+      feature4Desc: "肖像被授权时自动获得报酬。每笔交易通过智能合约路由，按比例分成。",
+      feature5Title: "侵权检测",
+      feature5Desc: "AI 驱动的图像扫描 24/7 监控网络上未经授权使用你的认证肖像的行为。",
+      feature6Title: "KYC 身份认证",
+      feature6Desc: "为企业级名人、艺术家和公众人物提供身份验证。在链上白名单登记。",
       items: [
         {
           icon: "🔗",
@@ -83,6 +95,14 @@ export const translations = {
     howItWorks: {
       title: "从肖像到受保护资产，只需4步",
       sub: "无需加密货币专业知识。我们处理区块链复杂性——你来掌控。",
+      step1: "上传肖像",
+      step1Desc: "上传清晰、高分辨率的肖像照片。我们自动检测人脸并为你裁剪。",
+      step2: "完成 KYC",
+      step2Desc: "验证你的身份，解锁企业授权功能，提高个人资料信任评分。",
+      step3: "链上认证",
+      step3Desc: "一键在以太坊 Sepolia 上铸造。你的肖像哈希、元数据和时间戳被永久记录。",
+      step4: "授权获利",
+      step4Desc: "设定条款。接受授权请求、收取版税、提取收益——全部在后台完成。",
       steps: [
         {
           step: "01",
@@ -114,6 +134,35 @@ export const translations = {
     pricing: {
       title: "简单透明的定价",
       sub: "免费开始，随成长扩展。无隐藏费用。",
+      freeTitle: "免费版",
+      freePrice: "¥0",
+      freePeriod: "永久",
+      freeDesc: "适合刚开始入门的个人创作者",
+      freeLi1: "5 张肖像上传",
+      freeLi2: "基础 KYC（自我声明）",
+      freeLi3: "社区支持",
+      freeLi4: "标准授权许可",
+      proTitle: "专业版",
+      proPrice: "¥99",
+      proPeriod: "/月",
+      proDesc: "适合专业艺术家和网红",
+      proLi1: "无限肖像上传",
+      proLi2: "完整 KYC 认证",
+      proLi3: "优先客户支持",
+      proLi4: "智能合约授权",
+      proLi5: "实时收益看板",
+      proLi6: "IPFS 永久存储",
+      contactTitle: "企业版",
+      contactPrice: "定制",
+      contactDesc: "适合代理机构和娱乐公司",
+      contactLi1: "专业版全部功能",
+      contactLi2: "多艺术家管理",
+      contactLi3: "白标证书",
+      contactLi4: "专属客户经理",
+      contactLi5: "自定义授权条款",
+      contactLi6: "API 接口访问",
+      contactUs: "联系销售",
+      proBadge: "最受欢迎",
       plans: [
         {
           name: "免费版",
@@ -166,6 +215,16 @@ export const translations = {
     // FAQ
     faq: {
       title: "常见问题",
+      q1: "什么是肖像权认证？",
+      a1: "肖像权认证将你的肖像的存在、作者身份和时间戳记录在以太坊区块链上。这创造了一个不可变的、可作为法律证据的证明，记录了肖像何时以及由谁创建。",
+      q2: "使用 PortraitPay 需要加密货币吗？",
+      a2: "不需要。我们处理所有认证的燃气费。你可以绑定中国银行账户或支付宝/微信支付进行提现。无需钱包设置。",
+      q3: "AI 侵权检测是如何工作的？",
+      a3: "我们的 AI 使用人脸识别+视觉相似度扫描网站、社交媒体和图片平台。当发现匹配度超过你的阈值时，你会收到警报和证据包。",
+      q4: "什么是 KYC？为什么需要它？",
+      a4: "KYC（了解你的客户）验证你的身份以防止欺诈。对于公众人物和名人，需要完整 KYC 才能认证肖像并访问企业授权功能。",
+      q5: "企业可以批量注册艺术家吗？",
+      a5: "可以。企业计划包括机构管理后台，可管理多位艺术家、批量上传肖像和团体授权协议。",
       items: [
         {
           q: "什么是肖像权认证？",
@@ -819,6 +878,14 @@ export const translations = {
     howItWorks: {
       title: "From portrait to protected asset in 4 steps",
       sub: "No crypto expertise required. We handle the blockchain complexity — you keep control.",
+      step1: "Upload Portrait",
+      step1Desc: "Upload a clear, high-resolution portrait. We detect faces automatically and crop for you.",
+      step2: "Complete KYC",
+      step2Desc: "Verify your identity to unlock enterprise licensing and increase your profile trust score.",
+      step3: "Certify On-Chain",
+      step3Desc: "One-click mint on Ethereum Sepolia. Your portrait hash, metadata, and timestamp are permanently recorded.",
+      step4: "License & Earn",
+      step4Desc: "Set terms. Accept license requests, collect royalties, withdraw earnings — all handled automatically.",
       steps: [
         {
           step: "01",
@@ -883,6 +950,16 @@ export const translations = {
     // FAQ
     faq: {
       title: "Frequently Asked Questions",
+      q1: "What is portrait rights certification?",
+      a1: "Portrait rights certification records your portrait's existence, authorship, and timestamp on the Ethereum blockchain. This creates an immutable, legally admissible proof of when and by whom the portrait was created.",
+      q2: "Do I need cryptocurrency to use PortraitPay?",
+      a2: "No. We handle all gas fees for certification. You can link a Chinese bank account or Alipay/WeChat Pay for withdrawals. No wallet setup required.",
+      q3: "How does the AI infringement detection work?",
+      a3: "Our AI scans websites, social media, and stock photo platforms using face recognition + visual similarity. When a match is found above your threshold, you receive an alert and evidence package.",
+      q4: "What is KYC and why do I need it?",
+      a4: "KYC (Know Your Customer) verifies your identity to prevent fraud. For public figures and celebrities, full KYC is required to certify portraits and access enterprise licensing features.",
+      q5: "Can enterprises bulk-register their artists?",
+      a5: "Yes. Enterprise plans include agency dashboards for managing multiple artists, batch portrait uploads, and group licensing agreements.",
       items: [
         {
           q: "What is portrait rights certification?",
