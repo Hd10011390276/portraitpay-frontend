@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * PATCH /api/v1/admin/enterprise/:id/review
  * 审核企业资质

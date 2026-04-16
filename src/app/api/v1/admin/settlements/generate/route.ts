@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/admin/settlements/generate
  * Admin: Trigger monthly settlement for a specific user (or all users)

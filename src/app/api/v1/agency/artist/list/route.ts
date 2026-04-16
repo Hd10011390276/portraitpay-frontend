@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/agency/artist/list
  * 获取经纪公司代理的艺人列表

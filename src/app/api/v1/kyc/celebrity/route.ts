@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST   /api/v1/kyc/celebrity        — 提交艺人申请
  * GET    /api/v1/kyc/celebrity        — 查询申请状态

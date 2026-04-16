@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/contacts — 提交联系表单
  * Body: { type, name, email, company, subject, message, enterpriseName?, intendedUse?, expectedScale?, contactPhone? }

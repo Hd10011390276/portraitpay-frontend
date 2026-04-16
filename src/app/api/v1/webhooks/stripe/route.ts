@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/webhooks/stripe
  * Handle incoming Stripe webhook events

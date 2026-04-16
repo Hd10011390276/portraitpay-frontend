@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/earnings/transactions
  * Get user's revenue transaction history (earnings detail)

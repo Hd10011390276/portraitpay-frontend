@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/kyc/webhook
  * 第三方 KYC 服务回调

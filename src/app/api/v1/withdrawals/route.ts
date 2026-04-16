@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET  /api/v1/withdrawals     - List user's withdrawal applications
  * POST /api/v1/withdrawals     - Create a new withdrawal application

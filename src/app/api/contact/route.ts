@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/contact — Simple contact form submission
  * Body: { name, email, subject, message }

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET  /api/v1/admin/withdrawals - Admin: List all withdrawal applications
  * PATCH /api/v1/admin/withdrawals/[id] (see withdrawals/[id]/route.ts for detail)

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET    /api/v1/withdrawals/[id] - Get withdrawal detail
  * PATCH  /api/v1/withdrawals/[id] - Update withdrawal (user cancel / admin approve/reject)

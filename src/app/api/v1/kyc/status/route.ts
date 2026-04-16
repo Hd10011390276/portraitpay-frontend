@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/kyc/status
  * 查询当前用户 KYC 状态

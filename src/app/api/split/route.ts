@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET  /api/split - Health check for revenue split API
  * POST /api/split - Record a revenue split transaction

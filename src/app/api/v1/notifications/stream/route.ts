@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/notifications/stream
  * SSE endpoint for real-time notification delivery.

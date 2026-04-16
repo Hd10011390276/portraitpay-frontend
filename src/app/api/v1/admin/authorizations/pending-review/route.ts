@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/admin/authorizations/pending-review
  * 获取待平台审核的授权申请列表（管理员）

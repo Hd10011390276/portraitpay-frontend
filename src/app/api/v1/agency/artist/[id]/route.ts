@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * DELETE /api/v1/agency/artist/:id
  * 移除代理艺人

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/authorizations/enterprise/apply/:id
  * 获取授权申请详情

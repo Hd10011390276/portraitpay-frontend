@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/portraits/[id]/upload
  * Generate presigned S3 upload URLs for original image + thumbnail

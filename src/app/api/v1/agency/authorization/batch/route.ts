@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/agency/authorization/batch
  * 经纪公司批量发起授权申请

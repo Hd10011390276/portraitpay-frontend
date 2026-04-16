@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * Seed API - Initialize demo account for testing
  * Only creates if demo account doesn't exist

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/authorizations/enterprise/:id/certificate
  * 下载授权证书 PDF

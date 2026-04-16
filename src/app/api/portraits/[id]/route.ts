@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/portraits/[id]     — Get portrait by ID
  * PATCH /api/portraits/[id]   — Update portrait metadata

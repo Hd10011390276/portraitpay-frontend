@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/enterprise/profile - 获取企业认证信息
  * PATCH /api/v1/enterprise/profile - 更新企业信息

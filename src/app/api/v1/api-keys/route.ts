@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * /api/v1/api-keys - API Key Management
  *

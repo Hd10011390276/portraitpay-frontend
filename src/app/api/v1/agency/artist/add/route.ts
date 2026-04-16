@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/agency/artist/add
  * 经纪公司添加代理艺人

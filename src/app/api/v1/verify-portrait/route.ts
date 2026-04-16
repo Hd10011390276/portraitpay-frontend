@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * /api/v1/verify-portrait - Verify Portrait Usage Rights
  *

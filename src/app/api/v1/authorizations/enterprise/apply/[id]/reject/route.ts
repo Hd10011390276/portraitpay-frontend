@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/authorizations/enterprise/apply/:id/reject
  * 拒绝授权申请（肖像所有者 或 平台管理员）

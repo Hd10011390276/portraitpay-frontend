@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/payments/initiate
  * Initialize a Stripe payment for license authorization

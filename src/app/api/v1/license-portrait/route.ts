@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * /api/v1/license-portrait - License a Portrait for AI/Commercial Use
  *

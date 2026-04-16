@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/earnings/summary
  * Get current user's earnings summary (as portrait owner)

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * PATCH /api/v1/notifications/[id]/read
  * Mark a single notification as read

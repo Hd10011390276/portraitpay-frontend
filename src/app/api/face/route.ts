@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/face — Face API status check
  * POST /api/face — Register a face embedding for a user

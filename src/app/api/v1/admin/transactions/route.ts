@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/admin/transactions
  * Admin: List all platform transactions with filters

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * /api/admin/contacts — 管理员获取所有联系记录
  * GET ?page=1&limit=20&status=&type=

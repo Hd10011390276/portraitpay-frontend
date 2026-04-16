@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/authorizations/enterprise/apply/:id/approve
  * 平台管理员批准授权申请

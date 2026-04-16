@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/kyc/submit
  * 提交 KYC 资料（身份证照片 + 人脸照）

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * Vercel Cron API — /api/cron/monitoring
  *

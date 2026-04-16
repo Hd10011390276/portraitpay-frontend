@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/portraits/[id]/certify
  * Full blockchain certification flow:

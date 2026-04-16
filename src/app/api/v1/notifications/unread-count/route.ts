@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/notifications/unread-count
  * Get unread notification count for current user

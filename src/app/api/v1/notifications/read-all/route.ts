@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * PATCH /api/v1/notifications/read-all
  * Mark all notifications as read for current user

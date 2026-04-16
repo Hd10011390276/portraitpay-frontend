@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET  /api/route - Health check for portrait usage request API
  * POST /api/route - Submit a portrait usage authorization request

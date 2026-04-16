@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/admin/enterprise/pending
  * 列出所有待审核企业

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET  /api/v1/withdrawals/stripe-account - Get user's Stripe account status
  * POST /api/v1/withdrawals/stripe-account - Create/refresh Stripe account onboarding link

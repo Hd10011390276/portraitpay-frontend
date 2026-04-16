@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/auth/reset-password — Reset password using token
  * Body: { token, password }

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/kyc/logs
  * 获取当前用户的 KYC 日志（分页）

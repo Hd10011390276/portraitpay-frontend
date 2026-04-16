@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * PATCH /api/v1/kyc/celebrity/review
  * 管理员审核艺人申请

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/portraits          — List portraits (filter by owner, status, category)
  * POST /api/portraits         — Create a new portrait draft

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/authorizations/owner/pending
  * 获取肖像所有者收到的待确认授权申请

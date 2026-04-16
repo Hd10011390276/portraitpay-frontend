@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/admin/dashboard
  * Admin dashboard statistics: user count, transaction volume,

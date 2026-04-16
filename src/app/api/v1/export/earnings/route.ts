@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/export/earnings
  * Export user's earnings as CSV or PDF

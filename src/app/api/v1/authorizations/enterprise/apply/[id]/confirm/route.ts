@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/authorizations/enterprise/apply/:id/confirm
  * 肖像所有者确认授权

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/v1/kyc/init
  * 初始化 KYC 认证会话

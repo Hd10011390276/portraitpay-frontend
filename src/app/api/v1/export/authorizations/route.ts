@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/export/authorizations
  * Export user's authorization records as CSV or PDF

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/authorizations/enterprise/active
  * 获取企业活跃授权列表

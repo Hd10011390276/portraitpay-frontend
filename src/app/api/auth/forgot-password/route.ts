@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/auth/forgot-password — Send password reset email
  * Body: { email }
