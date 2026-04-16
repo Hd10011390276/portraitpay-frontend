@@ -281,39 +281,6 @@ export default function HomePage() {
                onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}>{t.nav.faq}</a>
           </nav>
 
-          {/* Search */}
-          <form action="/search" method="get" className="hidden-mobile" style={{ display: "flex", alignItems: "center" }}>
-            <div style={{ position: "relative" }}>
-              <svg style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "var(--text-tertiary)", pointerEvents: "none" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                name="q"
-                placeholder={t.nav.search}
-                style={{
-                  width: "180px",
-                  padding: "8px 12px 8px 34px",
-                  borderRadius: "var(--radius-md)",
-                  border: "1px solid var(--border-default)",
-                  background: "var(--surface)",
-                  fontSize: "13px",
-                  color: "var(--text-primary)",
-                  outline: "none",
-                  transition: "border-color 150ms, box-shadow 150ms",
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = "var(--accent-primary)";
-                  e.target.style.boxShadow = "0 0 0 3px var(--accent-light)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "var(--border-default)";
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-            </div>
-          </form>
-
           {/* Right side */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <LanguageToggle />
