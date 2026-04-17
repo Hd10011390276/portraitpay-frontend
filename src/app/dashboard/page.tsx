@@ -49,7 +49,7 @@ function DashboardContent({ user }: { user: User }) {
     async function fetchDashboardData() {
       try {
         // Fetch user's portraits
-        const portraitsRes = await fetch('/api/v1/portraits');
+        const portraitsRes = await fetch('/api/portraits');
         if (portraitsRes.ok) {
           const portraitsData = await portraitsRes.json();
           const portraits = portraitsData.data?.slice(0, 5) || [];
