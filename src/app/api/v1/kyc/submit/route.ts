@@ -28,8 +28,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // TEMP BYPASS: skip KYC provider, return success directly
-    console.log("[KYC SUBMIT] TEMP BYPASS - returning success without calling provider");
+    await kycService.submit(session.userId, {
+      level: level ?? 2,
+      idCardFrontUrl,
+      idCardBackUrl,
+      faceImageUrl,
+    });
+
     return NextResponse.json({
       success: true,
       data: { message: "KYC submitted, pending review" },

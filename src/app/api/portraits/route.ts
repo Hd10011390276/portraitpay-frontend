@@ -73,11 +73,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
-    console.log("[POST /api/portraits] session:", session?.userId ? "found" : "null");
 
-    // TEMP BYPASS: use a test userId for now
-    const userId = session?.userId ?? "temp-user-id";
-    console.log("[POST /api/portraits] using userId:", userId);
+    if (!session?.userId) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     const body = await request.json();
     const parsed = CreatePortraitSchema.safeParse(body);
@@ -98,7 +100,7 @@ export async function POST(request: NextRequest) {
         category,
         tags,
         isPublic,
-        ownerId: userId,
+        ownerId: session.userId,
         status: "DRAFT",
         faceEmbedding: [],
       },
