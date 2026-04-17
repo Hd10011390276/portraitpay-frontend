@@ -22,4 +22,4 @@ jobs:
         run: npx prisma generate
 
       - name: Deploy to Vercel
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --project-name portraitpay
+        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --project-name hearty-creation
