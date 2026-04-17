@@ -37,6 +37,7 @@ function addMonths(date: Date, months: number): Date {
 
 function createKYCProvider(): KYCProviderClient {
   const provider = (process.env.KYC_PROVIDER ?? "aliyun") as KYCProvider;
+  console.log("[KYC] createKYCProvider called, provider:", provider, "KYC_ALIYUN_STUB:", process.env.KYC_ALIYUN_STUB, "KYC_TENCENT_STUB:", process.env.KYC_TENCENT_STUB);
 
   switch (provider) {
     case "aliyun":
