@@ -164,7 +164,7 @@ export async function sendEmail(opts: EmailOptions): Promise<void> {
 }
 
 export async function sendContactNotification(data: ContactEmailData): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@portraitpayai.com";
+  const adminEmail = process.env.CONTACT_TO_EMAIL ?? process.env.ADMIN_EMAIL ?? "admin@portraitpayai.com";
   const { subject, html, text } = buildContactNotificationEmail(data);
 
   await sendEmail({
