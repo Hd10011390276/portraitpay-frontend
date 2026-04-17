@@ -36,13 +36,9 @@ export interface ContactEmailData {
 }
 
 // ============================================================
-// Nodemailer transporter (reused across calls)
+// Nodemailer transporter (created fresh each time to avoid stale credentials)
 // ============================================================
-let _transporter: nodemailer.Transporter | null = null;
-
-function getTransporter(): nodemailer.Transporter {
-  if (_transporter) return _transporter;
-
+function createTransporter(): nodemailer.Transporter {
   const host = process.env.SMTP_HOST ?? "smtp.exmail.qq.com";
   const port = parseInt(process.env.SMTP_PORT ?? "465", 10);
   const user = process.env.SMTP_USER ?? "";
@@ -52,7 +48,7 @@ function getTransporter(): nodemailer.Transporter {
     throw new Error("SMTP credentials not configured: SMTP_USER / SMTP_PASS environment variables are required");
   }
 
-  _transporter = nodemailer.createTransport({
+  return nodemailer.createTransport({
     host,
     port,
     secure: port === 465, // true for 465 (SSL), false for other ports
@@ -61,15 +57,13 @@ function getTransporter(): nodemailer.Transporter {
       pass,
     },
   });
-
-  return _transporter;
 }
 
 // ============================================================
 // SMTP sender
 // ============================================================
 async function sendViaSMTP(opts: EmailOptions): Promise<void> {
-  const transporter = getTransporter();
+  const transporter = createTransporter();
 
   const from = process.env.EMAIL_FROM ?? process.env.SMTP_USER ?? "noreply@portraitpayai.com";
   const fromName = process.env.EMAIL_FROM_NAME ?? "PortraitPay AI";
