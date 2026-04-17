@@ -165,7 +165,8 @@ export default function ContactPage() {
         }}>
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
-            <img src="/logo.png" alt="PortraitPay AI" style={{ height: "32px", width: "32px", borderRadius: "8px" }} />
+            <img src="/logo.png" alt="Logo" className="logo-light" style={{ width: "32px", height: "32px", objectFit: "contain", borderRadius: "6px" }} />
+            <img src="/logo-dark.png" alt="Logo" className="logo-dark" style={{ width: "32px", height: "32px", objectFit: "contain", borderRadius: "6px" }} />
             <span style={{ fontSize: "20px", fontWeight: 700, color: "var(--text-primary)" }}>PortraitPay AI</span>
           </Link>
 
