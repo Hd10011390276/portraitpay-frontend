@@ -38,8 +38,8 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Install libssl1.1 for Prisma query engine (Alpine 3.18+ removed it from main repo)
-RUN apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.16/community openssl1.1
+# Install libssl1.1 for Prisma query engine
+RUN apk add --no-cache libssl1.1 || apk add --no-cache openssl
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
