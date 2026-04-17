@@ -12,11 +12,12 @@ function createPrismaClient() {
 
   const clientOptions: ConstructorParameters<typeof PrismaClient>[0] = { log };
 
-  // Only set datasource URL if DATABASE_URL is provided
+  // Only set datasource URL if DATABASE_URL is a non-empty string
   // This allows the build to succeed even without env vars during build time
-  if (process.env.DATABASE_URL) {
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl && dbUrl.trim().length > 0) {
     clientOptions.datasources = {
-      db: { url: process.env.DATABASE_URL },
+      db: { url: dbUrl },
     };
   }
 
