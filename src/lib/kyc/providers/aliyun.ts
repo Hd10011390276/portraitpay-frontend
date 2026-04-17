@@ -96,6 +96,7 @@ export class AliyunKYCProvider implements KYCProviderClient {
     idCardFrontUrl: string,
     idCardBackUrl: string
   ): Promise<IDCardOCRResult> {
+    console.log("[KYC STUB] submitOCR called, STUBS.enabled =", STUBS.enabled, "idCardFrontUrl:", idCardFrontUrl);
     if (STUBS.enabled) {
       return this.stubOCR();
     }
@@ -180,6 +181,7 @@ export class AliyunKYCProvider implements KYCProviderClient {
   // ─── 桩方法 ─────────────────────────────────────────────────
 
   private stubOCR(): IDCardOCRResult {
+    console.log("[KYC STUB] stubOCR called, STUBS.enabled =", STUBS.enabled);
     return {
       name: "张三",
       gender: "男",
