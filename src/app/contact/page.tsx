@@ -166,7 +166,7 @@ export default function ContactPage() {
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
             <img src="/logo.png" alt="PortraitPay AI" style={{ height: "32px", width: "32px", borderRadius: "8px" }} />
-            <span style={{ fontSize: "20px", fontWeight: 700, color: "#000" }}>PortraitPay AI</span>
+            <span style={{ fontSize: "20px", fontWeight: 700, color: "var(--text-primary)" }}>PortraitPay AI</span>
           </Link>
 
           {/* Right side */}
