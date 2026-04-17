@@ -153,7 +153,7 @@ export default function ContactPage() {
                   value={form.name}
                   onChange={(e) => update("name", e.target.value)}
                   placeholder="您的姓名"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 ${
                     errors.name ? "border-red-400 bg-red-50" : "border-gray-200"
                   }`}
                 />
@@ -169,7 +169,7 @@ export default function ContactPage() {
                   value={form.email}
                   onChange={(e) => update("email", e.target.value)}
                   placeholder="your@email.com"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 ${
                     errors.email ? "border-red-400 bg-red-50" : "border-gray-200"
                   }`}
                 />
@@ -187,7 +187,7 @@ export default function ContactPage() {
                 value={form.company}
                 onChange={(e) => update("company", e.target.value)}
                 placeholder="您所属的公司或组织"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
               />
             </div>
 
@@ -201,7 +201,7 @@ export default function ContactPage() {
                 value={form.subject}
                 onChange={(e) => update("subject", e.target.value)}
                 placeholder="简要描述您的问题"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
               />
             </div>
 
@@ -215,7 +215,7 @@ export default function ContactPage() {
                 onChange={(e) => update("message", e.target.value)}
                 placeholder="请详细描述您的问题或建议..."
                 rows={6}
-                className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
+                className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-gray-900 ${
                   errors.message ? "border-red-400 bg-red-50" : "border-gray-200"
                 }`}
               />
