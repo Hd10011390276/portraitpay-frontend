@@ -23,8 +23,8 @@ import { addMonths } from "date-fns";
 // ============================================================
 
 const STUBS = {
-  enabled: process.env.KYC_ALIYUN_STUB === "true",
-  autoApprove: process.env.KYC_ALIYUN_AUTO_APPROVE === "true",
+  enabled: process.env.KYC_ALIYUN_STUB !== "false",
+  autoApprove: process.env.KYC_ALIYUN_AUTO_APPROVE !== "false",
 };
 
 /**
