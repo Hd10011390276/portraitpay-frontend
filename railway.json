@@ -1,8 +1,5 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
-  "healthcheck": {
-    "disabled": true
-  },
   "build": {
     "builder": "NIXPACKS"
   },
