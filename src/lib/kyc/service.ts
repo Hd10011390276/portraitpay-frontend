@@ -202,6 +202,8 @@ export class KYCService {
         });
       } catch (err) {
         console.error("[KYC] OCR failed:", err);
+        console.error("[KYC] OCR failed, error message:", err instanceof Error ? err.message : String(err));
+        console.error("[KYC] OCR failed, stack:", err instanceof Error ? err.stack : "no stack");
         throw new Error("OCR识别失败，请重新上传清晰的身份证照片");
       }
     }
