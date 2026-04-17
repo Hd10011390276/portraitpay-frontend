@@ -14,6 +14,10 @@ RUN npm ci --only=production
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Receive DATABASE_URL from Railway build args (required for Prisma)
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
