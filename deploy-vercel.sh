@@ -10,6 +10,18 @@ if [ -z "$VERCEL_TOKEN" ]; then
 fi
 
 echo "Deploying to Vercel production..."
-npx vercel --prod --token $VERCEL_TOKEN
+npx vercel --prod --force --token $VERCEL_TOKEN
 
-echo "Deployment complete!"
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✅ Deployment successful!"
+    echo ""
+    echo "Please verify:"
+    echo "  1. Logo shows 'PortraitPay AI' (hard refresh: Ctrl+F5)"
+    echo "  2. Test contact form at https://portraitpayai.com/contact"
+    echo ""
+else
+    echo ""
+    echo "❌ Deployment failed!"
+    exit 1
+fi
