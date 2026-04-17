@@ -14,10 +14,6 @@ RUN npm ci --only=production
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Accept DATABASE_URL as build argument with placeholder for build-time validation
-ARG DATABASE_URL=postgresql://placeholder:placeholder@placeholder.db.railway.app:5432/railway?sslmode=require
-ENV DATABASE_URL=$DATABASE_URL
-
 COPY package.json package-lock.json ./
 RUN npm ci
 
