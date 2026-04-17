@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { level, idCardFrontUrl, idCardBackUrl, faceImageUrl } = body;
 
+    console.log("[KYC SUBMIT] userId:", session.userId, "payload:", { level, idCardFrontUrl, idCardBackUrl, faceImageUrl });
+
     if (!idCardFrontUrl) {
       return NextResponse.json(
         { success: false, error: "idCardFrontUrl is required" },
