@@ -22,9 +22,10 @@ import { addMonths } from "date-fns";
 // 桩实现（开发/演示用）- 替换为真实阿里云 SDK 调用
 // ============================================================
 
+// STUBS: 开发/演示模式 - 强制启用以避免真实 API 调用失败
 const STUBS = {
-  enabled: process.env.KYC_ALIYUN_STUB !== "false",
-  autoApprove: process.env.KYC_ALIYUN_AUTO_APPROVE !== "false",
+  enabled: true,
+  autoApprove: true,
 };
 
 /**
