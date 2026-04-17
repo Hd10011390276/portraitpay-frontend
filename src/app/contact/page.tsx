@@ -258,21 +258,6 @@ export default function ContactPage() {
             </p>
           </form>
         </div>
-
-        {/* FAQ / alternative contact */}
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { icon: "📧", title: "邮件联系", desc: "hi@portraitpayai.com" },
-            { icon: "💬", title: "微信客服", desc: "PortraitPay_AI" },
-            { icon: "📖", title: "帮助中心", desc: "常见问题解答" },
-          ].map((item) => (
-            <div key={item.title} className="bg-white rounded-xl p-5 border border-gray-100 text-center">
-              <div className="text-2xl mb-2">{item.icon}</div>
-              <p className="text-sm font-medium text-gray-800">{item.title}</p>
-              <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
-            </div>
-          ))}
-        </div>
       </main>
     </div>
   );
