@@ -262,6 +262,47 @@ export const translations = {
       terms: "服务条款",
       contact: "联系我们",
     },
+    // Contact page
+    contact: {
+      title: "联系我们",
+      subtitle: "有任何问题或建议？欢迎填写表单，我们的团队会在 1-3 个工作日内与您联系。",
+      enterpriseContact: "企业入驻咨询",
+      success: {
+        title: "提交成功！",
+        message: "感谢您的留言，我们的团队会在 1-3 个工作日内与您联系。",
+        backHome: "返回首页",
+        continue: "继续留言",
+      },
+      form: {
+        name: "姓名",
+        namePlaceholder: "您的姓名",
+        email: "邮箱",
+        emailPlaceholder: "your@email.com",
+        company: "公司 / 组织",
+        companyPlaceholder: "您所属的公司或组织",
+        subject: "主题",
+        subjectPlaceholder: "简要描述您的问题",
+        message: "留言内容",
+        messagePlaceholder: "请详细描述您的问题或建议...",
+        submit: "提交留言",
+        submitting: "提交中...",
+        privacy: "提交即表示您同意我们的",
+        privacyPolicy: "隐私政策",
+      },
+      validation: {
+        nameRequired: "请填写姓名",
+        emailRequired: "请填写邮箱",
+        emailInvalid: "邮箱格式不正确",
+        messageRequired: "请填写留言内容",
+        messageTooShort: "留言至少10个字符",
+      },
+    },
+    nav: {
+      home: "返回首页",
+    },
+    common: {
+      optional: "可选",
+    },
     // Auth / Login
     auth: {
       welcomeBack: "欢迎回来",
@@ -1108,6 +1149,47 @@ export const translations = {
       privacy: "Privacy Policy",
       terms: "Terms of Service",
       contact: "Contact Us",
+    },
+    // Contact page
+    contact: {
+      title: "Contact Us",
+      subtitle: "Have questions or suggestions? Fill out the form and our team will get back to you within 1-3 business days.",
+      enterpriseContact: "Enterprise Inquiry",
+      success: {
+        title: "Submitted Successfully!",
+        message: "Thank you for your message. Our team will get back to you within 1-3 business days.",
+        backHome: "Back to Home",
+        continue: "Send Another Message",
+      },
+      form: {
+        name: "Name",
+        namePlaceholder: "Your name",
+        email: "Email",
+        emailPlaceholder: "your@email.com",
+        company: "Company / Organization",
+        companyPlaceholder: "Your company or organization",
+        subject: "Subject",
+        subjectPlaceholder: "Briefly describe your issue",
+        message: "Message",
+        messagePlaceholder: "Please describe your question or suggestion in detail...",
+        submit: "Submit",
+        submitting: "Submitting...",
+        privacy: "By submitting, you agree to our",
+        privacyPolicy: "Privacy Policy",
+      },
+      validation: {
+        nameRequired: "Please enter your name",
+        emailRequired: "Please enter your email",
+        emailInvalid: "Invalid email format",
+        messageRequired: "Please enter your message",
+        messageTooShort: "Message must be at least 10 characters",
+      },
+    },
+    nav: {
+      home: "Back to Home",
+    },
+    common: {
+      optional: "Optional",
     },
     // Auth / Login
     auth: {

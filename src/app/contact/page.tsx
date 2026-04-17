@@ -1,10 +1,14 @@
 /**
  * /contact — 联系表单页面
+ * UI风格与主页一致，支持日间/夜间模式和中英文切换
  */
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface FormData {
   name: string;
@@ -21,6 +25,7 @@ interface FieldError {
 }
 
 export default function ContactPage() {
+  const { t } = useLanguage();
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
@@ -35,11 +40,11 @@ export default function ContactPage() {
 
   function validate(): boolean {
     const e: FieldError = {};
-    if (!form.name.trim()) e.name = "请填写姓名";
-    if (!form.email.trim()) e.email = "请填写邮箱";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "邮箱格式不正确";
-    if (!form.message.trim()) e.message = "请填写留言内容";
-    else if (form.message.trim().length < 10) e.message = "留言至少10个字符";
+    if (!form.name.trim()) e.name = t.contact.validation.nameRequired || "请填写姓名";
+    if (!form.email.trim()) e.email = t.contact.validation.emailRequired || "请填写邮箱";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = t.contact.validation.emailInvalid || "邮箱格式不正确";
+    if (!form.message.trim()) e.message = t.contact.validation.messageRequired || "请填写留言内容";
+    else if (form.message.trim().length < 10) e.message = t.contact.validation.messageTooShort || "留言至少10个字符";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -79,28 +84,58 @@ export default function ContactPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="text-5xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">提交成功！</h2>
-          <p className="text-gray-500 mb-6">
-            感谢您的留言，我们的团队会在 <strong>1-3 个工作日</strong>内与您联系。
+      <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+        <div style={{
+          maxWidth: "480px",
+          width: "100%",
+          background: "var(--bg-secondary)",
+          borderRadius: "var(--radius-xl)",
+          boxShadow: "var(--shadow-lg)",
+          padding: "32px",
+          textAlign: "center",
+        }}>
+          <div style={{ fontSize: "48px", marginBottom: "16px" }}>✅</div>
+          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>
+            {t.contact.success?.title || "提交成功！"}
+          </h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "24px" }}>
+            {t.contact.success?.message || "感谢您的留言，我们的团队会在 1-3 个工作日内与您联系。"}
           </p>
-          <div className="flex flex-col gap-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <Link
               href="/"
-              className="block w-full py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition"
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "12px",
+                background: "var(--accent-primary)",
+                color: "#fff",
+                borderRadius: "var(--radius-lg)",
+                fontWeight: 500,
+                textAlign: "center",
+                textDecoration: "none",
+                transition: "background 0.2s",
+              }}
             >
-              返回首页
+              {t.contact.success?.backHome || "返回首页"}
             </Link>
             <button
               onClick={() => {
                 setSuccess(false);
                 setForm({ name: "", email: "", company: "", subject: "", message: "" });
               }}
-              className="block w-full py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition"
+              style={{
+                width: "100%",
+                padding: "12px",
+                background: "transparent",
+                border: "1px solid var(--border-color)",
+                color: "var(--text-primary)",
+                borderRadius: "var(--radius-lg)",
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
             >
-              继续留言
+              {t.contact.success?.continue || "继续留言"}
             </button>
           </div>
         </div>
@@ -109,130 +144,222 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="PortraitPay AI" className="h-8 w-8 rounded-lg" />
-            <span className="text-xl font-bold text-purple-600">PortraitPay AI</span>
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
+      {/* Header - 与主页一致 */}
+      <header style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 30,
+        background: "var(--bg-secondary)",
+        backdropFilter: "blur(12px)",
+        borderBottom: "1px solid var(--border-color)",
+      }}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          height: "64px",
+          padding: "0 24px",
+          maxWidth: "1152px",
+          margin: "0 auto",
+        }}>
+          {/* Logo */}
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
+            <img src="/logo.png" alt="PortraitPay AI" style={{ height: "32px", width: "32px", borderRadius: "8px" }} />
+            <span style={{ fontSize: "20px", fontWeight: 700, color: "#000" }}>PortraitPay AI</span>
           </Link>
-          <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 transition">
-            ← 返回首页
-          </Link>
+
+          {/* Right side */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <LanguageToggle />
+            <ThemeToggle />
+            <Link href="/" style={{ fontSize: "14px", color: "var(--text-secondary)", textDecoration: "none" }}>
+              ← {t.nav?.home || "返回首页"}
+            </Link>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-12">
+      <main style={{ maxWidth: "768px", margin: "0 auto", padding: "48px 24px" }}>
         {/* Page header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">联系我们</h1>
-          <p className="text-gray-500">
-            有任何问题或建议？欢迎填写表单，我们的团队会在 1-3 个工作日内与您联系。
+        <div style={{ marginBottom: "40px" }}>
+          <h1 style={{ fontSize: "30px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>
+            {t.contact.title || "联系我们"}
+          </h1>
+          <p style={{ color: "var(--text-secondary)" }}>
+            {t.contact.subtitle || "有任何问题或建议？欢迎填写表单，我们的团队会在 1-3 个工作日内与您联系。"}
           </p>
-          <div className="flex gap-3 mt-4">
+          <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
             <Link
               href="/enterprise/contact"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 transition"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 16px",
+                background: "var(--accent-light)",
+                color: "var(--accent-primary)",
+                borderRadius: "var(--radius-lg)",
+                fontSize: "14px",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "background 0.2s",
+              }}
             >
-              🏢 企业入驻咨询 →
+              🏢 {t.contact.enterpriseContact || "企业入驻咨询"} →
             </Link>
           </div>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div style={{
+          background: "var(--bg-secondary)",
+          borderRadius: "var(--radius-xl)",
+          boxShadow: "var(--shadow-sm)",
+          border: "1px solid var(--border-color)",
+          padding: "32px",
+        }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             {/* Name + Email row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  姓名 <span className="text-red-500">*</span>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)", marginBottom: "6px" }}>
+                  {t.contact.form?.name || "姓名"} <span style={{ color: "red" }}>*</span>
                 </label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => update("name", e.target.value)}
-                  placeholder="您的姓名"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 ${
-                    errors.name ? "border-red-400 bg-red-50" : "border-gray-200"
-                  }`}
+                  placeholder={t.contact.form?.namePlaceholder || "您的姓名"}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    border: `1px solid ${errors.name ? "#ef4444" : "var(--border-color)"}`,
+                    borderRadius: "var(--radius-lg)",
+                    fontSize: "14px",
+                    background: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                    outline: "none",
+                    transition: "border-color 0.2s, box-shadow 0.2s",
+                  }}
                 />
-                {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+                {errors.name && <p style={{ marginTop: "4px", fontSize: "12px", color: "#ef4444" }}>{errors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  邮箱 <span className="text-red-500">*</span>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)", marginBottom: "6px" }}>
+                  {t.contact.form?.email || "邮箱"} <span style={{ color: "red" }}>*</span>
                 </label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => update("email", e.target.value)}
                   placeholder="your@email.com"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 ${
-                    errors.email ? "border-red-400 bg-red-50" : "border-gray-200"
-                  }`}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    border: `1px solid ${errors.email ? "#ef4444" : "var(--border-color)"}`,
+                    borderRadius: "var(--radius-lg)",
+                    fontSize: "14px",
+                    background: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                    outline: "none",
+                    transition: "border-color 0.2s, box-shadow 0.2s",
+                  }}
                 />
-                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
+                {errors.email && <p style={{ marginTop: "4px", fontSize: "12px", color: "#ef4444" }}>{errors.email}</p>}
               </div>
             </div>
 
             {/* Company */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                公司 / 组织 <span className="text-gray-400 font-normal">(可选)</span>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)", marginBottom: "6px" }}>
+                {t.contact.form?.company || "公司 / 组织"} <span style={{ color: "var(--text-secondary)", fontWeight: 400 }}>({t.common?.optional || "可选"})</span>
               </label>
               <input
                 type="text"
                 value={form.company}
                 onChange={(e) => update("company", e.target.value)}
-                placeholder="您所属的公司或组织"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                placeholder={t.contact.form?.companyPlaceholder || "您所属的公司或组织"}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "var(--radius-lg)",
+                  fontSize: "14px",
+                  background: "var(--bg-primary)",
+                  color: "var(--text-primary)",
+                  outline: "none",
+                  transition: "border-color 0.2s, box-shadow 0.2s",
+                }}
               />
             </div>
 
             {/* Subject */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                主题 <span className="text-gray-400 font-normal">(可选)</span>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)", marginBottom: "6px" }}>
+                {t.contact.form?.subject || "主题"} <span style={{ color: "var(--text-secondary)", fontWeight: 400 }}>({t.common?.optional || "可选"})</span>
               </label>
               <input
                 type="text"
                 value={form.subject}
                 onChange={(e) => update("subject", e.target.value)}
-                placeholder="简要描述您的问题"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                placeholder={t.contact.form?.subjectPlaceholder || "简要描述您的问题"}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "var(--radius-lg)",
+                  fontSize: "14px",
+                  background: "var(--bg-primary)",
+                  color: "var(--text-primary)",
+                  outline: "none",
+                  transition: "border-color 0.2s, box-shadow 0.2s",
+                }}
               />
             </div>
 
             {/* Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                留言内容 <span className="text-red-500">*</span>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)", marginBottom: "6px" }}>
+                {t.contact.form?.message || "留言内容"} <span style={{ color: "red" }}>*</span>
               </label>
               <textarea
                 value={form.message}
                 onChange={(e) => update("message", e.target.value)}
-                placeholder="请详细描述您的问题或建议..."
+                placeholder={t.contact.form?.messagePlaceholder || "请详细描述您的问题或建议..."}
                 rows={6}
-                className={`w-full px-4 py-3 border rounded-xl text-sm transition focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-gray-900 ${
-                  errors.message ? "border-red-400 bg-red-50" : "border-gray-200"
-                }`}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  border: `1px solid ${errors.message ? "#ef4444" : "var(--border-color)"}`,
+                  borderRadius: "var(--radius-lg)",
+                  fontSize: "14px",
+                  background: "var(--bg-primary)",
+                  color: "var(--text-primary)",
+                  outline: "none",
+                  resize: "none",
+                  transition: "border-color 0.2s, box-shadow 0.2s",
+                }}
               />
-              <div className="flex justify-between items-center mt-1">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "4px" }}>
                 {errors.message ? (
-                  <p className="text-xs text-red-500">{errors.message}</p>
-                ) : (
-                  <span />
-                )}
-                <span className="text-xs text-gray-400">{form.message.length}/5000</span>
+                  <p style={{ fontSize: "12px", color: "#ef4444" }}>{errors.message}</p>
+                ) : <span />}
+                <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{form.message.length}/5000</span>
               </div>
             </div>
 
             {/* Server error */}
             {serverError && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+              <div style={{
+                padding: "16px",
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                borderRadius: "var(--radius-lg)",
+                fontSize: "14px",
+                color: "#dc2626",
+              }}>
                 {serverError}
               </div>
             )}
@@ -241,21 +368,46 @@ export default function ContactPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3.5 bg-purple-600 text-white rounded-xl font-semibold text-sm hover:bg-purple-700 disabled:opacity-60 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+              style={{
+                width: "100%",
+                padding: "14px",
+                background: "var(--accent-primary)",
+                color: "#fff",
+                borderRadius: "var(--radius-lg)",
+                fontWeight: 600,
+                fontSize: "14px",
+                border: "none",
+                cursor: submitting ? "not-allowed" : "pointer",
+                opacity: submitting ? 0.6 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                transition: "background 0.2s",
+              }}
             >
               {submitting ? (
                 <>
-                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                  提交中...
+                  <span style={{
+                    width: "16px",
+                    height: "16px",
+                    border: "2px solid #fff",
+                    borderTopColor: "transparent",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                  }} />
+                  {t.contact.form?.submitting || "提交中..."}
                 </>
               ) : (
-                "提交留言"
+                t.contact.form?.submit || "提交留言"
               )}
             </button>
 
-            <p className="text-center text-xs text-gray-400">
-              提交即表示您同意我们的{" "}
-              <a href="/privacy" className="text-purple-600 hover:underline">隐私政策</a>
+            <p style={{ textAlign: "center", fontSize: "12px", color: "var(--text-secondary)" }}>
+              {t.contact.form?.privacy || "提交即表示您同意我们的"}{" "}
+              <a href="/privacy" style={{ color: "var(--accent-primary)", textDecoration: "none" }}>
+                {t.contact.form?.privacyPolicy || "隐私政策"}
+              </a>
             </p>
           </form>
         </div>
