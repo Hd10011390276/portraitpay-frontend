@@ -664,6 +664,11 @@ export const translations = {
       estimatedTime: "预计 1-3 个工作日",
       certificationLevel: "认证等级",
       basicKyc: "基础 KYC",
+      idCard: "居民身份证",
+      passport: "护照",
+      hkPass: "港澳通行证",
+      twPass: "台湾居民证",
+      docSupported: "支持",
     },
     // Withdraw
     withdraw: {
@@ -1639,6 +1644,11 @@ export const translations = {
       estimatedTime: "Estimated 1-3 business days",
       certificationLevel: "Certification Level",
       basicKyc: "Basic KYC",
+      idCard: "Chinese ID Card",
+      passport: "Passport",
+      hkPass: "Hong Kong-Macau Pass",
+      twPass: "Taiwan Resident Pass",
+      docSupported: "Supported",
     },
     // Withdraw
     withdraw: {

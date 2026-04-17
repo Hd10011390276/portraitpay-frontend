@@ -56,6 +56,7 @@ export default function KYCPage() {
     try {
       const res = await fetch("/api/v1/kyc/submit", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           level: 2,
@@ -132,10 +133,10 @@ export default function KYCPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{t.kyc.documentType}</label>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { value: "id_card", label: "居民身份证", icon: "🪪" },
-                  { value: "passport", label: "护照", icon: "🌍" },
-                  { value: "hk_pass", label: "港澳通行证", icon: "🛂" },
-                  { value: "tw_pass", label: "台湾居民证", icon: "✈️" },
+                  { value: "id_card", label: t.kyc.idCard, icon: "🪪" },
+                  { value: "passport", label: t.kyc.passport, icon: "🌍" },
+                  { value: "hk_pass", label: t.kyc.hkPass, icon: "🛂" },
+                  { value: "tw_pass", label: t.kyc.twPass, icon: "✈️" },
                 ].map((opt) => (
                   <button
                     key={opt.value}
@@ -149,7 +150,7 @@ export default function KYCPage() {
                     <span className="text-2xl">{opt.icon}</span>
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{opt.label}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">支持</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t.kyc.docSupported}</p>
                     </div>
                   </button>
                 ))}
