@@ -14,9 +14,9 @@ RUN npm ci --only=production
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Receive DATABASE_URL from Railway build args (required for Prisma)
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
+# Set placeholder DATABASE_URL for build time (Prisma requires it)
+# At runtime, Railway will inject the real DATABASE_URL
+ENV DATABASE_URL="postgresql://build:build@build.railway.app:5432/build?sslmode=require"
 
 COPY package.json package-lock.json ./
 RUN npm ci
