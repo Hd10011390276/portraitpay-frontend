@@ -44,7 +44,10 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-purple-600">🎭 PortraitPay AI</Link>
+          <Link href="/" className="flex items-center gap-2 justify-center">
+            <img src="/logo.png" alt="PortraitPay AI" className="h-10 w-10 rounded-lg" />
+            <span className="text-2xl font-bold text-purple-600">PortraitPay AI</span>
+          </Link>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           {submitted ? (
