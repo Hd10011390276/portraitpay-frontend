@@ -4,6 +4,8 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
 
+  // Output standalone for Docker/Railway deployment
+  output: 'standalone',
 
   // Image optimization
   images: {
