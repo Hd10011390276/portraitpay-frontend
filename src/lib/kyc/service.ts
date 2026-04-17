@@ -184,11 +184,13 @@ export class KYCService {
 
     // 1) OCR 识别
     if (payload.idCardFrontUrl) {
+      console.log("[KYC] About to call submitOCR, provider:", providerName);
       try {
         ocrResult = await this.provider.submitOCR(
           payload.idCardFrontUrl,
           payload.idCardBackUrl ?? payload.idCardFrontUrl
         );
+        console.log("[KYC] submitOCR success, result:", ocrResult);
         await writeKYLog({
           userId,
           provider: providerName,
