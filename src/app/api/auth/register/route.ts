@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Platform wallet address — used for blockchain certification gas fees
-    const PLATFORM_WALLET = "0xABE2DeA4E422E83076d9025622e5B45Ad7E163dF";
+    const PLATFORM_WALLET = process.env.PLATFORM_WALLET_ADDRESS ?? "0xABE2DeA4E422E83076d9025622e5B45Ad7E163dF";
 
     const user = await prisma.user.create({
       data: {
