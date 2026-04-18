@@ -505,6 +505,59 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── Team ──────────────────────────────────────────── */}
+        <section id="team" style={{ background: "var(--bg-secondary)", padding: "96px 0" }}>
+          <div className="container">
+            <div style={{ textAlign: "center", marginBottom: "64px" }}>
+              <p className="text-overline" style={{ marginBottom: "12px" }}>{t.team.title}</p>
+              <h2 style={{ fontSize: "var(--text-h2)", fontWeight: "700", color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "16px" }}>{t.team.subtitle}</h2>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px", maxWidth: "900px", margin: "0 auto" }}>
+              {/* Team Member Cards */}
+              {[
+                { role: t.team.founder, icon: "👤" },
+                { role: t.team.lawyer, icon: "⚖️" },
+                { role: t.team.tech, icon: "💻" },
+              ].map((member, i) => (
+                <div key={i} style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border-default)",
+                  borderRadius: "var(--radius-xl)",
+                  padding: "32px",
+                  textAlign: "center",
+                }}>
+                  <div style={{
+                    width: "72px",
+                    height: "72px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, var(--accent-light), var(--accent-violet-light))",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "32px",
+                    margin: "0 auto 20px",
+                  }}>
+                    {member.icon}
+                  </div>
+                  <h3 style={{ fontSize: "18px", fontWeight: "600", color: "var(--text-primary)", marginBottom: "8px" }}>{member.role}</h3>
+                  <span style={{
+                    display: "inline-block",
+                    padding: "4px 12px",
+                    borderRadius: "var(--radius-full)",
+                    background: "var(--accent-light)",
+                    color: "var(--accent-primary)",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                  }}>
+                    {t.team.status}
+                  </span>
+                  <p style={{ fontSize: "13px", color: "var(--text-tertiary)", marginTop: "8px" }}>{t.team.statusDesc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── CTA ────────────────────────────────────────────── */}
         <section style={{
           background: "var(--bg-secondary)",

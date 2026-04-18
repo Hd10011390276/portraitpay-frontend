@@ -255,6 +255,16 @@ export const translations = {
       cta1: "立即免费开始",
       cta2: "登录",
     },
+    // Team
+    team: {
+      title: "核心团队",
+      subtitle: "我们是一个专注于区块链技术和AI安全的专业团队",
+      founder: "创始人",
+      lawyer: "律师楼合作方",
+      tech: "技术团队",
+      status: "待填",
+      statusDesc: "正在招募中",
+    },
     // Footer
     footer: {
       copyright: "© 2026 PortraitPay AI. 保留所有权利。",
@@ -1219,6 +1229,16 @@ export const translations = {
       sub: "Join thousands of creators today and protect your image identity on the blockchain.",
       cta1: "Start Free Now",
       cta2: "Sign In",
+    },
+    // Team
+    team: {
+      title: "Our Team",
+      subtitle: "We are a professional team focused on blockchain technology and AI security",
+      founder: "Founder",
+      lawyer: "Law Firm Partner",
+      tech: "Tech Team",
+      status: "To Be Announced",
+      statusDesc: "Recruiting",
     },
     // Footer
     footer: {

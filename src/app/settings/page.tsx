@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useToast, ToastProvider } from "@/components/ui/Toast";
 import { DashboardShell } from "@/components/layout/DashboardShell";
@@ -9,10 +9,24 @@ import { useLanguage } from "@/context/LanguageContext";
 function SettingsContent() {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const [user, setUser] = useState<{ id: string; email: string; name: string | null } | null>(null);
+  const [checking, setChecking] = useState(true);
   const [saving, setSaving] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [infringementAlerts, setInfringementAlerts] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
+
+  useEffect(() => {
+    const raw = localStorage.getItem("pp_user");
+    if (raw) {
+      try {
+        setUser(JSON.parse(raw));
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+      }
+    }
+    setChecking(false);
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +43,14 @@ function SettingsContent() {
       toast({ type: "error", title: t.settings.deleteAccountError || "Account deletion requires contacting support" });
     }
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <DashboardShell
@@ -97,7 +119,8 @@ function SettingsContent() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t.settings.emailAddress}</label>
                 <input
                   type="email"
-                  defaultValue="user@example.com"
+                  id="email"
+                  defaultValue={user?.email || ""}
                   className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
               </div>
@@ -105,7 +128,9 @@ function SettingsContent() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t.settings.displayName}</label>
                 <input
                   type="text"
-                  defaultValue="用户名"
+                  id="name"
+                  defaultValue={user?.name || ""}
+                  placeholder={t.settings.namePlaceholder || "设置您的显示名称"}
                   className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
               </div>
