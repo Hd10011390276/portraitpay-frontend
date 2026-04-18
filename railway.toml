@@ -1,5 +1,5 @@
-[build.builder]
-  name = "docker"
+[build]
+builder = "dockerfile"
 
 [deploy]
-  numReplicas = 1
+numReplicas = 1
