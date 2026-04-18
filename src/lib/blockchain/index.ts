@@ -88,9 +88,13 @@ export async function certifyPortrait(
   console.log(`  IPFS CID: ${ipfsCid}`);
   console.log(`  Image Hash: ${imageHash}`);
 
+  // Estimate gas with 20% buffer to avoid revert (actual gas ~230783)
+  const estimatedGas = await contract.certifyPortrait.estimateGas(ipfsCid, imageHashBytes32);
+  const gasLimit = (estimatedGas * 120n) / 100n;
+
   // Send transaction
   const tx = await contract.certifyPortrait(ipfsCid, imageHashBytes32, {
-    gasLimit: 200000,
+    gasLimit,
   });
 
   console.log(`[Blockchain] Tx submitted: ${tx.hash}`);

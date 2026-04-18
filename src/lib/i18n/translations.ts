@@ -413,6 +413,11 @@ export const translations = {
       success: "上传成功",
       error: "上传失败，请重试",
       supported: "支持 JPG、PNG、WebP 格式",
+      certifyingBlockchain: "🔗 正在区块链认证...",
+      certifySuccess: "✅ 区块链认证完成！",
+      certifySuccessDesc: "你的肖像已在区块链上获得认证，永久不可篡改",
+      certifyDeferred: "⚠️ 认证已延期",
+      certifyDeferredDesc: "肖像已保存，认证失败请稍后在详情页重试",
     },
     // Legal / Privacy
     legal: {
@@ -1484,6 +1489,11 @@ export const translations = {
       success: "Upload successful",
       error: "Upload failed, please try again",
       supported: "Supports JPG, PNG, WebP formats",
+      certifyingBlockchain: "🔗 Certifying on blockchain...",
+      certifySuccess: "✅ Blockchain certified!",
+      certifySuccessDesc: "Your portrait is now permanently certified on the blockchain",
+      certifyDeferred: "⚠️ Certification deferred",
+      certifyDeferredDesc: "Portrait saved. You can retry certification from the detail page",
     },
     // Legal / Privacy
     legal: {

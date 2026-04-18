@@ -14,7 +14,7 @@ import { DashboardShell } from "@/components/layout/DashboardShell";
 import { useLanguage } from "@/context/LanguageContext";
 import { cosineSimilarity, descriptorToArray } from "@/lib/face";
 
-type Stage = "form" | "upload" | "done";
+type Stage = "form" | "upload" | "certifying" | "certify_done" | "done";
 
 const DB_NAME = "portraitpay-local";
 const DB_VERSION = 1;
@@ -63,6 +63,7 @@ export default function UploadPortraitPage() {
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [imageHash, setImageHash] = useState<string | null>(null);
   const [progress, setProgress] = useState("");
+  const [certifyResult, setCertifyResult] = useState<{ success: boolean; error?: string; data?: any } | null>(null);
 
   // ID card state
   const [idCardFront, setIdCardFront] = useState<File | null>(null);
@@ -235,10 +236,36 @@ export default function UploadPortraitPage() {
       await savePortraitLocally(id, croppedFile!, idCardFront);
 
       setProgress("✅ Portrait saved locally!");
-      setStage("done");
+
+      // ── Auto-certify on blockchain ───────────────────────────
+      setStage("certifying");
+      setProgress(t.upload?.certifyingBlockchain || "🔗 Certifying on blockchain...");
+
+      let result: { success: boolean; error?: string; data?: any } = { success: false };
+      try {
+        const certifyRes = await fetch(`/api/portraits/${id}/certify`, { method: "POST" });
+        result = await certifyRes.json();
+        setCertifyResult(result);
+      } catch (certErr) {
+        result = { success: false, error: (certErr as Error).message };
+        setCertifyResult(result);
+      }
+
+      if (result.success) {
+        setProgress(
+          `${t.upload?.certifySuccess || "✅ Blockchain certified!"} Tx: ${result.data?.blockchainTxHash?.slice(0, 10)}...`
+        );
+        setStage("certify_done");
+      } else {
+        // Certification failed but portrait was saved — allow retry from detail page
+        setProgress(
+          `${t.upload?.certifySkipped || "⚠️ Certification deferred"}: ${result.error ?? "unknown"}`
+        );
+        setStage("certify_done");
+      }
 
       // Redirect after short delay
-      setTimeout(() => router.push("/portraits"), 1500);
+      setTimeout(() => router.push("/portraits"), 3000);
     } catch (err) {
       console.error("Upload failed:", err);
       setProgress(`❌ Error: ${(err as Error).message}`);
@@ -249,7 +276,33 @@ export default function UploadPortraitPage() {
   return (
     <DashboardShell title={t.upload?.title || "上传肖像"} subtitle={t.upload?.subtitle || "上传并认证你的肖像"}>
       <div className="max-w-3xl">
-        {stage === "done" ? (
+        {stage === "certifying" || stage === "certify_done" ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">{stage === "certifying" ? "🔗" : "✅"}</div>
+            <h2 className="text-xl font-semibold mb-2">
+              {stage === "certifying"
+                ? (t.upload?.certifyingBlockchain || "区块链认证中...")
+                : (certifyResult?.success
+                  ? (t.upload?.certifySuccess || "区块链认证完成！")
+                  : (t.upload?.certifyDeferred || "肖像已保存，认证稍后进行"))}
+            </h2>
+            <p className="text-gray-500">
+              {stage === "certifying"
+                ? (t.upload?.certifyingDesc || "正在将肖像元数据上传至 IPFS 并写入区块链...")
+                : certifyResult?.success
+                  ? (t.upload?.certifySuccessDesc || "你的肖像已在区块链上获得认证，永久不可篡改")
+                  : (t.upload?.certifyDeferredDesc || "认证失败，请稍后在详情页重试")}
+            </p>
+            {progress && (
+              <p className="mt-4 text-sm text-gray-400 font-mono">{progress}</p>
+            )}
+            {stage === "certifying" && (
+              <div className="mt-6 flex justify-center">
+                <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full" />
+              </div>
+            )}
+          </div>
+        ) : stage === "done" ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">✅</div>
             <h2 className="text-xl font-semibold mb-2">肖像已保存</h2>
