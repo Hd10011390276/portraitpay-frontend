@@ -112,8 +112,10 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     console.error("[REGISTER_ERROR]", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[REGISTER_ERROR] Details:", message);
     return NextResponse.json(
-      { success: false, message: "服务器错误，请稍后重试" },
+      { success: false, message: "服务器错误，请稍后重试", debug: message },
       { status: 500 }
     );
   }
