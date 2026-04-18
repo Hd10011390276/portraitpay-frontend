@@ -168,7 +168,7 @@ export default function InfringementsPage() {
                         </span>
                         <span className="text-xs text-gray-400 dark:text-gray-500">{report.source}</span>
                       </div>
-                      <p className="truncate font-medium text-gray-900 dark:text-white">{report.portrait?.title ?? t.portraits.details}</p>
+                      <p className="truncate font-medium text-gray-900 dark:text-white">{report.portrait?.title ?? t.portraits.detail.details}</p>
                       <p className="mt-0.5 truncate text-sm text-gray-500 dark:text-gray-400">{report.description}</p>
                       <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                         {new Date(report.createdAt).toLocaleString()} &nbsp;|&nbsp; ID: {report.id.slice(0, 8)}...

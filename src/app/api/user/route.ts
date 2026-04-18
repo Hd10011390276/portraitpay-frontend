@@ -19,6 +19,7 @@ const UpdateUserSchema = z.object({
   phone: z.string().max(20).optional(),
   name: z.string().min(1).max(100).optional(),
   image: z.string().url().optional(),
+  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid Ethereum address").optional(),
 });
 
 // Fields to exclude from response

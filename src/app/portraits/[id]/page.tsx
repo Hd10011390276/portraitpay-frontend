@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { getIpfsGatewayUrl } from "@/lib/ipfs";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface PortraitDetail {
   id: string;
@@ -37,6 +38,7 @@ interface PortraitDetail {
 }
 
 export default function PortraitDetailPage() {
+  const { t } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -59,18 +61,17 @@ export default function PortraitDetailPage() {
   }, [id, router]);
 
   const handleCertify = async () => {
-    if (!confirm("Certify this portrait on Ethereum Sepolia? This will upload to IPFS and mint an on-chain transaction.")) return;
+    if (!confirm(tc.certifyConfirm)) return;
 
     setCertifying(true);
-    setCertifyMsg("Starting certification...");
+    setCertifyMsg(tc.certifyStepHash);
 
     try {
       const steps = [
-        "Computing image hash...",
-        "Uploading image to IPFS...",
-        "Uploading metadata to IPFS...",
-        "Minting on Sepolia (confirming wallet)...⌛",
-        "Waiting for block confirmation...",
+        tc.certifyStepHash,
+        tc.certifyStepUploadMeta,
+        tc.certifyStepMint,
+        tc.certifyStepConfirm,
       ];
 
       let stepIdx = 0;
@@ -83,12 +84,12 @@ export default function PortraitDetailPage() {
 
       const json = await res.json();
       if (!json.success) {
-        setCertifyMsg(`❌ Failed: ${json.error}`);
+        setCertifyMsg(`${tc.certifyFailed}${json.error}`);
         setTimeout(() => setCertifyMsg(""), 5000);
         return;
       }
 
-      setCertifyMsg(`✅ Certified! Block #${json.data.blockNumber}`);
+      setCertifyMsg(`${tc.certifySuccess}${json.data.blockNumber}`);
 
       // Refresh portrait
       const refreshed = await fetch(`/api/portraits/${id}`).then((r) => r.json());
@@ -96,7 +97,7 @@ export default function PortraitDetailPage() {
 
       setTimeout(() => setCertifyMsg(""), 5000);
     } catch (err) {
-      setCertifyMsg("❌ Network error. Please try again.");
+      setCertifyMsg(tc.certifyNetworkError);
       setTimeout(() => setCertifyMsg(""), 5000);
     } finally {
       setCertifying(false);
@@ -104,7 +105,7 @@ export default function PortraitDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Archive this portrait? It will be hidden but not permanently deleted.")) return;
+    if (!confirm(tc.archiveConfirm)) return;
 
     setDeleting(true);
     try {
@@ -126,6 +127,7 @@ export default function PortraitDetailPage() {
   if (!portrait) return null;
 
   const ipfsGatewayUrl = portrait.ipfsCid ? getIpfsGatewayUrl(portrait.ipfsCid) : null;
+  const tc = t.portraits.detail;
 
   return (
     <DashboardShell
@@ -133,7 +135,7 @@ export default function PortraitDetailPage() {
       subtitle={`Status: ${portrait.status}`}
       action={
         <Link href="/portraits" className="text-gray-500 hover:text-gray-700 text-sm">
-          ← Back
+          ← {tc.back}
         </Link>
       }
     >
@@ -161,16 +163,16 @@ export default function PortraitDetailPage() {
           {portrait.blockchainTxHash && (
             <div className="mt-4 bg-white dark:bg-gray-900 rounded-xl border border-purple-200 dark:border-purple-800 p-5">
               <h3 className="font-semibold text-purple-900 dark:text-purple-300 mb-3 flex items-center gap-2">
-                🔗 Blockchain Certificate
+                {tc.blockchainCertificate}
               </h3>
 
               <div className="space-y-2 text-sm">
                 <div className="flex gap-2">
-                  <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">Network</span>
+                  <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">{tc.network}</span>
                   <span className="text-gray-900 dark:text-white font-medium">{portrait.blockchainNetwork?.toUpperCase() ?? "Sepolia"}</span>
                 </div>
                 <div className="flex gap-2">
-                  <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">Tx Hash</span>
+                  <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">{tc.txHash}</span>
                   <a
                     href={`https://sepolia.etherscan.io/tx/${portrait.blockchainTxHash}`}
                     target="_blank"
@@ -182,7 +184,7 @@ export default function PortraitDetailPage() {
                 </div>
                 {portrait.ipfsCid && (
                   <div className="flex gap-2">
-                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">IPFS CID</span>
+                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">{tc.ipfsCid}</span>
                     <a
                       href={ipfsGatewayUrl ?? undefined}
                       target="_blank"
@@ -195,13 +197,13 @@ export default function PortraitDetailPage() {
                 )}
                 {portrait.imageHash && (
                   <div className="flex gap-2">
-                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">Image Hash</span>
+                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">{tc.imageHash}</span>
                     <span className="text-gray-700 dark:text-gray-300 font-mono text-xs break-all">{portrait.imageHash}</span>
                   </div>
                 )}
                 {portrait.certifiedAt && (
                   <div className="flex gap-2">
-                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">Certified At</span>
+                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">{tc.certifiedAt}</span>
                     <span className="text-gray-900 dark:text-white text-xs">
                       {new Date(portrait.certifiedAt).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
                     </span>
@@ -209,7 +211,7 @@ export default function PortraitDetailPage() {
                 )}
                 {portrait.owner.walletAddress && (
                   <div className="flex gap-2">
-                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">Owner</span>
+                    <span className="text-gray-500 dark:text-gray-400 w-28 shrink-0">{tc.owner}</span>
                     <span className="text-gray-900 dark:text-white font-mono text-xs">{portrait.owner.walletAddress}</span>
                   </div>
                 )}
@@ -223,16 +225,16 @@ export default function PortraitDetailPage() {
 
           {/* Details */}
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Details</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white mb-4">{tc.details}</h2>
             <div className="space-y-3 text-sm">
               {portrait.description && (
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 mb-1">Description</p>
+                  <p className="text-gray-500 dark:text-gray-400 mb-1">{tc.description}</p>
                   <p className="text-gray-800 dark:text-gray-200">{portrait.description}</p>
                 </div>
               )}
               <div className="flex gap-2">
-                <span className="text-gray-500 dark:text-gray-400">Category</span>
+                <span className="text-gray-500 dark:text-gray-400">{tc.category}</span>
                 <span className="text-gray-900 dark:text-white">{portrait.category}</span>
               </div>
               {portrait.tags.length > 0 && (
@@ -245,13 +247,13 @@ export default function PortraitDetailPage() {
                 </div>
               )}
               <div className="flex gap-2">
-                <span className="text-gray-500 dark:text-gray-400">Visibility</span>
+                <span className="text-gray-500 dark:text-gray-400">{tc.visibility}</span>
                 <span className={portrait.isPublic ? "text-green-600 dark:text-green-400" : "text-gray-400"}>
-                  {portrait.isPublic ? "Public" : "Private"}
+                  {portrait.isPublic ? tc.public : tc.private}
                 </span>
               </div>
               <div className="flex gap-2">
-                <span className="text-gray-500 dark:text-gray-400">Created</span>
+                <span className="text-gray-500 dark:text-gray-400">{tc.created}</span>
                 <span className="text-gray-900 dark:text-white">
                   {new Date(portrait.createdAt).toLocaleDateString("zh-CN", { timeZone: "Asia/Shanghai" })}
                 </span>
@@ -262,15 +264,14 @@ export default function PortraitDetailPage() {
           {/* Certification CTA */}
           {!portrait.blockchainTxHash && portrait.status !== "ARCHIVED" && (
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 rounded-xl border border-purple-100 dark:border-purple-900/50 p-6">
-              <h2 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">🔐 Not Yet Certified</h2>
+              <h2 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">{tc.notCertified}</h2>
               <p className="text-sm text-purple-700 dark:text-purple-400 mb-3">
-                Certify this portrait on Ethereum Sepolia to create an immutable proof of authorship.
-                Your portrait metadata will be stored on IPFS.
+                {tc.notCertifiedDesc}
               </p>
 
               {portrait.imageHash && (
                 <div className="mb-3 p-2 bg-white/60 dark:bg-gray-900/60 rounded-lg">
-                  <p className="text-xs text-gray-400 mb-0.5">Image SHA-256</p>
+                  <p className="text-xs text-gray-400 mb-0.5">{tc.imageHash}</p>
                   <p className="text-xs font-mono text-gray-600 dark:text-gray-300 break-all">{portrait.imageHash}</p>
                 </div>
               )}
@@ -291,11 +292,11 @@ export default function PortraitDetailPage() {
                 disabled={certifying || !portrait.imageHash}
                 className="w-full px-4 py-2.5 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {certifying ? "Certifying..." : "🔗 Certify on Blockchain"}
+                {certifying ? tc.certifying : tc.certifyOnBlockchain}
               </button>
 
               {!portrait.imageHash && (
-                <p className="text-xs text-center text-purple-500 dark:text-purple-400 mt-2">Portrait image hash not available</p>
+                <p className="text-xs text-center text-purple-500 dark:text-purple-400 mt-2">{tc.imageHashNotAvailable}</p>
               )}
             </div>
           )}
@@ -306,20 +307,20 @@ export default function PortraitDetailPage() {
               href={`/portraits/${id}/edit`}
               className="flex-1 px-4 py-2 text-center text-sm font-medium bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
-              Edit
+              {tc.edit}
             </Link>
             <button
               onClick={handleDelete}
               disabled={deleting}
               className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
             >
-              {deleting ? "Deleting..." : "Archive"}
+              {deleting ? tc.archiving : tc.archive}
             </button>
           </div>
 
           {/* Owner info */}
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Owner</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{tc.owner}</p>
             <p className="font-medium text-gray-900 dark:text-white">{portrait.owner.displayName ?? "—"}</p>
             {portrait.owner.walletAddress && (
               <p className="text-xs font-mono text-gray-500 dark:text-gray-400 mt-0.5">{portrait.owner.walletAddress}</p>
