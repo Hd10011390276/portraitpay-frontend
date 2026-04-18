@@ -162,7 +162,7 @@ export function buildPortraitMetadata(
     tags: string[];
     owner: { walletAddress?: string | null };
     imageHash: string;
-    ipfsCid: string;
+    ipfsCid: string | null;
     blockchainTxHash: string | null;
     certifiedAt: Date | null;
   },
@@ -172,7 +172,8 @@ export function buildPortraitMetadata(
   return {
     name: portrait.title,
     description: portrait.description ?? undefined,
-    image: portrait.ipfsCid ? `ipfs://${portrait.ipfsCid}` : "",
+    // Image is stored locally; IPFS stores only metadata. imageHash provides integrity proof.
+    image: portrait.ipfsCid ? `ipfs://${portrait.ipfsCid}` : `local:${portrait.imageHash}`,
     owner: portrait.owner.walletAddress ?? "",
     category: portrait.category,
     tags: portrait.tags,

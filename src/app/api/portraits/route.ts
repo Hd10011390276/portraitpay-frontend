@@ -17,6 +17,7 @@ const CreatePortraitSchema = z.object({
   category: z.string().min(1).max(50).default("general"),
   tags: z.array(z.string()).default([]),
   isPublic: z.boolean().default(false),
+  imageHash: z.string().regex(/^[a-f0-9]{64}$/, "Must be a valid SHA-256 hex string").optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, description, category, tags, isPublic } = parsed.data;
+    const { title, description, category, tags, isPublic, imageHash } = parsed.data;
 
     const portrait = await prisma.portrait.create({
       data: {
@@ -100,6 +101,7 @@ export async function POST(request: NextRequest) {
         category,
         tags,
         isPublic,
+        imageHash: imageHash ?? null,
         ownerId: session.userId,
         status: "DRAFT",
         faceEmbedding: [],

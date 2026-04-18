@@ -1,21 +1,19 @@
 
 /**
  * POST /api/portraits/[id]/certify
- * Full blockchain certification flow:
+ * Blockchain certification flow (local-first):
  *  1. Validate portrait ownership + status
- *  2. Compute SHA-256 hash of image
- *  3. Upload image to IPFS
- *  4. Build metadata JSON → upload to IPFS
- *  5. Mint on Sepolia (Ethers.js)
- *  6. Store txHash + ipfsCid in DB
+ *  2. Use pre-computed SHA-256 hash (from client)
+ *  3. Upload metadata JSON to IPFS (Pinata)
+ *  4. Mint on Sepolia (Ethers.js)
+ *  5. Store txHash + ipfsCid in DB
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
-import { certifyPortrait, computeImageHash, SUPPORTED_NETWORKS } from "@/lib/blockchain";
-import { uploadToIpfs, uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
-import { getPresignedUploadUrl, generateImageKey } from "@/lib/storage";
+import { certifyPortrait, SUPPORTED_NETWORKS } from "@/lib/blockchain";
+import { uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
 export const dynamic = "force-dynamic";
 
 
@@ -79,48 +77,23 @@ export async function POST(request: NextRequest, context: RouteContext) {
       }
     }
 
-    // ── Step 3: Fetch image from S3 presigned URL ─────────────────
-    if (!portrait.originalImageUrl) {
+    // ── Step 3: Verify imageHash exists ────────────────────────────
+    const imageHash = portrait.imageHash;
+    if (!imageHash) {
       return NextResponse.json(
-        { success: false, error: "No image uploaded for this portrait. Upload an image first." },
+        { success: false, error: "No image hash found. Please upload a portrait first.", code: "PP-4001" },
         { status: 400 }
       );
     }
 
-    const imageResponse = await fetch(portrait.originalImageUrl);
-    if (!imageResponse.ok) {
-      return NextResponse.json(
-        { success: false, error: "Failed to fetch image from storage" },
-        { status: 502 }
-      );
-    }
-
-    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-
-    // ── Step 4: Compute SHA-256 hash ──────────────────────────────
-    const imageHash = await computeImageHash(imageBuffer);
-    console.log(`[Certify] Image SHA-256: ${imageHash}`);
-
-    // ── Step 5: Upload image to IPFS ─────────────────────────────
-    let imageIpfsResult;
-    try {
-      imageIpfsResult = await uploadToIpfs(imageBuffer, `portrait-${portrait.id}.jpg`, "image/jpeg");
-      console.log(`[Certify] Image uploaded to IPFS: ${imageIpfsResult.cid}`);
-    } catch (err) {
-      console.error("[Certify] IPFS image upload failed:", err);
-      return NextResponse.json(
-        { success: false, error: "IPFS image upload failed", code: "PP-5002" },
-        { status: 503 }
-      );
-    }
-
-    // ── Step 6: Build metadata JSON ──────────────────────────────
+    // ── Step 4: Upload metadata JSON to IPFS (no image data) ─────
+    let metadataIpfsResult;
     const contractAddress = SUPPORTED_NETWORKS[network].contractAddress;
     const metadata = buildPortraitMetadata(
       {
         ...portrait,
         imageHash,
-        ipfsCid: imageIpfsResult.cid,
+        ipfsCid: null,
         blockchainTxHash: null,
         certifiedAt: null,
       },
@@ -128,8 +101,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
       network
     );
 
-    // ── Step 7: Upload metadata JSON to IPFS ─────────────────────
-    let metadataIpfsResult;
     try {
       metadataIpfsResult = await uploadJsonToIpfs(metadata, `portrait-${portrait.id}/metadata.json`);
       console.log(`[Certify] Metadata uploaded to IPFS: ${metadataIpfsResult.cid}`);
@@ -141,7 +112,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    // ── Step 8: Mint on Sepolia ──────────────────────────────────
+    // ── Step 5: Mint on Sepolia ──────────────────────────────────
     let certificationResult;
     try {
       certificationResult = await certifyPortrait(metadataIpfsResult.cid, imageHash, network);

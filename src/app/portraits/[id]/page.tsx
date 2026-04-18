@@ -149,7 +149,10 @@ export default function PortraitDetailPage() {
                   className="w-full h-full object-contain bg-gray-50 dark:bg-gray-800"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-6xl">👤</div>
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 text-6xl gap-2">
+                  <span>🔒</span>
+                  <p className="text-xs text-gray-400 text-center px-4">Portrait stored locally on your device</p>
+                </div>
               )}
             </div>
           </div>
@@ -260,10 +263,17 @@ export default function PortraitDetailPage() {
           {!portrait.blockchainTxHash && portrait.status !== "ARCHIVED" && (
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 rounded-xl border border-purple-100 dark:border-purple-900/50 p-6">
               <h2 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">🔐 Not Yet Certified</h2>
-              <p className="text-sm text-purple-700 dark:text-purple-400 mb-4">
+              <p className="text-sm text-purple-700 dark:text-purple-400 mb-3">
                 Certify this portrait on Ethereum Sepolia to create an immutable proof of authorship.
                 Your portrait metadata will be stored on IPFS.
               </p>
+
+              {portrait.imageHash && (
+                <div className="mb-3 p-2 bg-white/60 dark:bg-gray-900/60 rounded-lg">
+                  <p className="text-xs text-gray-400 mb-0.5">Image SHA-256</p>
+                  <p className="text-xs font-mono text-gray-600 dark:text-gray-300 break-all">{portrait.imageHash}</p>
+                </div>
+              )}
 
               {certifyMsg && (
                 <div className="mb-3 p-3 bg-white dark:bg-gray-900 rounded-lg text-sm text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
@@ -278,14 +288,14 @@ export default function PortraitDetailPage() {
 
               <button
                 onClick={handleCertify}
-                disabled={certifying || !portrait.originalImageUrl}
+                disabled={certifying || !portrait.imageHash}
                 className="w-full px-4 py-2.5 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {certifying ? "Certifying..." : "🔗 Certify on Blockchain"}
               </button>
 
-              {!portrait.originalImageUrl && (
-                <p className="text-xs text-center text-purple-500 dark:text-purple-400 mt-2">Upload an image first to certify</p>
+              {!portrait.imageHash && (
+                <p className="text-xs text-center text-purple-500 dark:text-purple-400 mt-2">Portrait image hash not available</p>
               )}
             </div>
           )}
