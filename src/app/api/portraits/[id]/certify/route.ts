@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getSessionFromRequest } from "@/lib/auth/session";
 import { certifyPortrait, SUPPORTED_NETWORKS } from "@/lib/blockchain";
 import { uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
 export const dynamic = "force-dynamic";
@@ -21,9 +21,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    // Use cookie-only session to match portrait creation auth method
-    // This avoids issues with stale Bearer tokens in localStorage
-    const session = await getSession();
+    // Use Bearer token + cookie auth to match other portrait routes
+    const session = await getSessionFromRequest(request);
     if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
