@@ -1,6 +1,6 @@
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
-import { verifyToken, type JwtPayload } from "./jwt";
+import type { NextRequest } from "next/server";
+import { getSessionFromRequest as _getSessionFromRequest, getSessionFallback } from "./request-context";
+import type { SessionUser } from "./request-context";
 
 const ACCESS_TOKEN_COOKIE = "pp_access_token";
 const REFRESH_TOKEN_COOKIE = "pp_refresh_token";
@@ -13,37 +13,20 @@ export interface SessionUser {
   image: string | null;
 }
 
+/**
+ * Default getSession() — cookie-only fallback (for page components/server components).
+ * For API routes that need Bearer token support, import getSessionFromRequest instead.
+ */
 export async function getSession(): Promise<SessionUser | null> {
-  const cookieStore = await cookies();
-  const accessToken =
-    cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ||
-    cookieStore.get("accessToken")?.value;
+  return getSessionFallback();
+}
 
-  if (!accessToken) return null;
-
-  const payload: JwtPayload | null = verifyToken(accessToken);
-  if (!payload) return null;
-
-  const user = await prisma.user.findUnique({
-    where: { id: payload.userId },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      image: true,
-    },
-  });
-
-  if (!user) return null;
-
-  return {
-    userId: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    image: user.image,
-  };
+/**
+ * Get session from a NextRequest — supports both Authorization Bearer token
+ * and cookie-based auth. Use this in API route handlers.
+ */
+export async function getSessionFromRequest(request: NextRequest): Promise<SessionUser | null> {
+  return _getSessionFromRequest(request);
 }
 
 export function setTokenCookies(
