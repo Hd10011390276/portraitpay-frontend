@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
@@ -29,6 +29,24 @@ export function Header({ user, title, subtitle, action }: HeaderProps) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false);
+
+  useEffect(() => {
+    // Check for unread notifications
+    const checkUnread = async () => {
+      try {
+        const res = await fetch("/api/v1/notifications/unread-count");
+        const json = await res.json();
+        setHasUnread(json.data?.count > 0);
+      } catch {
+        setHasUnread(false);
+      }
+    };
+    checkUnread();
+    // Refresh every 60 seconds
+    const interval = setInterval(checkUnread, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -75,7 +93,7 @@ export function Header({ user, title, subtitle, action }: HeaderProps) {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+              {hasUnread && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />}
             </button>
 
             {notifOpen && (
