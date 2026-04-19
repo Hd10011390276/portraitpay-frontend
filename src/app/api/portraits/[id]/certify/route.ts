@@ -39,10 +39,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Portrait not found" }, { status: 404 });
     }
 
-    console.log(`[Certify] ownerId=${portrait.ownerId} session.userId=${session.userId} match=${portrait.ownerId === session.userId}`);
-    if (portrait.ownerId !== session.userId) {
+    console.log(`[Certify] ownerId=${portrait.ownerId} session.userId=${session.userId} match=${portrait.ownerId === session.userId} role=${session.role}`);
+    if (portrait.ownerId !== session.userId && session.role !== "ADMIN") {
       console.error("[Certify] Forbidden: portrait.ownerId=", portrait.ownerId, "session.userId=", session.userId);
-      return NextResponse.json({ success: false, error: "Forbidden", debug: { ownerId: portrait.ownerId, sessionUserId: session.userId } }, { status: 403 });
+      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
     if (!portrait.owner.walletAddress) {
