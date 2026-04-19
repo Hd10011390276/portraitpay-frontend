@@ -6,13 +6,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { batchCreateAuthorization } from "@/lib/enterprise/agencyService";
 import { getEnterpriseProfile } from "@/lib/enterprise/service";
-import { getSession } from "@/lib/auth/session";
+import { getSession, getSessionFromRequest } from "@/lib/auth/session";
 export const dynamic = "force-dynamic";
 
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
