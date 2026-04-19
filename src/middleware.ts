@@ -30,14 +30,18 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check JWT token
-  const token =
+  // Check JWT token — support both cookie and Authorization header
+  const authHeader = req.headers.get("Authorization");
+  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const cookieToken =
     req.cookies.get("pp_access_token")?.value ||
     req.cookies.get("accessToken")?.value;
+  const token = bearerToken || cookieToken;
 
   if (!token || !(await verifyToken(token))) {
+    // API routes require authentication - return 401
     if (pathname.startsWith("/api/")) {
-      return NextResponse.next();
+      return NextResponse.json({ success: false, message: "未授权，请先登录" }, { status: 401 });
     }
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);

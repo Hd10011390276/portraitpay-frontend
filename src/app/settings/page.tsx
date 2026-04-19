@@ -43,6 +43,8 @@ function SettingsContent() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    // TODO: Persist notification preferences once DB migration is applied
+    // (emailNotifications, infringementAlerts, marketingEmails)
     await new Promise((r) => setTimeout(r, 800));
     toast({ type: "success", title: t.settings.settingsSaved });
     setSaving(false);

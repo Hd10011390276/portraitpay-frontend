@@ -1,18 +1,14 @@
 /**
  * GET /api/user     — Get current user profile
- * PATCH /api/user   — Update current user profile
+ * PATCH /api/user   — Update current user profile (supports Bearer token)
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
-
+import { getSessionFromRequest } from "@/lib/auth/session";
 export const dynamic = "force-dynamic";
 
-
-// Schema for updating user profile
 const UpdateUserSchema = z.object({
   displayName: z.string().min(1).max(100).optional(),
   bio: z.string().max(1000).optional(),
@@ -22,10 +18,8 @@ const UpdateUserSchema = z.object({
   walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid Ethereum address").optional(),
 });
 
-// Fields to exclude from response
 const SENSITIVE_FIELDS = ["passwordHash", "otpCode", "otpExpires"];
 
-// Basic user info to return (excludes sensitive fields)
 const USER_PUBLIC_SELECT = {
   id: true,
   email: true,
@@ -43,11 +37,11 @@ const USER_PUBLIC_SELECT = {
   updatedAt: true,
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!session?.userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
@@ -55,7 +49,7 @@ export async function GET() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.userId },
       select: USER_PUBLIC_SELECT,
     });
 
@@ -81,9 +75,9 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!session?.userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
@@ -104,9 +98,8 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Check if user exists
     const existingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.userId },
       select: { id: true },
     });
 
@@ -117,12 +110,11 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // If phone is being updated, check for uniqueness
     if (parsed.data.phone) {
       const phoneExists = await prisma.user.findFirst({
         where: {
           phone: parsed.data.phone,
-          NOT: { id: session.user.id },
+          NOT: { id: session.userId },
         },
       });
 
@@ -134,12 +126,12 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    // If walletAddress is being updated, check for uniqueness
+    // If walletAddress is being updated, check for uniqueness before updating
     if (parsed.data.walletAddress) {
       const walletExists = await prisma.user.findFirst({
         where: {
           walletAddress: parsed.data.walletAddress,
-          NOT: { id: session.user.id },
+          NOT: { id: session.userId },
         },
       });
 
@@ -152,7 +144,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: session.userId },
       data: parsed.data,
       select: USER_PUBLIC_SELECT,
     });
@@ -163,13 +155,14 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (error) {
     // Prisma P2002 = unique constraint violation (race condition after our check)
-    if (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code: string }).code === "P2002") {
       return NextResponse.json(
         { success: false, error: "Wallet address already in use" },
         { status: 409 }
       );
     }
     console.error("[PATCH /api/user]", error);
+
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

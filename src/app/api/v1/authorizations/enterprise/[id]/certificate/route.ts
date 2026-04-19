@@ -5,7 +5,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getCertificatePDF } from "@/lib/enterprise/certificate";
-import { getSession } from "@/lib/auth/session";
+import { getSession, getSessionFromRequest } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }

@@ -60,11 +60,13 @@ export class AliyunKYCProvider implements KYCProviderClient {
     redirectUrl: string;
     externalRef: string;
   }> {
-    if (STUBS.enabled) {
+    if (STUBS.enabled || !this.accessKeyId || !this.accessKeySecret) {
       const ref = `aliyun_${userId}_${Date.now()}`;
       return {
         sessionToken: ref,
-        redirectUrl: `https://bizauth.verification.aliyun.com/initialize?appId=${this.appId}&sessionId=${ref}`,
+        redirectUrl: this.appId
+          ? `https://bizauth.verification.aliyun.com/initialize?appId=${this.appId}&sessionId=${ref}`
+          : `https://portraitpayai.com/kyc/callback?provider=aliyun&sessionId=${ref}`,
         externalRef: ref,
       };
     }
@@ -97,7 +99,7 @@ export class AliyunKYCProvider implements KYCProviderClient {
     idCardBackUrl: string
   ): Promise<IDCardOCRResult> {
     console.log("[KYC STUB] submitOCR called, STUBS.enabled =", STUBS.enabled, "idCardFrontUrl:", idCardFrontUrl);
-    if (STUBS.enabled) {
+    if (STUBS.enabled || !this.accessKeyId || !this.accessKeySecret) {
       return this.stubOCR();
     }
 
@@ -115,7 +117,7 @@ export class AliyunKYCProvider implements KYCProviderClient {
     faceImageUrl: string,
     idCardNumber: string
   ): Promise<FaceVerifyResult> {
-    if (STUBS.enabled) {
+    if (STUBS.enabled || !this.accessKeyId || !this.accessKeySecret) {
       return this.stubFaceVerify();
     }
 
@@ -138,7 +140,7 @@ export class AliyunKYCProvider implements KYCProviderClient {
     status: "PENDING" | "APPROVED" | "REJECTED";
     result?: IDCardOCRResult & FaceVerifyResult;
   }> {
-    if (STUBS.enabled) {
+    if (STUBS.enabled || !this.accessKeyId || !this.accessKeySecret) {
       return STUBS.autoApprove
         ? { status: "APPROVED", result: { ...this.stubOCR(), ...this.stubFaceVerify() } }
         : { status: "PENDING" };

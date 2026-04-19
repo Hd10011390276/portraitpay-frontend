@@ -49,9 +49,6 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Platform wallet address — used for blockchain certification gas fees
-    const PLATFORM_WALLET = "0xABE2DeA4E422E83076d9025622e5B45Ad7E163dF";
-
     const user = await prisma.user.create({
       data: {
         email,
@@ -59,7 +56,7 @@ export async function POST(req: NextRequest) {
         name,
         passwordHash: hashedPassword,
         role: role as UserRole,
-        walletAddress: PLATFORM_WALLET, // Auto-bind platform wallet for blockchain cert
+        walletAddress: null, // User binds their own wallet on-demand, not at registration
         portraitSettings: {
           create: {
             allowLicensing: allowLicensing ?? true,

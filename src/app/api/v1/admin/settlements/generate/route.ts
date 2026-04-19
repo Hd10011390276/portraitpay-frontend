@@ -9,14 +9,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getSession, getSessionFromRequest } from "@/lib/auth/session";
 import { generateMonthlySettlement } from "@/lib/revenue/service";
 export const dynamic = "force-dynamic";
 
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session || session.role !== "ADMIN") {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }

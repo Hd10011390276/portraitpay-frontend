@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getSession, getSessionFromRequest } from "@/lib/auth/session";
 import { initiateStripePayout } from "@/lib/payments/stripe";
 export const dynamic = "force-dynamic";
 
@@ -22,7 +22,7 @@ type Params = { params: Promise<{ id: string }> };
 export async function GET(_request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
@@ -50,7 +50,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
 export async function PATCH(request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }

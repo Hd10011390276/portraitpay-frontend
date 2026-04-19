@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getSession, getSessionFromRequest } from "@/lib/auth/session";
 import { createApiKey, revokeApiKey, isValidApiKeyFormat } from "@/lib/api-keys";
 import { logAudit } from "@/lib/audit/service";
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 // GET /api/v1/api-keys - List user's API keys
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
 // POST /api/v1/api-keys - Create new API key
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
 // DELETE /api/v1/api-keys - Revoke an API key
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },

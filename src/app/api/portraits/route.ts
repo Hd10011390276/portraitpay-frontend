@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getSession, getSessionFromRequest } from "@/lib/auth/session";
 export const dynamic = "force-dynamic";
 
 
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSessionFromRequest(request);
 
     if (!session?.userId) {
       return NextResponse.json(

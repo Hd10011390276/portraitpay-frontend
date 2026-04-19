@@ -139,10 +139,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Portrait not found" }, { status: 404 });
     }
 
-    // Compute evidence hash
+    // Compute evidence hash — use real SHA-256 of the URL
+    const { createHash } = await import("crypto");
     const evidenceHash = buildEvidenceSetHash(
-      evidenceUrls.map((url, i) => ({
-        contentHash: `sha256:${Buffer.from(url).toString("base64").slice(0, 16)}`, // STUB — replace with real hash
+      evidenceUrls.map((url) => ({
+        contentHash: createHash("sha256").update(url).digest("hex"),
         capturedAt: new Date(),
         evidenceUrl: url,
       }))
