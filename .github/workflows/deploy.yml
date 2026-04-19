@@ -23,5 +23,5 @@ jobs:
 
       - name: Deploy to Vercel
         run: |
-          npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --project-name hearty-creation \
+          npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} \
             --env DATABASE_URL=${{ secrets.DATABASE_URL }}

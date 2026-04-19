@@ -53,7 +53,7 @@ jobs:
         run: npm install
 
       - name: Deploy to Vercel
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --project-name portraitpay --yes
+        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
