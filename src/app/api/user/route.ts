@@ -134,6 +134,23 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    // If walletAddress is being updated, check for uniqueness
+    if (parsed.data.walletAddress) {
+      const walletExists = await prisma.user.findFirst({
+        where: {
+          walletAddress: parsed.data.walletAddress,
+          NOT: { id: session.user.id },
+        },
+      });
+
+      if (walletExists) {
+        return NextResponse.json(
+          { success: false, error: "Wallet address already in use" },
+          { status: 409 }
+        );
+      }
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: parsed.data,
@@ -145,6 +162,13 @@ export async function PATCH(request: NextRequest) {
       data: { user: updatedUser },
     });
   } catch (error) {
+    // Prisma P2002 = unique constraint violation (race condition after our check)
+    if (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") {
+      return NextResponse.json(
+        { success: false, error: "Wallet address already in use" },
+        { status: 409 }
+      );
+    }
     console.error("[PATCH /api/user]", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
