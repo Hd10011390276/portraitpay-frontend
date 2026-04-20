@@ -165,7 +165,7 @@ function SettingsContent() {
               disabled={saving}
               className="px-6 py-2.5 text-sm font-medium bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 transition"
             >
-              {saving ? t.settings.saving : t.settings.save}
+              {saving ? t.settings.saving : t.settings.saveSettings}
             </button>
           </div>
         </form>
