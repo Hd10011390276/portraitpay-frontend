@@ -22,6 +22,7 @@ const CreatePortraitSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getSessionFromRequest(request);
     const { searchParams } = new URL(request.url);
     const ownerId = searchParams.get("ownerId");
     const status = searchParams.get("status");
@@ -34,6 +35,12 @@ export async function GET(request: NextRequest) {
     };
 
     if (ownerId) where.ownerId = ownerId;
+    else if (session?.userId) where.ownerId = session.userId;
+
+    // If no ownerId specified and not logged in, return empty
+    if (!ownerId && !session?.userId) {
+      return NextResponse.json({ success: true, data: [], meta: { page, limit, total: 0, totalPages: 0 } });
+    }
     if (status) where.status = status;
     if (category) where.category = category;
 
