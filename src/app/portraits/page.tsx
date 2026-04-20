@@ -96,12 +96,18 @@ export default function PortraitsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Archive this portrait?")) return;
+    if (!confirm("确认删除此肖像？")) return;
     try {
       const res = await fetch(`/api/portraits/${id}`, { method: "DELETE", credentials: "include" });
       const json = await res.json();
-      if (json.success) setPortraits((prev) => prev.filter((p) => p.id !== id));
-    } catch { /* silent */ }
+      if (json.success) {
+        setPortraits((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        alert(`删除失败: ${json.error || "未知错误"}`);
+      }
+    } catch {
+      alert("删除失败: 网络错误");
+    }
   };
 
   const filtered = portraits.filter((p) =>
