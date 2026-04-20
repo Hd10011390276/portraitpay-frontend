@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       where: { id, deletedAt: null },
       include: {
         owner: {
-          select: { id: true, displayName: true, walletAddress: true, kycStatus: true },
+          select: { id: true, displayName: true, email: true, walletAddress: true, kycStatus: true },
         },
         _count: {
           select: { authorizations: true, reports: true },

@@ -1,11 +1,13 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { RegisterSchema } from "@/lib/auth/schemas";
 import { signTokenPair } from "@/lib/auth/jwt";
 import { setTokenCookies } from "@/lib/auth/session";
-import { sendWelcomeEmail } from "@/lib/email";
+import { sendWelcomeEmail, sendEmail } from "@/lib/email";
+import { buildVerificationEmailHtml } from "@/lib/email/templates/verification";
 export const dynamic = "force-dynamic";
 
 type UserRole = string;
@@ -76,6 +78,32 @@ export async function POST(req: NextRequest) {
       console.log("[REGISTER] Welcome email sent successfully for:", user.email);
     } catch (emailError) {
       console.error("[REGISTER] Welcome email failed:", emailError);
+    }
+
+    // Send email verification email (non-blocking)
+    try {
+      const verifyToken = randomBytes(32).toString("hex");
+      const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      await prisma.verificationToken.upsert({
+        where: { identifier_token: { identifier: user.email, token: verifyToken } },
+        create: { identifier: user.email, token: verifyToken, expires: verifyExpires },
+        update: { token: verifyToken, expires: verifyExpires },
+      });
+
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+      const verifyUrl = `${baseUrl}/verify-email?token=${verifyToken}`;
+
+      const { subject, html, text } = buildVerificationEmailHtml({
+        name: user.name ?? user.email.split("@")[0],
+        email: user.email,
+        verifyUrl,
+      });
+
+      await sendEmail({ to: user.email, subject, html, text });
+      console.log("[REGISTER] Verification email sent to:", user.email);
+    } catch (emailError) {
+      console.error("[REGISTER] Verification email failed:", emailError);
     }
 
     const tokens = signTokenPair({

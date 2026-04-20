@@ -9,6 +9,7 @@ export interface SessionUser {
   name: string | null;
   role: string;
   image: string | null;
+  emailVerified: Date | null;
 }
 
 const ACCESS_TOKEN_COOKIE = "pp_access_token";
@@ -20,10 +21,10 @@ async function _verifySession(token: string | null): Promise<SessionUser | null>
   if (!payload) return null;
   const user = await prisma.user.findUnique({
     where: { id: payload.userId },
-    select: { id: true, email: true, name: true, role: true, image: true },
+    select: { id: true, email: true, name: true, role: true, image: true, emailVerified: true },
   });
   if (!user) return null;
-  return { userId: user.id, email: user.email, name: user.name, role: user.role, image: user.image };
+  return { userId: user.id, email: user.email, name: user.name, role: user.role, image: user.image, emailVerified: user.emailVerified };
 }
 
 /**

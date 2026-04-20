@@ -11,6 +11,7 @@ interface User {
   email: string;
   name: string | null;
   role: string;
+  emailVerified: Date | null;
 }
 
 interface Stat {
@@ -247,6 +248,40 @@ function DashboardContent({ user }: { user: User }) {
                 )}
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{user.email}</p>
+              {!user.emailVerified && (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">
+                    {t.dashboard.stats.emailUnverified}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("/api/auth/send-verification", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ email: user.email }),
+                        });
+                        const json = await res.json();
+                        if (json.success) {
+                          alert(isZh ? "验证邮件已发送，请查收邮箱" : "Verification email sent. Please check your inbox.");
+                        } else {
+                          alert(json.error ?? (isZh ? "发送失败" : "Send failed"));
+                        }
+                      } catch {
+                        alert(isZh ? "网络错误" : "Network error");
+                      }
+                    }}
+                    className="text-xs text-yellow-600 dark:text-yellow-400 font-medium hover:underline"
+                  >
+                    {t.dashboard.stats.resendVerifyEmail}
+                  </button>
+                </div>
+              )}
+              {user.emailVerified && (
+                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">
+                  {t.dashboard.stats.emailVerified}
+                </span>
+              )}
               <div className="flex gap-3 mt-3">
                 <Link href="/kyc"
                   className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline">

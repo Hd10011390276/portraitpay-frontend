@@ -32,6 +32,7 @@ interface PortraitDetail {
   owner: {
     id: string;
     displayName?: string | null;
+    email?: string | null;
     walletAddress?: string | null;
     kycStatus: string;
   };
@@ -302,6 +303,9 @@ export default function PortraitDetailPage() {
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{tc.owner}</p>
             <p className="font-medium text-gray-900 dark:text-white">{portrait.owner.displayName ?? "—"}</p>
+            {portrait.owner.email && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{portrait.owner.email}</p>
+            )}
             {portrait.owner.walletAddress && <p className="text-xs font-mono text-gray-500 dark:text-gray-400 mt-0.5">{portrait.owner.walletAddress}</p>}
           </div>
         </div>
