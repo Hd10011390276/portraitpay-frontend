@@ -59,18 +59,11 @@ export default function PortraitsPage() {
     try {
       const params = new URLSearchParams();
       if (statusFilter) params.set("status", statusFilter);
-      const res = await fetch(`/api/portraits?${params.toString()}`);
+      const res = await fetch(`/api/portraits?${params.toString()}`, { credentials: "include" });
       const json = await res.json();
       if (json.success) setPortraits(json.data as Portrait[]);
     } catch {
-      // Fallback mock data
-      setPortraits([
-        { id: "1", title: "Official Portrait — Jane D.", category: "celebrity", status: "ACTIVE", thumbnailUrl: null, originalImageUrl: null, imageHash: null, blockchainTxHash: "0x7a3f4b8c9e2d1a0f", ipfsCid: "QmXxx", certifiedAt: new Date().toISOString(), createdAt: new Date().toISOString(), isPublic: true, description: null },
-        { id: "2", title: "Studio Portrait — S.K.", category: "artist", status: "UNDER_REVIEW", thumbnailUrl: null, originalImageUrl: null, imageHash: null, blockchainTxHash: null, ipfsCid: null, certifiedAt: null, createdAt: new Date(Date.now() - 86400000).toISOString(), isPublic: true, description: null },
-        { id: "3", title: "Concert Photo — M.W.", category: "artist", status: "DRAFT", thumbnailUrl: null, originalImageUrl: null, imageHash: null, blockchainTxHash: null, ipfsCid: null, certifiedAt: null, createdAt: new Date(Date.now() - 172800000).toISOString(), isPublic: false, description: null },
-        { id: "4", title: "Corporate Headshot — A.L.", category: "business", status: "ACTIVE", thumbnailUrl: null, originalImageUrl: null, imageHash: "0xabc123", blockchainTxHash: "0xb2d1f8a0e3c4", ipfsCid: "QmAbc", certifiedAt: new Date(Date.now() - 259200000).toISOString(), createdAt: new Date(Date.now() - 604800000).toISOString(), isPublic: true, description: null },
-        { id: "5", title: "Event Photo — R.K.", category: "celebrity", status: "ARCHIVED", thumbnailUrl: null, originalImageUrl: null, imageHash: null, blockchainTxHash: null, ipfsCid: null, certifiedAt: null, createdAt: new Date(Date.now() - 2592000000).toISOString(), isPublic: false, description: null },
-      ]);
+      setPortraits([]);
     } finally {
       setLoading(false);
     }
@@ -103,10 +96,19 @@ export default function PortraitsPage() {
       if (json.success) {
         setPortraits((prev) => prev.filter((p) => p.id !== id));
       } else {
-        alert(`删除失败: ${json.error || "未知错误"}`);
+        // 409 = already certified (cannot delete), 404 = not found, 403 = not yours
+        if (res.status === 409) {
+          alert("无法删除：已认证的肖像需要在详情页取消认证后才能删除");
+        } else if (res.status === 403) {
+          alert("无法删除：您不是此肖像的拥有者");
+        } else if (res.status === 401) {
+          alert("无法删除：请重新登录后再试");
+        } else {
+          alert(`删除失败 (${res.status}): ${json.error || "未知错误"}`);
+        }
       }
     } catch {
-      alert("删除失败: 网络错误");
+      alert("删除失败：网络错误");
     }
   };
 
