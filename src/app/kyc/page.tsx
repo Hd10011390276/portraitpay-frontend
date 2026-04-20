@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -14,15 +15,11 @@ const STEPS = (t: ReturnType<typeof useLanguage>["t"]) => [
 ];
 
 export default function KYCPage() {
+  const router = useRouter();
   const { t } = useLanguage();
   const [user, setUser] = useState<{ id: string; email: string; name: string | null; role: string } | null>(null);
   const [checking, setChecking] = useState(true);
   const [frontImage, setFrontImage] = useState<File | null>(null);
-
-  // Redirect to portrait upload (which includes face-verified KYC)
-  useEffect(() => {
-    window.location.href = "/portraits/upload";
-  }, []);
   const [backImage, setBackImage] = useState<File | null>(null);
   const [frontPreview, setFrontPreview] = useState<string | null>(null);
   const [backPreview, setBackPreview] = useState<string | null>(null);

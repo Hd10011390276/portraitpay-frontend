@@ -152,7 +152,7 @@ export default function PortraitDetailPage() {
   if (!portrait) return null;
 
   const ipfsGatewayUrl = portrait.ipfsCid ? getIpfsGatewayUrl(portrait.ipfsCid) : null;
-  const tc = t.portraits.detail;
+  const tc = t.portraits.detail; // Define tc early so it's available in handlers
 
   const hasImage = !!portrait.originalImageUrl;
 
