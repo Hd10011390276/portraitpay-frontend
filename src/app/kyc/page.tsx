@@ -33,10 +33,16 @@ export default function KYCPage() {
   const [draftSaved, setDraftSaved] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("pp_user");
-    if (!raw) { window.location.href = "/login"; return; }
-    try { setUser(JSON.parse(raw)); } catch { window.location.href = "/login"; }
-    finally { setChecking(false); }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) { window.location.href = "/login"; return; }
+        const json = await res.json();
+        setUser(json.data?.user || json.user || null);
+      } catch { window.location.href = "/login"; }
+      finally { setChecking(false); }
+    };
+    checkAuth();
   }, []);
 
   const handleFileChange = (side: "front" | "back", file: File) => {

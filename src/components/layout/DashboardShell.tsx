@@ -28,18 +28,22 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("pp_user");
-    if (!raw) {
-      router.push("/login");
-      return;
-    }
-    try {
-      setUser(JSON.parse(raw));
-    } catch {
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) {
+          router.push("/login");
+          return;
+        }
+        const json = await res.json();
+        setUser(json.data?.user || json.user || null);
+      } catch {
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
   }, [router]);
 
   if (loading) {
