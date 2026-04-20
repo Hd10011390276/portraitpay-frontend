@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold" style={{ color: "var(--accent-primary)" }}>
             <img src="/logo.png" alt="PortraitPay AI" className="w-7 h-7 rounded-lg dark:hidden" />
-            <img src="/logo-dark.svg" alt="PortraitPay AI" className="w-7 h-7 rounded-lg hidden dark:block" />
+            <img src="/logo-dark.png" alt="PortraitPay AI" className="w-7 h-7 rounded-lg hidden dark:block" />
             PortraitPay AI
           </Link>
           <div className="flex items-center gap-3">
