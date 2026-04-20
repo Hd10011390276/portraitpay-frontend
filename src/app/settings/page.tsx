@@ -9,42 +9,30 @@ import { useLanguage } from "@/context/LanguageContext";
 function SettingsContent() {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [user, setUser] = useState<{ id: string; email: string; name: string | null; walletAddress?: string | null } | null>(null);
+  const [user, setUser] = useState<{ id: string; email: string; name: string | null } | null>(null);
   const [checking, setChecking] = useState(true);
   const [saving, setSaving] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [infringementAlerts, setInfringementAlerts] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
-  const [bindingWallet, setBindingWallet] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("pp_user");
-    if (raw) {
+    const checkAuth = async () => {
       try {
-        setUser(JSON.parse(raw));
-      } catch (e) {
-        console.error("Failed to parse user data", e);
-      }
-    }
-    // Fetch latest user data from API
-    fetch("/api/user")
-      .then((r) => r.json())
-      .then((j) => {
-        if (j.success && j.data.user) {
-          setUser(j.data.user);
-          setWalletAddress(j.data.user.walletAddress || "");
-        }
-      })
-      .catch(console.error)
-      .finally(() => setChecking(false));
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) { window.location.href = "/login"; return; }
+        const json = await res.json();
+        const u = json.data?.user || json.user;
+        setUser(u ? { id: u.id, email: u.email, name: u.name } : null);
+      } catch { window.location.href = "/login"; }
+      finally { setChecking(false); }
+    };
+    checkAuth();
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    // TODO: Persist notification preferences once DB migration is applied
-    // (emailNotifications, infringementAlerts, marketingEmails)
     await new Promise((r) => setTimeout(r, 800));
     toast({ type: "success", title: t.settings.settingsSaved });
     setSaving(false);
@@ -53,7 +41,6 @@ function SettingsContent() {
   const handleDeleteAccount = () => {
     const confirmed = window.confirm(t.settings.deleteAccountConfirm || "Are you sure you want to delete your account? This action cannot be undone.");
     if (confirmed) {
-      // TODO: Call API to delete account
       toast({ type: "error", title: t.settings.deleteAccountError || "Account deletion requires contacting support" });
     }
   };
@@ -151,71 +138,6 @@ function SettingsContent() {
             </div>
           </div>
 
-          {/* Wallet Binding */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{t.settings.walletBinding}</h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t.settings.walletBindingDesc}</p>
-
-            {user?.walletAddress ? (
-              <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{t.settings.walletAddress}</p>
-                  <p className="text-sm font-mono text-gray-900 dark:text-white truncate">{user.walletAddress}</p>
-                </div>
-                <span className="px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-full shrink-0">
-                  {t.settings.walletBound}
-                </span>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div>
-                  <input
-                    type="text"
-                    id="walletAddress"
-                    value={walletAddress}
-                    onChange={(e) => setWalletAddress(e.target.value)}
-                    placeholder={t.settings.walletAddressPlaceholder}
-                    className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">{t.settings.walletAddressHint}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (!walletAddress) return;
-                    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-                      toast({ type: "error", title: t.settings.invalidWalletAddress });
-                      return;
-                    }
-                    setBindingWallet(true);
-                    try {
-                      const res = await fetch("/api/user", {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ walletAddress }),
-                      });
-                      const json = await res.json();
-                      if (json.success) {
-                        setUser((prev) => prev ? { ...prev, walletAddress } : prev);
-                        toast({ type: "success", title: t.settings.walletBindSuccess });
-                      } else {
-                        toast({ type: "error", title: json.error || t.settings.walletBindError });
-                      }
-                    } catch {
-                      toast({ type: "error", title: t.settings.walletBindError });
-                    } finally {
-                      setBindingWallet(false);
-                    }
-                  }}
-                  disabled={bindingWallet || !walletAddress}
-                  className="px-4 py-2 text-sm font-medium bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                >
-                  {bindingWallet ? t.settings.saving : t.settings.bindWallet}
-                </button>
-              </div>
-            )}
-          </div>
-
           {/* Danger Zone */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-red-200 dark:border-red-900/50 p-6">
             <h2 className="text-base font-semibold text-red-600 dark:text-red-400 mb-5">{t.settings.dangerZone}</h2>
@@ -228,29 +150,22 @@ function SettingsContent() {
                 <button
                   type="button"
                   onClick={handleDeleteAccount}
-                  className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition shrink-0"
+                  className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 transition"
                 >
-                  {t.settings.deleteAccount}
+                  {t.settings.deleteAccountBtn}
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Save */}
+          {/* Save Button */}
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2.5 bg-purple-600 text-white text-sm font-semibold rounded-xl hover:bg-purple-700 disabled:opacity-60 transition flex items-center gap-2"
+              className="px-6 py-2.5 text-sm font-medium bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 transition"
             >
-              {saving ? (
-                <>
-                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                  {t.settings.saving}
-                </>
-              ) : (
-                t.settings.saveSettings
-              )}
+              {saving ? t.settings.saving : t.settings.save}
             </button>
           </div>
         </form>
