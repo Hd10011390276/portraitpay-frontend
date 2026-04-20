@@ -71,7 +71,9 @@ export async function POST(req: NextRequest) {
 
     // Send welcome email (non-blocking — don't fail registration if email throws)
     try {
+      console.log("[REGISTER] Attempting to send welcome email to:", user.email);
       await sendWelcomeEmail({ email: user.email, name: user.name ?? user.email.split("@")[0], role: user.role });
+      console.log("[REGISTER] Welcome email sent successfully for:", user.email);
     } catch (emailError) {
       console.error("[REGISTER] Welcome email failed:", emailError);
     }
