@@ -402,8 +402,8 @@ export default function EnterpriseContactPage() {
               <p className="text-xs text-indigo-600 mb-3">
                 如需快速沟通，可直接发送邮件至
               </p>
-              <a href="mailto:enterprise@portraitpayai.com" className="text-sm text-purple-600 font-medium hover:underline break-all">
-                enterprise@portraitpayai.com
+              <a href="mailto:contact@portraitpayai.com" className="text-sm text-purple-600 font-medium hover:underline break-all">
+                contact@portraitpayai.com
               </a>
             </div>
           </div>
