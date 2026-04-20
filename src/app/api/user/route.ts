@@ -154,20 +154,14 @@ export async function PATCH(request: NextRequest) {
       data: { user: updatedUser },
     });
   } catch (error) {
-    console.error("[PATCH /api/user]", error);
-
     // Prisma P2002 = unique constraint violation (race condition after our check)
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code: string }).code === "P2002") {
       return NextResponse.json(
         { success: false, error: "Wallet address already in use" },
         { status: 409 }
       );
     }
+    console.error("[PATCH /api/user]", error);
 
     return NextResponse.json(
       { success: false, error: "Internal server error" },

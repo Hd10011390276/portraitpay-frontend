@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /portraits/upload — Portrait upload page
  * Images stored locally in browser IndexedDB.
  * Only SHA-256 hash + metadata go to the server.

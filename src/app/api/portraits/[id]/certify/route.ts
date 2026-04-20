@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession, getSessionFromRequest } from "@/lib/auth/session";
+import { getSessionFromRequest } from "@/lib/auth/session";
 import { certifyPortrait, SUPPORTED_NETWORKS } from "@/lib/blockchain";
 import { uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
 export const dynamic = "force-dynamic";
@@ -21,6 +21,7 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
+    // Use Bearer token + cookie auth to match other portrait routes
     const session = await getSessionFromRequest(request);
     if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
@@ -39,16 +40,14 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Portrait not found" }, { status: 404 });
     }
 
-    if (portrait.ownerId !== session.userId) {
+    console.log(`[Certify] ownerId=${portrait.ownerId} session.userId=${session.userId} match=${portrait.ownerId === session.userId} role=${session.role}`);
+    if (portrait.ownerId !== session.userId && session.role !== "ADMIN") {
+      console.error("[Certify] Forbidden: portrait.ownerId=", portrait.ownerId, "session.userId=", session.userId);
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    if (!portrait.owner.walletAddress) {
-      return NextResponse.json(
-        { success: false, error: "Wallet address not set. Please bind a wallet first.", code: "PP-2001" },
-        { status: 400 }
-      );
-    }
+    // Note: blockchain certification uses the platform wallet (ETH_WALLET_PRIVATE_KEY), not the user's wallet.
+    // The owner.walletAddress field is only for display purposes and is not required for certification.
 
     if (portrait.status !== "DRAFT" && portrait.status !== "UNDER_REVIEW") {
       return NextResponse.json(
