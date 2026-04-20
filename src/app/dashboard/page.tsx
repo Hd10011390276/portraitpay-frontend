@@ -286,9 +286,6 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-            <img src="/logo.png" alt="PortraitPay AI" className="w-8 h-8 rounded-md object-contain" />
-          </div>
           <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full" />
         </div>
       </div>
