@@ -252,10 +252,6 @@ function DashboardContent({ user }: { user: User }) {
                   className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline">
                   {t.dashboard.userCard.completeKyc}
                 </Link>
-                <Link href="/settings"
-                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:underline">
-                  {t.dashboard.userCard.accountSettings}
-                </Link>
               </div>
             </div>
           </div>
