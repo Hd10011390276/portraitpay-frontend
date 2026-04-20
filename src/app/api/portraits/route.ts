@@ -114,6 +114,13 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("[POST /api/portraits]", error);
+    // Handle unique constraint violation on imageHash
+    if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: string }).code === 'P2002') {
+      return NextResponse.json(
+        { success: false, error: "This image is already registered. Each portrait must have a unique photo.", code: "PP-1001" },
+        { status: 409 }
+      );
+    }
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
