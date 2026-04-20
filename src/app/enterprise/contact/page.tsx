@@ -132,7 +132,7 @@ export default function EnterpriseContactPage() {
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="PortraitPay AI" className="h-8 w-8 rounded-lg" />
-            <span className="text-xl font-bold text-purple-600">PortraitPay AI</span>
+            <span className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>PortraitPay AI</span>
           </Link>
           <div className="flex gap-4">
             <Link href="/contact" className="text-sm text-gray-500 hover:text-gray-700 transition">

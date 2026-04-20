@@ -1,5 +1,9 @@
 /**
  * /withdraw — Withdrawal Application Page
+ * Supports region-based payment methods:
+ * - CN: WeChat Pay, Alipay, Bank Transfer
+ * - US: PayPal, Credit Card (Stripe), Bank Transfer
+ * - HK/TW/OTHER: PayPal, Bank Transfer
  */
 
 "use client";
@@ -26,6 +30,7 @@ interface WithdrawalRecord {
   createdAt: string;
   completedAt: string | null;
   paymentMethod?: string;
+  region?: string;
 }
 
 interface StripeAccountStatus {
@@ -45,9 +50,44 @@ const STATUS_LABEL: Record<string, { text: string; color: string }> = {
   FAILED: { text: "失败", color: "text-red-600 bg-red-50" },
 };
 
-const MIN_WITHDRAWAL = 100;
+const MIN_WITHDRAWAL_CNY = 100;
+const MIN_WITHDRAWAL_USD = 10;
 
-type PaymentMethod = "wechat" | "alipay" | "paypal" | "bank";
+type PaymentMethod = "wechat" | "alipay" | "paypal" | "credit_card" | "bank";
+type Region = "CN" | "US" | "HK" | "TW" | "OTHER";
+
+const REGION_OPTIONS: { value: Region; label: string; labelEn: string; flag: string }[] = [
+  { value: "US", label: "美国", labelEn: "United States", flag: "🇺🇸" },
+  { value: "CN", label: "中国大陆", labelEn: "China", flag: "🇨🇳" },
+  { value: "HK", label: "中国香港", labelEn: "Hong Kong", flag: "🇭🇰" },
+  { value: "TW", label: "中国台湾", labelEn: "Taiwan", flag: "🇹🇼" },
+  { value: "OTHER", label: "其他地区", labelEn: "Other", flag: "🌍" },
+];
+
+function getPaymentMethodsForRegion(region: Region, t: Record<string, any>) {
+  switch (region) {
+    case "CN":
+      return [
+        { value: "wechat" as PaymentMethod, label: t.withdraw.weChatPay, icon: "💚" },
+        { value: "alipay" as PaymentMethod, label: t.withdraw.alipay, icon: "🔵" },
+        { value: "bank" as PaymentMethod, label: t.withdraw.bankTransfer, icon: "🏦" },
+      ];
+    case "US":
+      return [
+        { value: "paypal" as PaymentMethod, label: t.withdraw.paypal, icon: "🟣" },
+        { value: "credit_card" as PaymentMethod, label: t.withdraw.creditCard, icon: "💳" },
+        { value: "bank" as PaymentMethod, label: t.withdraw.bankTransfer, icon: "🏦" },
+      ];
+    case "HK":
+    case "TW":
+    case "OTHER":
+    default:
+      return [
+        { value: "paypal" as PaymentMethod, label: t.withdraw.paypal, icon: "🟣" },
+        { value: "bank" as PaymentMethod, label: t.withdraw.bankTransfer, icon: "🏦" },
+      ];
+  }
+}
 
 function WithdrawPageContent() {
   const router = useRouter();
@@ -63,24 +103,27 @@ function WithdrawPageContent() {
   const { t, locale } = useLanguage();
 
   // Form state
+  const [region, setRegion] = useState<Region>("US");
   const [amount, setAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("wechat");
-  const [accountId, setAccountId] = useState(""); // WeChat/ Alipay/ PayPal account
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("paypal");
+  const [accountId, setAccountId] = useState(""); // WeChat/Alipay/PayPal/Email
   const [accountName, setAccountName] = useState(""); // Account holder name
   const [bankName, setBankName] = useState("");
   const [bankAccount, setBankAccount] = useState("");
 
-  // Get payment method options based on locale
-  const paymentMethods = locale === "zh-CN"
-    ? [
-        { value: "wechat" as PaymentMethod, label: t.withdraw.weChatPay, icon: "💚" },
-        { value: "alipay" as PaymentMethod, label: t.withdraw.alipay, icon: "🔵" },
-        { value: "bank" as PaymentMethod, label: t.withdraw.bankTransfer, icon: "🏦" },
-      ]
-    : [
-        { value: "paypal" as PaymentMethod, label: t.withdraw.paypal, icon: "🟣" },
-        { value: "bank" as PaymentMethod, label: t.withdraw.bankTransfer, icon: "🏦" },
-      ];
+  const currency = locale === "zh-CN" ? "CNY" : "USD";
+  const minAmount = currency === "CNY" ? MIN_WITHDRAWAL_CNY : MIN_WITHDRAWAL_USD;
+  const currencySymbol = currency === "CNY" ? "¥" : "$";
+
+  const paymentMethods = getPaymentMethodsForRegion(region, t);
+
+  // Update payment method when region changes
+  useEffect(() => {
+    const methods = getPaymentMethodsForRegion(region, t);
+    if (!methods.find(m => m.value === paymentMethod)) {
+      setPaymentMethod(methods[0].value);
+    }
+  }, [region, t, paymentMethod]);
 
   const loadData = useCallback(async () => {
     const [balanceRes, historyRes, stripeRes] = await Promise.all([
@@ -112,8 +155,8 @@ function WithdrawPageContent() {
   useEffect(() => { loadData(); }, [loadData]);
 
   const validateForm = () => {
-    if (!amount || isNaN(Number(amount)) || Number(amount) < MIN_WITHDRAWAL) {
-      return t.withdraw.minAmount.replace("{min}", MIN_WITHDRAWAL.toString());
+    if (!amount || isNaN(Number(amount)) || Number(amount) < minAmount) {
+      return t.withdraw.minAmount.replace("{min}", `${currencySymbol}${minAmount}`);
     }
     if (balance && Number(amount) > balance.availableBalance) {
       return t.withdraw.balanceInsufficient.replace("{balance}", balance.availableBalance.toFixed(2));
@@ -167,7 +210,8 @@ function WithdrawPageContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: Number(amount),
-          currency: locale === "zh-CN" ? "CNY" : "USD",
+          currency,
+          region,
           paymentMethod,
           accountId,
           accountName,
@@ -199,7 +243,7 @@ function WithdrawPageContent() {
   };
 
   const formatCurrency = (v: number) => {
-    if (locale === "zh-CN") {
+    if (currency === "CNY") {
       return new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(v);
     }
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
@@ -212,7 +256,27 @@ function WithdrawPageContent() {
       day: "2-digit",
     });
 
-  const currencySymbol = locale === "zh-CN" ? "¥" : "$";
+  const getMethodIcon = (pm: string) => {
+    switch (pm) {
+      case "wechat": return "💚";
+      case "alipay": return "🔵";
+      case "paypal": return "🟣";
+      case "credit_card": return "💳";
+      case "bank": return "🏦";
+      default: return "💰";
+    }
+  };
+
+  const getMethodLabel = (pm: string) => {
+    switch (pm) {
+      case "wechat": return t.withdraw.weChatPay;
+      case "alipay": return t.withdraw.alipay;
+      case "paypal": return t.withdraw.paypal;
+      case "credit_card": return t.withdraw.creditCard;
+      case "bank": return t.withdraw.bankTransfer;
+      default: return pm;
+    }
+  };
 
   return (
     <DashboardShell
@@ -229,12 +293,13 @@ function WithdrawPageContent() {
           <p className="text-blue-200 text-xs mt-2">{t.withdraw.balanceNote}</p>
         </div>
 
-        {/* Stripe Account Status Banner */}
-        {!loading && (
-          <div className={`rounded-xl p-4 border ${stripeAccount?.hasStripeAccount
+        {/* Stripe Account Status Banner (US region only) */}
+        {!loading && region === "US" && (
+          <div className={`rounded-xl p-4 border ${
+            stripeAccount?.hasStripeAccount
               ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
               : "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
-            }`}>
+          }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${stripeAccount?.hasStripeAccount ? "bg-green-100" : "bg-yellow-100"}`}>
@@ -273,6 +338,30 @@ function WithdrawPageContent() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Region Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t.withdraw.selectRegion}</label>
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                {REGION_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setRegion(opt.value)}
+                    className={`p-2 rounded-xl border-2 transition-all text-center ${
+                      region === opt.value
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                        : "border-gray-200 dark:border-gray-700 hover:border-blue-300"
+                    }`}
+                  >
+                    <span className="text-lg">{opt.flag}</span>
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5 leading-tight">
+                      {locale === "zh-CN" ? opt.label : opt.labelEn}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Amount */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -280,9 +369,9 @@ function WithdrawPageContent() {
               </label>
               <input
                 type="number"
-                min={MIN_WITHDRAWAL}
+                min={minAmount}
                 step="0.01"
-                placeholder={`${currencySymbol}${MIN_WITHDRAWAL}`}
+                placeholder={`${currencySymbol}${minAmount}`}
                 className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -316,15 +405,29 @@ function WithdrawPageContent() {
               </div>
             </div>
 
-            {/* Account ID (WeChat/Alipay/PayPal) */}
+            {/* Account ID (WeChat/Alipay/PayPal/Credit Card) */}
             {paymentMethod !== "bank" && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {paymentMethod === "wechat" ? t.withdraw.weChatPayAccount : paymentMethod === "alipay" ? t.withdraw.alipayAccount : t.withdraw.paypalAccount}
+                  {paymentMethod === "wechat"
+                    ? t.withdraw.weChatPayAccount
+                    : paymentMethod === "alipay"
+                    ? t.withdraw.alipayAccount
+                    : paymentMethod === "paypal"
+                    ? t.withdraw.paypalAccount
+                    : t.withdraw.creditCardAccount}
                 </label>
                 <input
                   type="text"
-                  placeholder={paymentMethod === "wechat" ? t.withdraw.weChatPayIdPlaceholder : paymentMethod === "alipay" ? t.withdraw.alipayIdPlaceholder : t.withdraw.paypalIdPlaceholder}
+                  placeholder={
+                    paymentMethod === "wechat"
+                      ? t.withdraw.weChatPayIdPlaceholder
+                      : paymentMethod === "alipay"
+                      ? t.withdraw.alipayIdPlaceholder
+                      : paymentMethod === "paypal"
+                      ? t.withdraw.paypalPlaceholder
+                      : t.withdraw.creditCardPlaceholder
+                  }
                   className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                   value={accountId}
                   onChange={(e) => setAccountId(e.target.value)}
@@ -384,7 +487,7 @@ function WithdrawPageContent() {
             )}
 
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-xs text-gray-500 dark:text-gray-400 space-y-1">
-              <p>• {t.withdraw.withdrawNote1.replace("{min}", MIN_WITHDRAWAL.toString()).replace("¥", currencySymbol)}</p>
+              <p>• {t.withdraw.withdrawNote1.replace("{min}", minAmount.toString()).replace("¥", currencySymbol).replace("$", currencySymbol)}</p>
               <p>• {t.withdraw.withdrawNote2}</p>
               <p>• {t.withdraw.withdrawNote3}</p>
             </div>
@@ -416,7 +519,7 @@ function WithdrawPageContent() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{formatCurrency(w.amount)}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                        {w.paymentMethod === "wechat" ? "💚 " + t.withdraw.weChatPay : w.paymentMethod === "alipay" ? "🔵 " + t.withdraw.alipay : w.paymentMethod === "paypal" ? "🟣 " + t.withdraw.paypal : "🏦 " + t.withdraw.bankTransfer}
+                        {getMethodIcon(w.paymentMethod ?? "bank")} {getMethodLabel(w.paymentMethod ?? "bank")}
                         {w.bankAccountLast4 ? ` ****${w.bankAccountLast4}` : ""} · {formatDate(w.createdAt)}
                       </p>
                       {w.rejectionReason && (

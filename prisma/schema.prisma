@@ -710,6 +710,9 @@ model Withdrawal {
   bankAccountLast4 String?
   accountHolder    String?
 
+  // Withdrawal region: CN (China), US (United States), HK (Hong Kong), TW (Taiwan), OTHER
+  region String @default("CN")
+
   // Status: PENDING, PROCESSING, APPROVED, REJECTED, COMPLETED, FAILED
   status          String @default("PENDING")
   rejectionReason String?
