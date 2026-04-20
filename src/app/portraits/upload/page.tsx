@@ -208,6 +208,19 @@ export default function UploadPortraitPage() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    // ── Check wallet binding before upload ────────────────────────
+    try {
+      const meRes = await fetch("/api/user", { credentials: "include" });
+      const meJson = await meRes.json();
+      if (!meJson.success || !meJson.data?.user?.walletAddress) {
+        setErrors({ wallet: t.upload?.walletRequiredError || "请先绑定钱包后再上传肖像" });
+        return;
+      }
+    } catch {
+      // If we can't check wallet status, still allow upload but skip auto-certify
+      console.warn("[Upload] Could not verify wallet status, proceeding anyway");
+    }
+
     setStage("upload");
     setProgress("Saving portrait record...");
 
@@ -441,6 +454,19 @@ export default function UploadPortraitPage() {
                 </div>
               </div>
             </section>
+
+            {/* Wallet error */}
+            {errors.wallet && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{errors.wallet}</span>
+                </p>
+                <a href="/wallet" className="mt-2 inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+                  → 绑定钱包
+                </a>
+              </div>
+            )}
 
             {/* Submit */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
