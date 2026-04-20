@@ -1,6 +1,6 @@
 /**
  * POST /api/ip-register/[id]/certify
- * Certify AI IP registration on blockchain (Sepolia)
+ * Certify AI IP registration on blockchain (Base Mainnet)
  *
  * Flow:
  *  1. Validate ownership
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const { id } = await context.params;
-    const network = "sepolia" as const;
+    const network = "base" as const;
 
     // Fetch AI content + registration
     const record = await prisma.aIContent.findUnique({
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    // ── Mint on Sepolia ─────────────────────────────────────────
+    // ── Mint on Base Mainnet ──────────────────────────────────────
     const imageHash = record.contentHash ?? (new Date().getTime().toString(16));
     let certifyResult;
     try {

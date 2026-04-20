@@ -171,7 +171,7 @@ export function buildPortraitMetadata(
     certifiedAt: Date | null;
   },
   contractAddress: string,
-  network: string = "sepolia"
+  network: string = "base"
 ): PortraitMetadata {
   return {
     name: portrait.title,

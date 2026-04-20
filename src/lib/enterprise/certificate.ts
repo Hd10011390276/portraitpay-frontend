@@ -212,7 +212,7 @@ export async function generateCertificatePDF(
       expiresAt: endDate,
       pdfUrl,
       blockchainTxHash: auth.contractHash,
-      blockchainNetwork: "sepolia",
+      blockchainNetwork: "base",
     },
   });
 

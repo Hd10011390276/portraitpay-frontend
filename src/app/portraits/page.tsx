@@ -80,7 +80,7 @@ export default function PortraitsPage() {
   }, [checking, fetchPortraits]);
 
   const handleCertify = async (id: string) => {
-    if (!confirm("Certify this portrait on the Ethereum Sepolia blockchain?")) return;
+    if (!confirm("Certify this portrait on the Base Mainnet blockchain?")) return;
     setCertifyingId(id);
     setCertifyStatus({ id, message: "Starting certification..." });
     try {

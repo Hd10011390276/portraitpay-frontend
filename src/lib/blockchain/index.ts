@@ -27,7 +27,7 @@ export interface OnChainPortraitRecord {
 /**
  * Create a ethers.js Wallet instance from private key
  */
-export function getSigner(network: keyof typeof SUPPORTED_NETWORKS = "sepolia") {
+export function getSigner(network: keyof typeof SUPPORTED_NETWORKS = "base") {
   const config = SUPPORTED_NETWORKS[network];
   if (!config) throw new Error(`Unsupported network: ${network}`);
 
@@ -39,7 +39,7 @@ export function getSigner(network: keyof typeof SUPPORTED_NETWORKS = "sepolia") 
 /**
  * Get a read-only provider for verifying data on-chain
  */
-export function getProvider(network: keyof typeof SUPPORTED_NETWORKS = "sepolia") {
+export function getProvider(network: keyof typeof SUPPORTED_NETWORKS = "base") {
   const config = SUPPORTED_NETWORKS[network];
   if (!config) throw new Error(`Unsupported network: ${network}`);
   return new ethers.JsonRpcProvider(config.rpcUrl);
@@ -48,7 +48,7 @@ export function getProvider(network: keyof typeof SUPPORTED_NETWORKS = "sepolia"
 /**
  * Get contract instance (read-write)
  */
-export function getContract(network: keyof typeof SUPPORTED_NETWORKS = "sepolia") {
+export function getContract(network: keyof typeof SUPPORTED_NETWORKS = "base") {
   const config = SUPPORTED_NETWORKS[network];
   if (!config) throw new Error(`Unsupported network: ${network}`);
 
@@ -59,7 +59,7 @@ export function getContract(network: keyof typeof SUPPORTED_NETWORKS = "sepolia"
 /**
  * Get contract instance (read-only)
  */
-export function getContractReadOnly(network: keyof typeof SUPPORTED_NETWORKS = "sepolia") {
+export function getContractReadOnly(network: keyof typeof SUPPORTED_NETWORKS = "base") {
   const config = SUPPORTED_NETWORKS[network];
   if (!config) throw new Error(`Unsupported network: ${network}`);
 
@@ -77,7 +77,7 @@ export function getContractReadOnly(network: keyof typeof SUPPORTED_NETWORKS = "
 export async function certifyPortrait(
   ipfsCid: string,
   imageHash: string,
-  network: keyof typeof SUPPORTED_NETWORKS = "sepolia"
+  network: keyof typeof SUPPORTED_NETWORKS = "base"
 ): Promise<CertificationResult> {
   const contract = getContract(network);
 
@@ -122,7 +122,7 @@ export async function certifyPortrait(
  */
 export async function verifyPortraitOnChain(
   imageHash: string,
-  network: keyof typeof SUPPORTED_NETWORKS = "sepolia"
+  network: keyof typeof SUPPORTED_NETWORKS = "base"
 ): Promise<OnChainPortraitRecord | null> {
   const contract = getContractReadOnly(network);
 
@@ -152,10 +152,10 @@ export async function computeImageHash(fileBuffer: Buffer): Promise<string> {
 }
 
 /**
- * Get current Sepolia gas price
+ * Get current Base Mainnet gas price
  */
-export async function getSepoliaGasPrice(): Promise<string> {
-  const provider = getProvider("sepolia");
+export async function getBaseGasPrice(): Promise<string> {
+  const provider = getProvider("base");
   const feeData = await provider.getFeeData();
   return feeData.gasPrice?.toString() ?? "0";
 }

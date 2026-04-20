@@ -5,7 +5,7 @@
  *  1. Validate portrait ownership + status
  *  2. Use pre-computed SHA-256 hash (from client)
  *  3. Upload metadata JSON to IPFS (Pinata)
- *  4. Mint on Sepolia (Ethers.js)
+ *  4. Mint on Base Mainnet (Ethers.js)
  *  5. Store txHash + ipfsCid in DB
  */
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const { id } = await context.params;
-    const network = "sepolia" as const;
+    const network = "base" as const;
 
     // ── Step 1: Fetch portrait ──────────────────────────────────
     const portrait = await prisma.portrait.findUnique({
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    // ── Step 5: Mint on Sepolia ──────────────────────────────────
+    // ── Step 5: Mint on Base Mainnet ─────────────────────────────
     let certificationResult;
     try {
       certificationResult = await certifyPortrait(metadataIpfsResult.cid, imageHash, network);

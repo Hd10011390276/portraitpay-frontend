@@ -1,6 +1,6 @@
 /**
  * PortraitCert contract ABI (minimal)
- * Deployed on Ethereum Sepolia testnet
+ * Deployed on Base Mainnet
  */
 
 export const PORTRAIT_CERT_ABI = [

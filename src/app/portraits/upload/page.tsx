@@ -232,10 +232,35 @@ export default function UploadPortraitPage() {
 
       setProgress("Storing image locally...");
 
-      // Step 2: Save image + ID card to browser IndexedDB
+      // Step 2: Upload image to S3, then save ID card locally
+      setProgress("Uploading image to S3...");
+      const presignedRes = await fetch(`/api/portraits/${id}/upload`);
+      if (!presignedRes.ok) throw new Error("Failed to get upload URLs");
+      const { data: uploadUrls } = await presignedRes.json();
+
+      // Upload original to S3 via presigned URL
+      const s3UploadRes = await fetch(uploadUrls.original.uploadUrl, {
+        method: "PUT",
+        body: croppedFile,
+        headers: { "Content-Type": "image/jpeg" },
+      });
+      if (!s3UploadRes.ok) throw new Error("S3 upload failed");
+      const originalImageUrl = uploadUrls.original.objectUrl;
+
+      // Save ID card to IndexedDB as fallback (portrait image now in S3)
       await savePortraitLocally(id, croppedFile!, idCardFront);
 
-      setProgress("✅ Portrait saved locally!");
+      // Register S3 URL with the portrait record
+      setProgress("Saving image URL...");
+      const updateRes = await fetch(`/api/portraits/${id}/upload`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ originalImageUrl, imageHash }),
+      });
+      const updateJson = await updateRes.json();
+      if (!updateJson.success) throw new Error(updateJson.error);
+
+      setProgress("✅ Portrait saved to S3!");
 
       // ── Auto-certify on blockchain ───────────────────────────
       setStage("certifying");
