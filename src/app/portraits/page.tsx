@@ -98,7 +98,7 @@ export default function PortraitsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Archive this portrait?")) return;
     try {
-      const res = await fetch(`/api/portraits/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/portraits/${id}`, { method: "DELETE", credentials: "include" });
       const json = await res.json();
       if (json.success) setPortraits((prev) => prev.filter((p) => p.id !== id));
     } catch { /* silent */ }

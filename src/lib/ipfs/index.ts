@@ -30,7 +30,7 @@ export interface PortraitMetadata {
  * Upload a file to IPFS via Pinata REST API
  */
 export async function uploadToIpfs(
-  data: Buffer,
+  data: Uint8Array | Buffer,
   fileName: string,
   mimeType: string = "image/jpeg"
 ): Promise<IpfsUploadResult> {
@@ -42,7 +42,8 @@ export async function uploadToIpfs(
   }
 
   const formData = new FormData();
-  const blob = new Blob([new Uint8Array(data)], { type: mimeType });
+  const uint8 = data instanceof Buffer ? new Uint8Array(data) : data;
+  const blob = new Blob([uint8], { type: mimeType });
   formData.append("file", blob, fileName);
 
   // Pinata metadata
@@ -82,7 +83,8 @@ export async function uploadToIpfs(
 }
 
 /**
- * Upload JSON metadata to IPFS
+ * Upload JSON metadata to IPFS via Pinata's pinJSONToIPFS endpoint.
+ * Uses plain JSON request (not FormData) for reliability in Edge Runtime.
  */
 export async function uploadJsonToIpfs(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,16 +98,18 @@ export async function uploadJsonToIpfs(
     throw new Error("Pinata API keys not configured.");
   }
 
-  const jsonBuffer = Buffer.from(JSON.stringify(metadata, null, 2));
-
-  const response = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+  // Use pinJSONToIPFS endpoint — simpler and works in Edge Runtime
+  const response = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
     method: "POST",
     headers: {
+      "Content-Type": "application/json",
       pinata_api_key: apiKey,
       pinata_secret_api_key: secretKey,
-      "Content-Type": "application/json",
     },
-    body: jsonBuffer,
+    body: JSON.stringify({
+      pinataContent: metadata,
+      pinataMetadata: { name: fileName },
+    }),
   });
 
   if (!response.ok) {
