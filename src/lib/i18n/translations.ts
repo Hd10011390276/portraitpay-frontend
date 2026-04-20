@@ -502,6 +502,7 @@ export const translations = {
       deleteAccountConfirm: "确定要删除你的账户吗？此操作无法撤销。",
       deleteAccountError: "账户删除需要联系客服",
       deleteAccountDesc: "删除账户将清除所有数据，且无法恢复",
+      deleteAccountBtn: "删除账户",
       namePlaceholder: "设置您的显示名称",
       // Wallet binding
       walletBinding: "绑定钱包",
@@ -1603,6 +1604,7 @@ export const translations = {
       deleteAccountConfirm: "Are you sure you want to delete your account? This action cannot be undone.",
       deleteAccountError: "Account deletion requires contacting support",
       deleteAccountDesc: "Deleting your account will remove all data and cannot be recovered",
+      deleteAccountBtn: "Delete Account",
       namePlaceholder: "Set your display name",
       // Wallet binding
       walletBinding: "Wallet Binding",

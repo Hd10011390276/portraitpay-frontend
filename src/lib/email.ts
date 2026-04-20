@@ -78,7 +78,7 @@ async function sendViaSMTP(opts: EmailOptions): Promise<void> {
     html: opts.html,
   });
 
-  console.log("[Email] Sent via SMTP:", info.messageId);
+  console.log("[Email] Sent via SMTP:", info.messageId, "to:", opts.to);
 }
 
 // ============================================================
@@ -167,4 +167,51 @@ export async function sendContactNotification(data: ContactEmailData): Promise<v
     html,
     text,
   });
+}
+
+// ============================================================
+// Welcome email
+// ============================================================
+interface WelcomeEmailParams {
+  name: string;
+  email: string;
+  role?: string;
+}
+
+export async function sendWelcomeEmail({ name, email, role: _role }: WelcomeEmailParams): Promise<void> {
+  console.log("[sendWelcomeEmail] Attempting to send welcome email to:", email, "name:", name);
+  try {
+    const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+  <div style="background:#7c3aed;padding:20px 24px">
+    <h2 style="margin:0;color:#fff;font-size:18px">欢迎来到 PortraitPay AI</h2>
+    <p style="margin:4px 0 0;color:#e9d5ff;font-size:13px">感谢您的注册</p>
+  </div>
+  <div style="padding:24px">
+    <p style="font-size:15px;color:#333">${name}，您好！</p>
+    <p style="font-size:15px;color:#333">感谢您注册 PortraitPay AI，您的账户已成功创建。</p>
+    <p style="font-size:15px;color:#333">您可以登录后开始上传和管理您的肖像资产。</p>
+    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#7c3aed;color:#fff;border-radius:6px;text-decoration:none;font-size:14px">立即体验 →</a>
+  </div>
+</div>
+</body>
+</html>`;
+
+    const text = `欢迎来到 PortraitPay AI\n\n${name}，您好！\n感谢您注册 PortraitPay AI，您的账户已成功创建。\n您可以登录后开始上传和管理您的肖像资产。`;
+
+    console.log("[sendWelcomeEmail] Calling sendEmail for:", email);
+    await sendEmail({
+      to: email,
+      subject: "欢迎来到 PortraitPay AI",
+      html,
+      text,
+    });
+    console.log("[sendWelcomeEmail] sendEmail completed for:", email);
+  } catch (err) {
+    // Non-blocking — log but do not throw
+    console.error("[sendWelcomeEmail] failed:", err);
+  }
 }

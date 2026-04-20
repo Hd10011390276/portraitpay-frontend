@@ -270,18 +270,16 @@ export default function DashboardPage() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const raw = localStorage.getItem("pp_user");
-    if (!raw) {
-      window.location.href = "/login";
-      return;
-    }
-    try {
-      setUser(JSON.parse(raw));
-    } catch {
-      window.location.href = "/login";
-    } finally {
-      setChecking(false);
-    }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) { window.location.href = "/login"; return; }
+        const json = await res.json();
+        setUser(json.data?.user || json.user || null);
+      } catch { window.location.href = "/login"; }
+      finally { setChecking(false); }
+    };
+    checkAuth();
   }, []);
 
   if (checking) {
@@ -289,7 +287,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-            <span className="text-white font-bold">PP</span>
+            <img src="/logo.png" alt="PortraitPay AI" className="w-8 h-8 rounded-md object-contain" />
           </div>
           <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full" />
         </div>

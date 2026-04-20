@@ -48,10 +48,16 @@ export default function PortraitsPage() {
   ];
 
   useEffect(() => {
-    const raw = localStorage.getItem("pp_user");
-    if (!raw) { window.location.href = "/login"; return; }
-    try { setUser(JSON.parse(raw)); } catch { window.location.href = "/login"; }
-    finally { setChecking(false); }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) { window.location.href = "/login"; return; }
+        const json = await res.json();
+        setUser(json.data?.user || json.user || null);
+      } catch { window.location.href = "/login"; }
+      finally { setChecking(false); }
+    };
+    checkAuth();
   }, []);
 
   const fetchPortraits = useCallback(async () => {
@@ -89,7 +95,7 @@ export default function PortraitsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("确认删除此肖像？")) return;
+    if (!window.confirm("确认删除此肖像？")) return;
     try {
       const res = await fetch(`/api/portraits/${id}`, { method: "DELETE", credentials: "include" });
       const json = await res.json();
@@ -104,6 +110,7 @@ export default function PortraitsPage() {
         } else if (res.status === 401) {
           alert("无法删除：请重新登录后再试");
         } else {
+          console.error("[handleDelete] unexpected error", res.status, json.error);
           alert(`删除失败 (${res.status}): ${json.error || "未知错误"}`);
         }
       }

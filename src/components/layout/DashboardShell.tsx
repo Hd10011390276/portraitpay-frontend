@@ -28,27 +28,29 @@ export function DashboardShell({ children, title, subtitle, action }: DashboardS
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("pp_user");
-    if (!raw) {
-      router.push("/login");
-      return;
-    }
-    try {
-      setUser(JSON.parse(raw));
-    } catch {
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) {
+          router.push("/login");
+          return;
+        }
+        const json = await res.json();
+        setUser(json.data?.user || json.user || null);
+      } catch {
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
   }, [router]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-            <span className="text-white font-bold">PP</span>
-          </div>
+          <img src="/logo.png" alt="PortraitPay AI" className="w-10 h-10 rounded-lg object-contain" />
           <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full" />
         </div>
       </div>

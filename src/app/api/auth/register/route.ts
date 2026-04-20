@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { RegisterSchema } from "@/lib/auth/schemas";
 import { signTokenPair } from "@/lib/auth/jwt";
 import { setTokenCookies } from "@/lib/auth/session";
+import { sendWelcomeEmail } from "@/lib/email";
 export const dynamic = "force-dynamic";
 
 type UserRole = string;
@@ -67,6 +68,15 @@ export async function POST(req: NextRequest) {
       },
       select: { id: true, email: true, name: true, role: true },
     });
+
+    // Send welcome email (non-blocking — don't fail registration if email throws)
+    try {
+      console.log("[REGISTER] Attempting to send welcome email to:", user.email);
+      await sendWelcomeEmail({ email: user.email, name: user.name ?? user.email.split("@")[0], role: user.role });
+      console.log("[REGISTER] Welcome email sent successfully for:", user.email);
+    } catch (emailError) {
+      console.error("[REGISTER] Welcome email failed:", emailError);
+    }
 
     const tokens = signTokenPair({
       userId: user.id,
