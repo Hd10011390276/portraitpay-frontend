@@ -240,7 +240,7 @@ export default function PrivacyPage() {
         <div className="max-w-3xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="PortraitPay AI" className="w-5 h-5 rounded dark:hidden" />
-            <img src="/logo-dark.svg" alt="PortraitPay AI" className="w-5 h-5 rounded hidden dark:block" />
+            <img src="/logo-dark.png" alt="PortraitPay AI" className="w-5 h-5 rounded hidden dark:block" />
             <span className="text-sm" style={{ color: "var(--text-tertiary)" }}>© 2026 PortraitPay AI</span>
           </div>
           <div className="flex items-center gap-5">
