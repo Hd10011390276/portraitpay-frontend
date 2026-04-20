@@ -52,12 +52,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    if (!record.owner.walletAddress) {
-      return NextResponse.json(
-        { success: false, error: "Wallet address not set. Please bind a wallet first.", code: "IP-2001" },
-        { status: 400 }
-      );
-    }
+    // Note: blockchain certification uses the platform wallet (ETH_WALLET_PRIVATE_KEY), not the user's wallet.
 
     const registration = record.ipRegistrations[0];
     if (!registration) {

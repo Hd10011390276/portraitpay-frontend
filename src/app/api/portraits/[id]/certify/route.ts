@@ -46,12 +46,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    if (!portrait.owner.walletAddress) {
-      return NextResponse.json(
-        { success: false, error: "Wallet address not set. Please bind a wallet first.", code: "PP-2001" },
-        { status: 400 }
-      );
-    }
+    // Note: blockchain certification uses the platform wallet (ETH_WALLET_PRIVATE_KEY), not the user's wallet.
+    // The owner.walletAddress field is only for display purposes and is not required for certification.
 
     if (portrait.status !== "DRAFT" && portrait.status !== "UNDER_REVIEW") {
       return NextResponse.json(
