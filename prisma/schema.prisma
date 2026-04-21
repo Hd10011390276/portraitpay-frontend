@@ -142,6 +142,14 @@ model Portrait {
 
   isPublic Boolean @default(false)
 
+  // AI Licensing settings (per-portrait override)
+  // null means use PortraitSettings default; true = allow AI licensing, false = block
+  allowAiLicensing  Boolean?
+  aiLicenseFee      Decimal?  @db.Decimal(12, 2)  // Override fee (null = use default)
+  aiLicenseScopes   String[]  @default([])         // Empty = all scopes allowed
+  aiProhibitedScopes String[] @default([])         // Blocked scopes for this portrait
+  aiTerritorialScope String  @default("global")   // Override territorial scope
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -1108,6 +1116,52 @@ model Celebrity {
   @@index([category])
   @@index([country])
   @@index([faceId])
+}
+
+// ============================================================
+// AI Platform API Keys — For third-party AI platforms to license portraits
+// ============================================================
+
+model AiPlatformApiKey {
+  id String @id @default(cuid())
+
+  // Platform name (e.g., "Midjourney", "Runway", "Stable Diffusion")
+  platformName String
+
+  // SHA-256 hash of the raw API key
+  keyHash String @unique
+  // For display only (last 6 chars), e.g., "pp_live_...a1b2c3"
+  keyPrefix String @default("pp_live_")
+
+  // Admin who created this key
+  createdById String
+
+  // Status: ACTIVE, SUSPENDED, REVOKED
+  status String @default("ACTIVE")
+
+  // Permissions/scopes granted to this platform
+  // Values: "portrait:read", "portrait:license", "portrait:verify", "earnings:read"
+  scopes String[] @default([])
+
+  // Optional note (e.g., "Production key for Midjourney v6")
+  note String?
+
+  // Usage limits
+  rateLimitPerMinute Int @default(120)
+
+  // Usage tracking
+  lastUsedAt   DateTime?
+  requestCount BigInt    @default(0)
+
+  // Optional expiration
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([keyHash])
+  @@index([status])
+  @@index([platformName])
 }
 
 // ============================================================

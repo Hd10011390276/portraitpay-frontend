@@ -50,6 +50,30 @@ export default function PortraitDetailPage() {
   const [certifyMsg, setCertifyMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
 
+  // AI Licensing state
+  const [licensing, setLicensing] = useState<{
+    allowAiLicensing: boolean | null;
+    aiLicenseFee: string | null;
+    aiLicenseScopes: string[];
+    aiProhibitedScopes: string[];
+    aiTerritorialScope: string;
+    defaults: {
+      allowLicensing: boolean;
+      defaultLicenseFee: string;
+      allowedScopes: string[];
+      prohibitedContent: string[];
+      defaultTerritorialScope: string;
+    };
+  } | null>(null);
+  const [licensingSaving, setLicensingSaving] = useState(false);
+  const [showLicensing, setShowLicensing] = useState(false);
+  // Editable form state
+  const [editAllowAi, setEditAllowAi] = useState<boolean | null>(null);
+  const [editFee, setEditFee] = useState("");
+  const [editScopes, setEditScopes] = useState<string[]>([]);
+  const [editProhibited, setEditProhibited] = useState<string[]>([]);
+  const [editTerritory, setEditTerritory] = useState("");
+
   useEffect(() => {
     fetch(`/api/portraits/${id}`)
       .then((r) => r.json())
@@ -60,6 +84,24 @@ export default function PortraitDetailPage() {
       .catch(() => router.push("/portraits"))
       .finally(() => setLoading(false));
   }, [id, router]);
+
+  // Load AI licensing settings
+  useEffect(() => {
+    if (!id) return;
+    fetch(`/api/portraits/${id}/licensing`)
+      .then((r) => r.json())
+      .then((j) => {
+        if (j.success) {
+          setLicensing(j.data);
+          setEditAllowAi(j.data.allowAiLicensing);
+          setEditFee(j.data.aiLicenseFee ?? "");
+          setEditScopes(j.data.aiLicenseScopes ?? []);
+          setEditProhibited(j.data.aiProhibitedScopes ?? []);
+          setEditTerritory(j.data.aiTerritorialScope ?? "global");
+        }
+      })
+      .catch(() => {});
+  }, [id]);
 
   const handleDownloadPortrait = async () => {
     try {
@@ -141,6 +183,51 @@ export default function PortraitDetailPage() {
       setDeleting(false);
     }
   };
+
+  const handleSaveLicensing = async () => {
+    setLicensingSaving(true);
+    try {
+      const body: Record<string, unknown> = {};
+      if (editAllowAi !== null) body.allowAiLicensing = editAllowAi;
+      if (editFee !== "") body.aiLicenseFee = editFee;
+      if (editScopes.length > 0) body.aiLicenseScopes = editScopes;
+      if (editProhibited.length > 0) body.aiProhibitedScopes = editProhibited;
+      if (editTerritory) body.aiTerritorialScope = editTerritory;
+
+      const res = await fetch(`/api/portraits/${id}/licensing`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setLicensing((prev) => prev ? {
+          ...prev,
+          allowAiLicensing: json.data.allowAiLicensing,
+          aiLicenseFee: json.data.aiLicenseFee,
+          aiLicenseScopes: json.data.aiLicenseScopes,
+          aiProhibitedScopes: json.data.aiProhibitedScopes,
+          aiTerritorialScope: json.data.aiTerritorialScope,
+        } : null);
+        setShowLicensing(false);
+        alert("Licensing settings saved!");
+      } else {
+        alert(json.error);
+      }
+    } finally {
+      setLicensingSaving(false);
+    }
+  };
+
+  function openLicensingPanel() {
+    if (!licensing) return;
+    setEditAllowAi(licensing.allowAiLicensing);
+    setEditFee(licensing.aiLicenseFee ?? "");
+    setEditScopes(licensing.aiLicenseScopes ?? []);
+    setEditProhibited(licensing.aiProhibitedScopes ?? []);
+    setEditTerritory(licensing.aiTerritorialScope ?? "global");
+    setShowLicensing(true);
+  }
 
   if (loading) {
     return (
@@ -300,6 +387,63 @@ export default function PortraitDetailPage() {
             <button onClick={handleDelete} disabled={deleting} className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50">{deleting ? tc.archiving : tc.archive}</button>
           </div>
 
+          {/* AI Licensing Panel */}
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-purple-200 dark:border-purple-800 p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-purple-900 dark:text-purple-300 flex items-center gap-2">
+                🤖 AI Licensing
+              </h3>
+              <button
+                onClick={openLicensingPanel}
+                className="text-xs px-3 py-1.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/60 transition"
+              >
+                Configure
+              </button>
+            </div>
+            {licensing === null ? (
+              <div className="text-sm text-gray-400">Loading...</div>
+            ) : (
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500 dark:text-gray-400">Status:</span>
+                  {licensing.allowAiLicensing === null ? (
+                    <span className="text-gray-400 text-xs">(Uses global default)</span>
+                  ) : licensing.allowAiLicensing ? (
+                    <span className="text-green-600 text-xs font-medium px-2 py-0.5 bg-green-50 rounded-full">Allowed</span>
+                  ) : (
+                    <span className="text-red-500 text-xs font-medium px-2 py-0.5 bg-red-50 rounded-full">Blocked</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500 dark:text-gray-400">License Fee:</span>
+                  <span className="text-gray-800 dark:text-gray-200">
+                    {licensing.aiLicenseFee ? `$${licensing.aiLicenseFee} USD` : `(Default: $${licensing.defaults.defaultLicenseFee})`}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500 dark:text-gray-400">Territory:</span>
+                  <span className="text-gray-800 dark:text-gray-200 capitalize">{licensing.aiTerritorialScope}</span>
+                </div>
+                {licensing.aiLicenseScopes.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {licensing.aiLicenseScopes.map((s) => (
+                      <span key={s} className="text-xs px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">{s}</span>
+                    ))}
+                  </div>
+                )}
+                {licensing.aiProhibitedScopes.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {licensing.aiProhibitedScopes.map((s) => (
+                      <span key={s} className="text-xs px-2 py-0.5 bg-red-50 dark:bg-red-900/30 text-red-500 rounded-full">{s}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">Unable to load licensing settings.</p>
+            )}
+          </div>
+
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{tc.owner}</p>
             <p className="font-medium text-gray-900 dark:text-white">{portrait.owner.displayName ?? "—"}</p>
@@ -310,6 +454,150 @@ export default function PortraitDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* AI Licensing Configuration Modal */}
+      {showLicensing && licensing && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setShowLicensing(false)}>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+              <h2 className="text-lg font-bold text-purple-900 dark:text-purple-300">🤖 AI Licensing Settings</h2>
+              <button onClick={() => setShowLicensing(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+            </div>
+            <div className="p-6 space-y-5">
+              {/* Allow AI Licensing Toggle */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Allow AI Platforms to License</label>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditAllowAi(true)}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium border transition ${
+                      editAllowAi === true
+                        ? "bg-green-50 border-green-300 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"
+                        : "bg-white border-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    ✅ Allow
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditAllowAi(false)}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium border transition ${
+                      editAllowAi === false
+                        ? "bg-red-50 border-red-300 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300"
+                        : "bg-white border-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    🚫 Block
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditAllowAi(null)}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium border transition ${
+                      editAllowAi === null
+                        ? "bg-gray-100 border-gray-400 text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                        : "bg-white border-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    Default
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">"Default" uses your global PortraitSettings preference.</p>
+              </div>
+
+              {/* License Fee */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">License Fee (USD)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editFee}
+                  onChange={(e) => setEditFee(e.target.value)}
+                  placeholder={`Default: $${licensing.defaults.defaultLicenseFee}`}
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-800"
+                />
+              </div>
+
+              {/* Territorial Scope */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Territorial Scope</label>
+                <select
+                  value={editTerritory}
+                  onChange={(e) => setEditTerritory(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-800"
+                >
+                  <option value="global">🌍 Global</option>
+                  <option value="china">🇨🇳 China</option>
+                  <option value="asia">🌏 Asia</option>
+                  <option value="europe">🇪🇺 Europe</option>
+                  <option value="americas">🌎 Americas</option>
+                </select>
+              </div>
+
+              {/* Allowed Usage Scopes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Allowed Usage (leave empty = all allowed)</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {["FILM", "ANIMATION", "ADVERTISING", "GAMING", "PRINT", "MERCHANDISE", "SOCIAL_MEDIA", "EDUCATION", "NEWS"].map((scope) => (
+                    <label key={scope} className="flex items-center gap-1.5 p-2 border border-gray-100 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                      <input
+                        type="checkbox"
+                        checked={editScopes.includes(scope)}
+                        onChange={() => {
+                          setEditScopes((prev) =>
+                            prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope]
+                          );
+                        }}
+                        className="rounded"
+                      />
+                      <span className="text-xs text-gray-700 dark:text-gray-300">{scope}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Prohibited Content */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Prohibited Content (always blocked)</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {["ADULT", "POLITICAL", "VIOLENCE", "HATE", "FRAUD", "WEAPONS", "ILLEGAL"].map((scope) => (
+                    <label key={scope} className="flex items-center gap-1.5 p-2 border border-gray-100 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                      <input
+                        type="checkbox"
+                        checked={editProhibited.includes(scope)}
+                        onChange={() => {
+                          setEditProhibited((prev) =>
+                            prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope]
+                          );
+                        }}
+                        className="rounded"
+                      />
+                      <span className="text-xs text-gray-700 dark:text-gray-300">{scope}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleSaveLicensing}
+                  disabled={licensingSaving}
+                  className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-700 disabled:opacity-60 transition"
+                >
+                  {licensingSaving ? "Saving..." : "💾 Save Settings"}
+                </button>
+                <button
+                  onClick={() => setShowLicensing(false)}
+                  className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardShell>
   );
 }
