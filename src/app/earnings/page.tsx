@@ -204,10 +204,20 @@ export default function EarningsPage() {
       title={t.earnings.title}
       subtitle={t.earnings.subtitle}
       action={
-        <a href="/withdraw"
-          className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-          💰 {t.earnings.applyWithdraw}
-        </a>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              const win = window.open("/api/v1/export/earnings?currency=CNY", "_blank");
+              if (!win) alert("请允许弹出窗口");
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">
+            📤 CSV
+          </button>
+          <a href="/withdraw"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+            💰 {t.earnings.applyWithdraw}
+          </a>
+        </div>
       }
     >
       <div className="space-y-6">

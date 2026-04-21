@@ -15,7 +15,9 @@ export async function GET(req: NextRequest) {
     if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
-    // TODO: verify session.user.role === ADMIN
+    if (session.user.role !== "ADMIN" && session.user.role !== "VERIFIER") {
+      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+    }
 
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") ?? "1");
