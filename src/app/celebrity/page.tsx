@@ -72,18 +72,17 @@ export default function CelebrityPage() {
     setServerError("");
 
     try {
-      const res = await fetch("/api/contacts", {
+      const res = await fetch("/api/v1/celebrity", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: "CELEBRITY",
           name: form.name,
           email: form.email,
           contactPhone: form.contactPhone,
-          subject: form.stageName,
-          enterpriseName: form.category,
-          intendedUse: form.socialMedia,
-          company: form.agency,
+          stageName: form.stageName,
+          category: form.category,
+          socialMedia: form.socialMedia,
+          agency: form.agency,
           message: form.message,
         }),
       });

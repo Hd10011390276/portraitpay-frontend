@@ -1,11 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import type { TraceResult } from "./FaceTraceUploader";
 
 interface FaceTraceResultsProps {
   results: TraceResult[];
   onReset: () => void;
+}
+
+interface SavedState {
+  [key: string]: "idle" | "saving" | "saved";
 }
 
 const STATUS_META = {
@@ -61,10 +65,19 @@ function SimilarityBar({ score }: { score: number }) {
   );
 }
 
-function MatchCard({ result, rank }: { result: TraceResult; rank: number }) {
+function MatchCard({
+  result,
+  rank,
+  savedState,
+  onSave,
+}: {
+  result: TraceResult;
+  rank: number;
+  savedState: "idle" | "saving" | "saved";
+  onSave: (result: TraceResult) => void;
+}) {
   const meta = STATUS_META[result.ownershipStatus] ?? STATUS_META.unclaimed;
   const catIcon = CATEGORY_ICON[result.category] ?? CATEGORY_ICON.default;
-  const similarityPct = (result.similarityScore * 100).toFixed(1);
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-md hover:border-indigo-200 transition-all">
@@ -115,9 +128,7 @@ function MatchCard({ result, rank }: { result: TraceResult; rank: number }) {
 
       {/* Actions */}
       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-        <span className="text-xs text-gray-400">
-          {meta.desc}
-        </span>
+        <span className="text-xs text-gray-400">{meta.desc}</span>
         {result.claimable && result.ownershipStatus === "unclaimed" && (
           <a
             href="/enterprise/authorization/apply"
@@ -136,6 +147,25 @@ function MatchCard({ result, rank }: { result: TraceResult; rank: number }) {
             ⏳ 审核中
           </span>
         )}
+        {savedState === "idle" && (
+          <button
+            onClick={() => onSave(result)}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+          >
+            💾 保存到我的图库
+          </button>
+        )}
+        {savedState === "saving" && (
+          <span className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600">
+            <span className="animate-spin h-3 w-3 border-2 border-indigo-300 border-t-indigo-600 rounded-full" />
+            保存中…
+          </span>
+        )}
+        {savedState === "saved" && (
+          <span className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg">
+            ✓ 已保存
+          </span>
+        )}
       </div>
     </div>
   );
@@ -145,6 +175,34 @@ export default function FaceTraceResults({
   results,
   onReset,
 }: FaceTraceResultsProps) {
+  const [saved, setSaved] = useState<SavedState>({});
+
+  async function handleSave(result: TraceResult) {
+    const key = `${result.name}-${result.category}`;
+    setSaved((prev) => ({ ...prev, [key]: "saving" }));
+
+    try {
+      const res = await fetch("/api/portraits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: result.name,
+          description: result.note ?? `Face trace match — ${result.category}`,
+          category: result.category,
+          tags: ["face-trace", result.ownershipStatus],
+          isPublic: false,
+        }),
+      });
+      if (res.ok) {
+        setSaved((prev) => ({ ...prev, [key]: "saved" }));
+      } else {
+        setSaved((prev) => ({ ...prev, [key]: "idle" }));
+      }
+    } catch {
+      setSaved((prev) => ({ ...prev, [key]: "idle" }));
+    }
+  }
+
   if (results.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-10 text-center">
@@ -194,7 +252,12 @@ export default function FaceTraceResults({
               🏆 Top Match
             </span>
           </div>
-          <MatchCard result={top} rank={1} />
+          <MatchCard
+            result={top}
+            rank={1}
+            savedState={(saved[`${top.name}-${top.category}`] ?? "idle") as "idle" | "saving" | "saved"}
+            onSave={handleSave}
+          />
         </div>
       )}
 
@@ -202,7 +265,13 @@ export default function FaceTraceResults({
       {rest.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {rest.map((r, i) => (
-            <MatchCard key={r.name + i} result={r} rank={i + 2} />
+            <MatchCard
+              key={r.name + i}
+              result={r}
+              rank={i + 2}
+              savedState={(saved[`${r.name}-${r.category}`] ?? "idle") as "idle" | "saving" | "saved"}
+              onSave={handleSave}
+            />
           ))}
         </div>
       )}

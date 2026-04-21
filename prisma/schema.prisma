@@ -1109,3 +1109,33 @@ model Celebrity {
   @@index([country])
   @@index([faceId])
 }
+
+// ============================================================
+// CelebrityIntake — Celebrity Artist Application Form
+// ============================================================
+
+model CelebrityIntake {
+  id String @id @default(cuid())
+
+  name         String
+  email        String
+  contactPhone String?
+  stageName    String
+  category     String   // star | actor | singer | influencer | athlete | artist | other
+  socialMedia  String?
+  agency       String?
+  message      String?  @db.Text
+
+  // Status: PENDING, REVIEWING, APPROVED, REJECTED
+  status String @default("PENDING")
+
+  reviewerId      String?
+  reviewedAt      DateTime?
+  rejectionReason String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
