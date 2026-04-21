@@ -6,8 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 import { buildEvidenceSetHash } from "@/lib/infringement/evidence";
 
 export const dynamic = "force-dynamic";
@@ -48,8 +47,8 @@ const ListInfringementSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -63,12 +62,12 @@ export async function GET(request: NextRequest) {
     }
 
     const { page, limit, status, type, portraitId, source } = parsed.data;
-    const isAdmin = session.user.role === "ADMIN" || session.user.role === "VERIFIER";
+    const isAdmin = session.role === "ADMIN" || session.role === "VERIFIER";
 
     // Non-admins can only see their own reports
     const where: Record<string, unknown> = {};
     if (!isAdmin) {
-      where.reporterId = session.user.id;
+      where.reporterId = session.userId;
     }
     if (status) where.status = status;
     if (type) where.type = type;
@@ -115,8 +114,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -152,7 +151,7 @@ export async function POST(request: NextRequest) {
     // Create the report
     const report = await prisma.infringementReport.create({
       data: {
-        reporterId: session.user.id,
+        reporterId: session.userId,
         portraitId,
         type,
         description,

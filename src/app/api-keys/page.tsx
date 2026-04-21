@@ -77,8 +77,11 @@ export default function AdminApiKeysPage() {
   // Action loading
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  const [accessDenied, setAccessDenied] = useState(false);
+
   const load = useCallback(async (page = 1) => {
     setLoading(true);
+    setAccessDenied(false);
     try {
       const params = new URLSearchParams({ page: String(page), limit: "20" });
       if (filterStatus) params.set("status", filterStatus);
@@ -88,12 +91,12 @@ export default function AdminApiKeysPage() {
       const res = await fetch(`/api/v1/admin/api-keys?${params}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
+      if (res.status === 401) { router.push("/login"); return; }
+      if (res.status === 403) { setAccessDenied(true); setLoading(false); return; }
       const json = await res.json();
       if (json.success) {
         setKeys(json.data ?? []);
         setMeta(json.meta ?? null);
-      } else {
-        router.push("/login");
       }
     } finally {
       setLoading(false);
@@ -221,6 +224,23 @@ export default function AdminApiKeysPage() {
   function toggleScope(scope: string) {
     setFormScopes((prev) =>
       prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope]
+    );
+  }
+
+  if (accessDenied) {
+    return (
+      <DashboardShell title="AI Platform API Keys" subtitle="Manage third-party AI platform access">
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">访问受限</h2>
+          <p className="text-gray-500 dark:text-gray-400 max-w-sm">此页面仅限管理员访问。请确认您使用的是管理员账号，或联系平台管理员获取权限。</p>
+          <button onClick={() => router.push("/dashboard")} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">返回控制台</button>
+        </div>
+      </DashboardShell>
     );
   }
 
