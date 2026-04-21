@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && next build",
-    "build:docker": "npx prisma generate && next build",
+    "build": "node node_modules/prisma/build/index.js generate && next build",
+    "build:docker": "node node_modules/prisma/build/index.js generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "npx prisma migrate deploy",
