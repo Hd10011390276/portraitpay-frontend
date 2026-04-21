@@ -18,8 +18,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 import { renderNotice, renderNoticeHtml, NoticeType } from "@/lib/infringement/notice";
 import { submitForNotarization as notarizeEvidence } from "@/lib/infringement/notarization";
 import { uploadJsonToIpfs } from "@/lib/ipfs";
@@ -47,8 +46,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 // GET — List notices
 export async function GET(_req: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -68,8 +67,8 @@ export async function GET(_req: NextRequest, context: RouteContext) {
 // POST — Generate & send notice
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -87,8 +86,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Report not found" }, { status: 404 });
     }
 
-    const isOwner = report.portrait.ownerId === session.user.id;
-    const isAdmin = session.user.role === "ADMIN";
+    const isOwner = report.portrait.ownerId === session.userId;
+    const isAdmin = session.role === "ADMIN";
     if (!isOwner && !isAdmin) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }

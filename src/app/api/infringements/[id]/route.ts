@@ -7,8 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -62,13 +61,13 @@ async function getReport(id: string, userId: string, role: string) {
 
 export async function GET(_req: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await context.params;
-    const report = await getReport(id, session.user.id, session.user.role ?? "");
+    const report = await getReport(id, session.userId, session.role ?? "");
 
     if (!report) {
       return NextResponse.json({ success: false, error: "Report not found or access denied" }, { status: 404 });
@@ -87,8 +86,8 @@ export async function GET(_req: NextRequest, context: RouteContext) {
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -99,8 +98,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Report not found" }, { status: 404 });
     }
 
-    const isReporter = existing.reporterId === session.user.id;
-    const isAdmin = session.user.role === "ADMIN" || session.user.role === "VERIFIER";
+    const isReporter = existing.reporterId === session.userId;
+    const isAdmin = session.role === "ADMIN" || session.role === "VERIFIER";
 
     // Only reporter (while pending) or admin can update
     if (!isReporter && !isAdmin) {
@@ -145,8 +144,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
 export async function DELETE(_req: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -157,7 +156,7 @@ export async function DELETE(_req: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Report not found" }, { status: 404 });
     }
 
-    if (existing.reporterId !== session.user.id && session.user.role !== "ADMIN") {
+    if (existing.reporterId !== session.userId && session.role !== "ADMIN") {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 

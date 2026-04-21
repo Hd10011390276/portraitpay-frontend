@@ -9,8 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -29,8 +28,8 @@ const AlertDecisionSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -40,7 +39,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = { ownerId: session.user.id };
+    const where: any = { ownerId: session.userId };
     if (status) where.status = status;
 
     const [alerts, total] = await Promise.all([
@@ -91,7 +90,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Alert not found" }, { status: 404 });
     }
 
-    if (alert.ownerId !== session.user.id && session.user.role !== "ADMIN") {
+    if (alert.ownerId !== session.userId && session.role !== "ADMIN") {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 

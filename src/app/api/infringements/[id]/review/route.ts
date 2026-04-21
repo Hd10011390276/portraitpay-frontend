@@ -6,8 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -24,12 +23,12 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const role = session.user.role ?? "";
+    const role = session.role ?? "";
     if (role !== "ADMIN" && role !== "VERIFIER") {
       return NextResponse.json({ success: false, error: "Forbidden — verifier or admin required" }, { status: 403 });
     }
@@ -60,7 +59,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       where: { id },
       data: {
         status: decision,
-        verifierId: session.user.id,
+        verifierId: session.userId,
         verifiedAt: new Date(),
         resolution: resolution || null,
         ...(defendantId && { defendantId }),
@@ -79,7 +78,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       });
     }
 
-    console.log(`[Review] Report ${id} ${decision} by ${session.user.id}. Resolution: ${resolution ?? "N/A"}`);
+    console.log(`[Review] Report ${id} ${decision} by ${session.userId}. Resolution: ${resolution ?? "N/A"}`);
 
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {

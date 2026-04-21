@@ -6,8 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +21,9 @@ const CreatePortraitSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!session?.userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
@@ -38,7 +37,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "20", 10), 100);
 
     const where: Record<string, unknown> = {
-      ownerId: session.user.id,
+      ownerId: session.userId,
       deletedAt: null,
     };
 
@@ -81,9 +80,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!session?.userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
@@ -109,7 +108,7 @@ export async function POST(request: NextRequest) {
         category,
         tags,
         isPublic,
-        ownerId: session.user.id,
+        ownerId: session.userId,
         status: "DRAFT",
         faceEmbedding: [],
       },

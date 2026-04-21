@@ -5,16 +5,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {
-      ownerId: session.user.id,
+      ownerId: session.userId,
       deletedAt: null,
     };
 
@@ -62,8 +61,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -116,7 +115,7 @@ export async function POST(request: NextRequest) {
     const result = await prisma.$transaction(async (tx) => {
       const aiContent = await tx.aIContent.create({
         data: {
-          ownerId: session.user.id,
+          ownerId: session.userId,
           title: title.trim(),
           description: description?.trim() || null,
           contentType,
@@ -143,7 +142,7 @@ export async function POST(request: NextRequest) {
       const ipRegistration = await tx.iPRegistration.create({
         data: {
           aiContentId: aiContent.id,
-          ownerId: session.user.id,
+          ownerId: session.userId,
           title: title.trim(),
           description: description?.trim() || null,
           certificateNo,

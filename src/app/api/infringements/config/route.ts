@@ -8,8 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -31,13 +30,13 @@ const MonitorConfigSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const config = await prisma.infringementMonitorConfig.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: session.userId },
     });
 
     return NextResponse.json({ success: true, data: config });
@@ -64,7 +63,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const config = await prisma.infringementMonitorConfig.upsert({
-      where: { userId: session.user.id },
+      where: { userId: session.userId },
       create: {
         userId: session.user.id,
         ...parsed.data,

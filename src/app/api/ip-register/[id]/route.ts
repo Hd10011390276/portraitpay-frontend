@@ -4,8 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionFromRequest } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +13,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const session = await getSessionFromRequest(request);
+    if (!session?.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
@@ -36,7 +35,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Not found" }, { status: 404 });
     }
 
-    if (record.ownerId !== session.user.id) {
+    if (record.ownerId !== session.userId) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
