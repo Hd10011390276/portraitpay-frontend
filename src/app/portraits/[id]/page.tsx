@@ -439,8 +439,6 @@ export default function PortraitDetailPage() {
                   </div>
                 )}
               </div>
-            ) : (
-              <p className="text-sm text-gray-400">Unable to load licensing settings.</p>
             )}
           </div>
 
