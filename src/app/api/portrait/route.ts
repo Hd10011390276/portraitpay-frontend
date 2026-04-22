@@ -47,7 +47,24 @@ export async function GET(request: NextRequest) {
     const [portraits, total] = await Promise.all([
       prisma.portrait.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          category: true,
+          tags: true,
+          originalImageUrl: true,
+          thumbnailUrl: true,
+          imageHash: true,
+          blockchainTxHash: true,
+          blockchainNetwork: true,
+          ipfsCid: true,
+          certifiedAt: true,
+          status: true,
+          faceEmbedding: true,
+          isPublic: true,
+          createdAt: true,
+          updatedAt: true,
           owner: {
             select: { id: true, displayName: true, walletAddress: true },
           },
