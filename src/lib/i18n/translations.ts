@@ -862,6 +862,8 @@ export const translations = {
       reportInfringement: "举报侵权",
       infringements: "侵权记录",
       settings: "设置",
+      apiKeys: "API Keys",
+      developers: "开发者文档",
     },
     // Header
     header: {

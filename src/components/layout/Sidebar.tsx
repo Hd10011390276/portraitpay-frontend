@@ -212,6 +212,47 @@ export function Sidebar({ onClose }: SidebarProps) {
             {item.label}
           </Link>
         ))}
+
+        {/* Developer section */}
+        <div className="pt-4 pb-2">
+          <div className="border-t border-gray-100 dark:border-gray-800 mb-2" />
+          <p className="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">开发者</p>
+        </div>
+
+        {[
+          {
+            label: t.sidebar.apiKeys,
+            href: "/api-keys",
+            icon: (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+            ),
+          },
+          {
+            label: t.sidebar.developers,
+            href: "/developers",
+            icon: (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            ),
+          },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onClose}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+              ${isActive(item.href)
+                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+              }`}
+          >
+            {item.icon}
+            {item.label}
+          </Link>
+        ))}
       </nav>
 
       {/* Bottom user */}
