@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
         update: { token: verifyToken, expires: verifyExpires },
       });
 
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://portraitpayai.com";
       const verifyUrl = `${baseUrl}/verify-email?token=${verifyToken}`;
 
       const { subject, html, text } = buildVerificationEmailHtml({
