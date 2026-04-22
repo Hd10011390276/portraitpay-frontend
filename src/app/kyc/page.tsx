@@ -121,23 +121,22 @@ export default function KYCPage() {
     if (side === "front") {
       setFrontImage(file);
       setFrontPreview(URL.createObjectURL(file));
-      setPortraitFile(file);
-      // Trigger face matching if ID card number is also provided
-      if (idCardNumber) {
-        setTimeout(() => runFaceMatch(file, file), 100);
-      }
     } else {
       setBackImage(file);
       setBackPreview(URL.createObjectURL(file));
     }
   };
 
-  // Auto-trigger face match when idCardNumber is set
+  const handlePortraitChange = (file: File) => {
+    setPortraitFile(file);
+  };
+
+  // Auto-trigger face match when portrait + ID card front + models are ready
   useEffect(() => {
-    if (idCardNumber && portraitFile && modelsReady) {
-      runFaceMatch(portraitFile, portraitFile);
+    if (idCardNumber && portraitFile && frontImage && modelsReady) {
+      runFaceMatch(portraitFile, frontImage);
     }
-  }, [idCardNumber, portraitFile, modelsReady, runFaceMatch]);
+  }, [idCardNumber, portraitFile, frontImage, modelsReady, runFaceMatch]);
 
   const handleSubmit = async () => {
     if (!frontImage) {
@@ -358,6 +357,40 @@ export default function KYCPage() {
               )}
             </div>
 
+            {/* Portrait photo upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                肖像照片 <span className="text-red-500">*</span>
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">上传本人清晰正面照片，用于与身份证照片进行人脸比对</p>
+              {portraitFile ? (
+                <div className="relative w-32">
+                  <img src={URL.createObjectURL(portraitFile)} alt="Portrait" className="w-32 h-32 object-cover rounded-xl border border-gray-200" />
+                  <button
+                    onClick={() => setPortraitFile(null)}
+                    className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer group w-32 h-32">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files?.[0] && handlePortraitChange(e.target.files[0])}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="flex flex-col items-center justify-center w-full h-full">
+                    <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition-transform">
+                      👤
+                    </div>
+                    <p className="text-xs text-gray-500">上传照片</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Face match status */}
             {modelsReady && portraitFile && frontImage && (
               <div className="p-3 rounded-lg border">
@@ -383,7 +416,7 @@ export default function KYCPage() {
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={handleSubmit}
-                disabled={submitting || !frontImage}
+                disabled={submitting || !frontImage || !portraitFile}
                 className="flex-1 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? t.kyc.submitting || "Submitting..." : t.kyc.submitDocs}
