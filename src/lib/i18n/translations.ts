@@ -767,7 +767,7 @@ export const translations = {
       clearReadable: "清晰可读，无反光",
       validDoc: "证件在有效期内",
       completeImage: "完整露出证件边缘",
-      submitSuccess: "提交成功！我们将在 1-3 个工作日内审核",
+      submitSuccess: "认证通过！",
       submitting: "提交中...",
       submitDocs: "提交认证",
       saveDraft: "保存草稿",
