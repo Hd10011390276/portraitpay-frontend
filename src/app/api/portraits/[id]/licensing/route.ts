@@ -27,18 +27,34 @@ export async function GET(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
 
-    const portrait = await prisma.portrait.findUnique({
-      where: { id, deletedAt: null },
-      select: {
-        id: true,
-        ownerId: true,
-        allowAiLicensing: true,
-        aiLicenseFee: true,
-        aiLicenseScopes: true,
-        aiProhibitedScopes: true,
-        aiTerritorialScope: true,
-      },
-    });
+    let portrait: Record<string, unknown> | null = null;
+    try {
+      portrait = await prisma.portrait.findUnique({
+        where: { id, deletedAt: null },
+        select: {
+          id: true,
+          ownerId: true,
+          allowAiLicensing: true,
+          aiLicenseFee: true,
+          aiLicenseScopes: true,
+          aiProhibitedScopes: true,
+          aiTerritorialScope: true,
+        },
+      });
+    } catch {
+      // AI fields may not exist in DB yet (unmigrated) — treat as nulls
+      portrait = await prisma.portrait.findUnique({
+        where: { id, deletedAt: null },
+        select: { id: true, ownerId: true },
+      });
+      if (portrait) {
+        portrait.allowAiLicensing = null;
+        portrait.aiLicenseFee = null;
+        portrait.aiLicenseScopes = [];
+        portrait.aiProhibitedScopes = [];
+        portrait.aiTerritorialScope = "global";
+      }
+    }
 
     if (!portrait) {
       return NextResponse.json({ success: false, error: "Portrait not found" }, { status: 404 });
@@ -46,18 +62,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     // Get user's default settings for reference
     const userSettings = await prisma.portraitSettings.findUnique({
-      where: { userId: portrait.ownerId },
+      where: { userId: portrait.ownerId as string },
     });
 
     return NextResponse.json({
       success: true,
       data: {
         portraitId: portrait.id,
-        allowAiLicensing: portrait.allowAiLicensing,
-        aiLicenseFee: portrait.aiLicenseFee ? portrait.aiLicenseFee.toString() : null,
-        aiLicenseScopes: portrait.aiLicenseScopes,
-        aiProhibitedScopes: portrait.aiProhibitedScopes,
-        aiTerritorialScope: portrait.aiTerritorialScope,
+        allowAiLicensing: portrait.allowAiLicensing as boolean | null,
+        aiLicenseFee: portrait.aiLicenseFee ? String(portrait.aiLicenseFee) : null,
+        aiLicenseScopes: (portrait.aiLicenseScopes as string[]) ?? [],
+        aiProhibitedScopes: (portrait.aiProhibitedScopes as string[]) ?? [],
+        aiTerritorialScope: (portrait.aiTerritorialScope as string) ?? "global",
         // Include defaults for reference
         defaults: {
           allowLicensing: userSettings?.allowLicensing ?? true,
