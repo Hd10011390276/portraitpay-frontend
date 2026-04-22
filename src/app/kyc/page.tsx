@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { useLanguage } from "@/context/LanguageContext";
+import { cosineSimilarity, descriptorToArray } from "@/lib/face";
 
 type KYCStep = 1 | 2 | 3 | 4;
 
@@ -29,6 +30,17 @@ export default function KYCPage() {
   const [selectedDocType, setSelectedDocType] = useState<string>("id_card");
   const [draftSaved, setDraftSaved] = useState(false);
 
+  // Face matching state
+  const [idCardNumber, setIdCardNumber] = useState<string>("");
+  const [idCardNumberHash, setIdCardNumberHash] = useState<string>("");
+  const [faceMatchScore, setFaceMatchScore] = useState<number | null>(null);
+  const [faceMatchStatus, setFaceMatchStatus] = useState<"idle" | "loading" | "success" | "failed">("idle");
+  const [faceMatchError, setFaceMatchError] = useState<string | null>(null);
+  const [portraitDescriptor, setPortraitDescriptor] = useState<number[] | null>(null);
+  const [idCardDescriptor, setIdCardDescriptor] = useState<number[] | null>(null);
+  const [modelsReady, setModelsReady] = useState(false);
+  const [portraitFile, setPortraitFile] = useState<File | null>(null);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -42,19 +54,102 @@ export default function KYCPage() {
     checkAuth();
   }, []);
 
+  // Load face-api.js models
+  useEffect(() => {
+    const loadModels = async () => {
+      try {
+        const faceapi = await import("@vladmandic/face-api");
+        const MODEL_URL = "/models";
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        ]);
+        setModelsReady(true);
+      } catch (err) {
+        console.error("[KYC] Failed to load face-api models:", err);
+      }
+    };
+    loadModels();
+  }, []);
+
+  // Compute idCardNumberHash whenever idCardNumber changes
+  useEffect(() => {
+    if (!idCardNumber) { setIdCardNumberHash(""); return; }
+    (async () => {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(idCardNumber);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      setIdCardNumberHash(hashArray.map(b => b.toString(16).padStart(2, "0")).join(""));
+    })();
+  }, [idCardNumber]);
+
+  const extractFaceDescriptor = useCallback(async (file: File): Promise<number[]> => {
+    const faceapi = await import("@vladmandic/face-api");
+    const MODEL_URL = "/models";
+    const img = await faceapi.bufferToImage(file);
+    const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.5 }));
+    if (detections.length === 0) throw new Error("No face detected");
+    const withDescriptor = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
+    if (!withDescriptor?.descriptor) throw new Error("Could not extract face descriptor");
+    return descriptorToArray(withDescriptor.descriptor);
+  }, []);
+
+  const runFaceMatch = useCallback(async (portrait: File, idCard: File) => {
+    if (!modelsReady) return;
+    setFaceMatchStatus("loading");
+    setFaceMatchError(null);
+    try {
+      const [portraitDesc, idCardDesc] = await Promise.all([
+        extractFaceDescriptor(portrait),
+        extractFaceDescriptor(idCard),
+      ]);
+      setPortraitDescriptor(portraitDesc);
+      setIdCardDescriptor(idCardDesc);
+      const similarity = cosineSimilarity(portraitDesc, idCardDesc);
+      const score = Math.round(similarity * 100);
+      setFaceMatchScore(score);
+      setFaceMatchStatus(score >= 60 ? "success" : "failed");
+    } catch (err) {
+      setFaceMatchStatus("failed");
+      setFaceMatchError(err instanceof Error ? err.message : "Face comparison failed");
+    }
+  }, [modelsReady, extractFaceDescriptor]);
+
   const handleFileChange = (side: "front" | "back", file: File) => {
     if (side === "front") {
       setFrontImage(file);
       setFrontPreview(URL.createObjectURL(file));
+      setPortraitFile(file);
+      // Trigger face matching if ID card number is also provided
+      if (idCardNumber) {
+        setTimeout(() => runFaceMatch(file, file), 100);
+      }
     } else {
       setBackImage(file);
       setBackPreview(URL.createObjectURL(file));
     }
   };
 
+  // Auto-trigger face match when idCardNumber is set
+  useEffect(() => {
+    if (idCardNumber && portraitFile && modelsReady) {
+      runFaceMatch(portraitFile, portraitFile);
+    }
+  }, [idCardNumber, portraitFile, modelsReady, runFaceMatch]);
+
   const handleSubmit = async () => {
     if (!frontImage) {
       setSubmitError(t.kyc.frontSide + " is required");
+      return;
+    }
+    if (!idCardNumberHash) {
+      setSubmitError("请输入身份证号码");
+      return;
+    }
+    if (faceMatchStatus === "failed") {
+      setSubmitError("人脸比对未通过，请重新上传清晰照片");
       return;
     }
 
@@ -62,12 +157,21 @@ export default function KYCPage() {
     setSubmitError(null);
 
     try {
+      // Compute SHA-256 hash of the portrait image
+      const portraitBuffer = await frontImage.arrayBuffer();
+      const portraitHashBuffer = await crypto.subtle.digest("SHA-256", portraitBuffer);
+      const portraitHash = Array.from(new Uint8Array(portraitHashBuffer))
+        .map(b => b.toString(16).padStart(2, "0")).join("");
+
       const res = await fetch("/api/v1/kyc/submit", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           level: 2,
+          idCardNumberHash,
+          faceMatchScore: faceMatchScore ?? 0,
+          portraitHash,
           documentType: selectedDocType,
           idCardFrontUrl: frontPreview,
           idCardBackUrl: backPreview,
@@ -236,15 +340,33 @@ export default function KYCPage() {
               </div>
             </div>
 
-            {/* Tips */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-900/50">
-              <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">💡 {t.kyc.photoRequirements}</p>
-              <ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
-                <li>• {t.kyc.clearReadable}</li>
-                <li>• {t.kyc.validDoc}</li>
-                <li>• {t.kyc.completeImage}</li>
-              </ul>
+            {/* ID card number input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                身份证号码 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={idCardNumber}
+                onChange={(e) => setIdCardNumber(e.target.value)}
+                placeholder="请输入身份证号码"
+                maxLength={18}
+                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+              {idCardNumberHash && (
+                <p className="mt-1 text-xs text-gray-400">SHA-256: {idCardNumberHash.slice(0, 16)}...</p>
+              )}
             </div>
+
+            {/* Face match status */}
+            {modelsReady && portraitFile && frontImage && (
+              <div className="p-3 rounded-lg border">
+                {faceMatchStatus === "idle" && <p className="text-sm text-gray-500">上传肖像和身份证照片后自动进行人脸比对</p>}
+                {faceMatchStatus === "loading" && <p className="text-sm text-blue-500 flex items-center gap-2"><div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />人脸比对中...</p>}
+                {faceMatchStatus === "success" && <p className="text-sm text-green-600">✅ 人脸比对成功！（{faceMatchScore}%）</p>}
+                {faceMatchStatus === "failed" && <p className="text-sm text-red-600">❌ 人脸比对未通过（{faceMatchScore ?? 0}%，需要 60%）</p>}
+              </div>
+            )}
 
             {submitError && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
