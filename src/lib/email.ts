@@ -170,6 +170,74 @@ export async function sendContactNotification(data: ContactEmailData): Promise<v
 }
 
 // ============================================================
+// Portrait certified email
+// ============================================================
+interface PortraitCertifiedEmailParams {
+  name: string;
+  email: string;
+  portraitTitle: string;
+  imageHash: string;
+  blockchainTxHash: string;
+  ipfsCid: string;
+  network: string;
+  certifiedAt: string;
+}
+
+export async function sendPortraitCertifiedEmail(params: PortraitCertifiedEmailParams): Promise<void> {
+  const { name, email, portraitTitle, imageHash, blockchainTxHash, ipfsCid, network, certifiedAt } = params;
+  const explorerUrl = network === "base" ? "https://basescan.org/tx/" : "https://etherscan.io/tx/";
+  const txUrl = `${explorerUrl}${blockchainTxHash}`;
+  const ipfsUrl = `https://ipfs.io/ipfs/${ipfsCid}`;
+  const certifiedAtStr = new Date(certifiedAt).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
+
+  const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+  <div style="background:#7c3aed;padding:20px 24px">
+    <h2 style="margin:0;color:#fff;font-size:18px">✅ 肖像区块链认证完成</h2>
+    <p style="margin:4px 0 0;color:#e9d5ff;font-size:13px">PortraitPay AI · 认证通知</p>
+  </div>
+  <div style="padding:24px">
+    <p style="font-size:15px;color:#333">${name}，您好！</p>
+    <p style="font-size:15px;color:#333">您的肖像 <strong>"${portraitTitle}"</strong> 已成功注册到区块链，永久存证不可篡改。</p>
+    <div style="margin:20px 0;padding:16px;background:#f9f9f9;border-radius:8px">
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:6px 0;color:#666;font-size:13px">肖像标题</td><td style="padding:6px 0;font-size:13px;font-weight:bold;color:#333">${portraitTitle}</td></tr>
+        <tr><td style="padding:6px 0;color:#666;font-size:13px">图像哈希</td><td style="padding:6px 0;font-size:12px;font-family:monospace;color:#7c3aed">${imageHash.slice(0, 24)}...</td></tr>
+        <tr><td style="padding:6px 0;color:#666;font-size:13px">IPFS CID</td><td style="padding:6px 0;font-size:12px;font-family:monospace;color:#7c3aed">${ipfsCid}</td></tr>
+        <tr><td style="padding:6px 0;color:#666;font-size:13px">区块链网络</td><td style="padding:6px 0;font-size:13px">${network === "base" ? "Base Mainnet" : network}</td></tr>
+        <tr><td style="padding:6px 0;color:#666;font-size:13px">认证时间</td><td style="padding:6px 0;font-size:13px">${certifiedAtStr}</td></tr>
+        <tr><td style="padding:6px 0;color:#666;font-size:13px">交易哈希</td><td style="padding:6px 0;font-size:12px;font-family:monospace;color:#7c3aed">${blockchainTxHash.slice(0, 16)}...</td></tr>
+      </table>
+    </div>
+    <div style="text-align:center;margin:20px 0">
+      <a href="${txUrl}" style="display:inline-block;padding:12px 24px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;margin-right:8px">查看区块链交易 →</a>
+      <a href="${ipfsUrl}" style="display:inline-block;padding:12px 24px;background:#fff;color:#7c3aed;border:2px solid #7c3aed;text-decoration:none;border-radius:8px;font-size:14px">查看 IPFS 存证 →</a>
+    </div>
+    <p style="font-size:12px;color:#999">此通知由系统自动发送，请勿回复。如有疑问请联系 support@portraitpayai.com</p>
+  </div>
+</div>
+</body>
+</html>`;
+
+  const text = `PortraitPay AI — 肖像区块链认证完成\n\n${name}，您好！\n您的肖像 "${portraitTitle}" 已成功注册到区块链，永久存证不可篡改。\n\n肖像标题: ${portraitTitle}\n图像哈希: ${imageHash}\nIPFS CID: ${ipfsCid}\n区块链网络: ${network === "base" ? "Base Mainnet" : network}\n认证时间: ${certifiedAtStr}\n交易哈希: ${blockchainTxHash}\n\n查看区块链交易: ${txUrl}\n查看 IPFS 存证: ${ipfsUrl}\n\n此通知由系统自动发送，请勿回复。`;
+
+  try {
+    await sendEmail({
+      to: email,
+      subject: `✅ 肖像认证成功 - ${portraitTitle}`,
+      html,
+      text,
+    });
+    console.log("[sendPortraitCertifiedEmail] Sent to:", email);
+  } catch (err) {
+    console.error("[sendPortraitCertifiedEmail] failed:", err);
+  }
+}
+
+// ============================================================
 // Welcome email
 // ============================================================
 interface WelcomeEmailParams {

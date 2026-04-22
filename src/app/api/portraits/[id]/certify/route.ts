@@ -14,6 +14,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth/session";
 import { certifyPortrait, SUPPORTED_NETWORKS } from "@/lib/blockchain";
 import { uploadJsonToIpfs, buildPortraitMetadata } from "@/lib/ipfs";
+import { sendPortraitCertifiedEmail } from "@/lib/email";
 export const dynamic = "force-dynamic";
 
 
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     // ── Step 1: Fetch portrait ──────────────────────────────────
     const portrait = await prisma.portrait.findUnique({
       where: { id, deletedAt: null },
-      include: { owner: { select: { walletAddress: true } } },
+      include: { owner: { select: { walletAddress: true, email: true, name: true } } },
     });
 
     if (!portrait) {
@@ -136,6 +137,20 @@ export async function POST(request: NextRequest, context: RouteContext) {
         status: "ACTIVE",
       },
     });
+
+    // ── Step 10: Send email notification (non-blocking) ──────────
+    if (portrait.owner?.email) {
+      sendPortraitCertifiedEmail({
+        name: portrait.owner.name ?? portrait.owner.email.split("@")[0],
+        email: portrait.owner.email,
+        portraitTitle: updated.title ?? updated.name ?? "肖像",
+        imageHash,
+        blockchainTxHash: certificationResult.txHash,
+        ipfsCid: metadataIpfsResult.cid,
+        network,
+        certifiedAt: certificationResult.certifiedAt.toString(),
+      });
+    }
 
     return NextResponse.json({
       success: true,
