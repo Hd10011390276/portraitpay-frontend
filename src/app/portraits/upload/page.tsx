@@ -21,44 +21,7 @@ type Stage = "form" | "uploading" | "certifying" | "certify_done";
 
 const FACE_MATCH_THRESHOLD = 60;
 
-// ── Face-api helpers ───────────────────────────────────────────────
-async function loadFaceModels() {
-  const faceapi = await import("@vladmandic/face-api");
-  const MODEL_URL = "/models";
-  await Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-  ]);
-  return faceapi;
-}
-
-async function extractFaceDescriptor(file: File, faceapi: any): Promise<number[]> {
-  const img = new window.Image();
-  img.src = URL.createObjectURL(file);
-  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
-
-  const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.5 });
-  const detection = await faceapi
-    .detectSingleFace(img, options)
-    .withFaceLandmarks()
-    .withFaceDescriptor();
-
-  if (!detection) throw new Error("No face detected in this image");
-  URL.revokeObjectURL(img.src);
-  return Array.from(detection.descriptor);
-}
-
-function cosineSimilarity(a: number[], b: number[]): number {
-  let dot = 0, normA = 0, normB = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
-  }
-  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
+// ── SHA-256 hash (kept for image integrity) ───────────────────────
 async function computeHash(file: File): Promise<string> {
   const buf = await file.arrayBuffer();
   const hash = await crypto.subtle.digest("SHA-256", buf);
@@ -113,45 +76,17 @@ export default function UploadPortraitPage() {
   const [faceMatchStatus, setFaceMatchStatus] = useState<"idle" | "loading" | "success" | "failed">("idle");
   const [faceMatchScore, setFaceMatchScore] = useState<number | null>(null);
   const [faceMatchError, setFaceMatchError] = useState<string | null>(null);
-  const [modelsReady, setModelsReady] = useState(false);
 
   // ── Form ─────────────────────────────────────────────────────
   const [form, setForm] = useState({ title: "", description: "", category: "general", tags: "", isPublic: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // ── Load face-api models once ────────────────────────────────
+  // ── Auto-trigger face match when both images ready ───────────────────────
   useEffect(() => {
-    loadFaceModels().then(() => setModelsReady(true)).catch(console.error);
-  }, []);
-
-
-
-  // ── Auto-trigger face match when ready ───────────────────────
-  const runFaceMatch = useCallback(async (portrait: File, idCard: File) => {
-    if (!modelsReady) return;
-    setFaceMatchStatus("loading");
-    setFaceMatchError(null);
-    try {
-      const faceapi = await loadFaceModels();
-      const [portraitDesc, idCardDesc] = await Promise.all([
-        extractFaceDescriptor(portrait, faceapi),
-        extractFaceDescriptor(idCard, faceapi),
-      ]);
-      const similarity = cosineSimilarity(portraitDesc, idCardDesc);
-      const score = Math.round(similarity * 100);
-      setFaceMatchScore(score);
-      setFaceMatchStatus(score >= FACE_MATCH_THRESHOLD ? "success" : "failed");
-    } catch (err) {
-      setFaceMatchStatus("failed");
-      setFaceMatchError(err instanceof Error ? err.message : "比对失败");
-    }
-  }, [modelsReady]);
-
-  useEffect(() => {
-    if (idCardFront && croppedFile && modelsReady) {
+    if (idCardFront && croppedFile) {
       runFaceMatch(croppedFile, idCardFront);
     }
-  }, [idCardFront, croppedFile, modelsReady, runFaceMatch]);
+  }, [idCardFront, croppedFile, runFaceMatch]);
 
   // ── Handlers ─────────────────────────────────────────────────
   const handleFileSelected = useCallback(async (file: File) => {
