@@ -2,7 +2,7 @@
  * i18n — Translations dictionary for PortraitPay AI
  * Supports: zh-CN (default), en-US
  * @note Ensure file is saved as UTF-8 (no BOM). Line endings: LF.
-
+ */
 export type Locale = "zh-CN" | "en-US";
 
 export const locales: Locale[] = ["zh-CN", "en-US"];
