@@ -185,13 +185,19 @@ export default function UploadPortraitPage() {
 
   const validateForm = () => {
     const errs: Record<string, string> = {};
-    if (!form.title.trim()) errs.title = "标题不能为空";
-    if (form.title.length > 200) errs.title = "标题过长";
-    if (!croppedFile) errs.image = "请上传肖像照片";
-    if (!idCardFront) errs.idCard = "请上传身份证正面";
-    if (!idCardNumber.trim()) errs.idCardNumber = "请输入身份证号码";
-    if (faceMatchStatus === "failed") errs.face = "人脸比对未通过，请重新上传清晰照片";
-    if (faceMatchStatus !== "success" && faceMatchStatus !== "failed") errs.face = "正在比对中，请稍候";
+    if (!form.title.trim()) errs.title = t.upload?.titleRequiredError || "请输入标题";
+    if (form.title.length > 200) errs.title = t.upload?.titleLengthError || "标题过长";
+    if (!croppedFile) errs.image = t.upload?.imageRequiredError || "请上传肖像照片";
+    if (!idCardFront) errs.idCard = t.upload?.idCardRequiredError || "请上传身份证正面";
+    if (!idCardNumber.trim()) errs.idCardNumber = t.upload?.idCardNumberError || "请输入身份证号码";
+    if (faceMatchStatus !== "success") {
+      if (faceMatchStatus === "failed") errs.face = t.upload?.faceMatchRejected?.replace("{score}", String(faceMatchScore ?? 0)) || "人脸比对未通过";
+      else if (faceMatchStatus === "loading") errs.face = t.upload?.comparingFaces || "正在比对人脸...";
+      else errs.face = t.upload?.uploadBothImages || "请先完成人脸比对";
+    }
+    if (faceMatchScore !== null && faceMatchScore < FACE_MATCH_THRESHOLD) {
+      errs.face = t.upload?.faceMatchRejected?.replace("{score}", String(faceMatchScore)) || `人脸比对未通过（${faceMatchScore}%）`;
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -200,6 +206,11 @@ export default function UploadPortraitPage() {
     e.preventDefault();
     if (!validateForm()) return;
     if (!croppedFile || !idCardFront) return;
+    // Guard: require successful face match with passing score
+    if (faceMatchStatus !== "success" || faceMatchScore === null || faceMatchScore < FACE_MATCH_THRESHOLD) {
+      setErrors(prev => ({ ...prev, face: "人脸比对未通过，请重新上传清晰照片" }));
+      return;
+    }
 
     setStage("uploading");
     setProgress("创建肖像记录...");
@@ -272,15 +283,15 @@ export default function UploadPortraitPage() {
       }
 
       if (result.success) {
-        setProgress(`区块链认证完成！Tx: ${result.data?.blockchainTxHash?.slice(0, 10)}...`);
+        setProgress(`${t.upload?.certifySuccess || "区块链认证完成"}！Tx: ${result.data?.blockchainTxHash?.slice(0, 10)}...`);
       } else {
-        setProgress(`肖像已保存，认证稍后进行: ${result.error ?? "unknown"}`);
+        setProgress(`${t.upload?.certifyDeferred || "肖像已保存，认证稍后进行"}: ${result.error ?? "unknown"}`);
       }
       setStage("certify_done");
       setTimeout(() => router.push("/portraits"), 3000);
     } catch (err) {
       console.error("Upload failed:", err);
-      setProgress(`错误: ${(err as Error).message}`);
+      setProgress(`${t.upload?.error || "错误"}: ${(err as Error).message}`);
       setTimeout(() => setStage("form"), 3000);
     }
   };
@@ -291,17 +302,17 @@ export default function UploadPortraitPage() {
     if (faceMatchStatus === "loading") return (
       <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
         <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
-        比对中...
+        {t.upload?.comparingFaces || "比对人脸中..."}
       </div>
     );
     if (faceMatchStatus === "success") return (
       <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
-        ✅ 人脸比对通过（{faceMatchScore}%)
+        ✅ {t.upload?.faceMatchPassed?.replace("{score}", String(faceMatchScore)) || `人脸比对通过（${faceMatchScore}%）`}
       </div>
     );
     if (faceMatchStatus === "failed") return (
       <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-        ❌ 比对未通过（{faceMatchScore}%）{faceMatchError ? `- ${faceMatchError}` : ""}
+        ❌ {t.upload?.faceMatchRejected?.replace("{score}", String(faceMatchScore ?? 0)) || `人脸比对未通过（${faceMatchScore}%）`}{faceMatchError ? ` - ${faceMatchError}` : ""}
       </div>
     );
     return null;
@@ -315,9 +326,9 @@ export default function UploadPortraitPage() {
           <div className="text-center py-16">
             <div className="text-6xl mb-4">{stage === "certifying" ? "🔗" : certifyResult?.success ? "✅" : "⚠️"}</div>
             <h2 className="text-xl font-semibold mb-2">
-              {stage === "certifying" ? "上传中..." : certifyResult?.success ? "认证完成！" : "已保存"}
+              {stage === "certifying" ? t.upload?.uploading || "上传中..." : certifyResult?.success ? (t.upload?.certifySuccess || "认证完成！") : (t.upload?.certifyDeferred || "已保存")}
             </h2>
-            <p className="text-gray-500">{stage === "certifying" ? "正在上传并写入区块链..." : certifyResult?.success ? "你的肖像已在区块链上获得认证，永久不可篡改" : "认证稍后进行，请稍候"}</p>
+            <p className="text-gray-500">{stage === "certifying" ? t.upload?.certifyingBlockchain || "正在区块链认证..." : certifyResult?.success ? (t.upload?.certifySuccessDesc || "你的肖像已在区块链上获得认证") : (t.upload?.certifyDeferredDesc || "认证稍后进行")}</p>
             {progress && <p className="mt-4 text-sm text-gray-400 font-mono">{progress}</p>}
             {stage === "certifying" && <div className="mt-6 flex justify-center"><div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full" /></div>}
           </div>
@@ -334,20 +345,31 @@ export default function UploadPortraitPage() {
           {/* Notice */}
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
             <p className="text-sm text-blue-700 dark:text-blue-400">
-              🔒 <strong>隐私：</strong>肖像仅上传至 S3 存储，SHA-256 哈希用于区块链存证。身份证用于实名认证（人脸比对），不会泄露真实号码。
+              🔒 <strong>{t.upload?.uploadTip ? "隐私" : "隐私："}</strong>{t.upload?.uploadTip || "肖像仅上传至 S3 存储，SHA-256 哈希用于区块链存证。身份证用于实名认证（人脸比对），不会泄露真实号码。"}
             </p>
           </div>
 
           {/* Section 1: Portrait */}
           <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              📸 肖像照片 <span className="text-red-500">*</span>
+              📸 {t.upload?.portraitImage || "肖像照片"} <span className="text-red-500">*</span>
             </h2>
-            <UploadZone onFileSelected={handleFileSelected} maxSizeMB={10} />
+            <UploadZone
+              onFileSelected={handleFileSelected}
+              maxSizeMB={10}
+              dropzoneText={t.upload?.dropzone || "Drag & drop your portrait"}
+              browseText={t.upload?.selectImage || "or click to browse"}
+              supportedText={t.upload?.supported || "JPG, PNG, WebP"}
+              cropPrompt={t.upload?.cropPrompt || "Crop your portrait"}
+              uploadingText={t.upload?.uploading || "Uploading..."}
+              imageReadyText={t.upload?.imageReady || "✅ Ready!"}
+              imageSizeLabel={t.upload?.imageSize || "Size"}
+              replaceText={t.upload?.replaceImage || "Replace"}
+            />
             {errors.image && <p className="mt-2 text-sm text-red-600">{errors.image}</p>}
             {imageHash && (
               <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <p className="text-xs text-gray-400">SHA-256: {imageHash.slice(0, 16)}...</p>
+                <p className="text-xs text-gray-400">{t.upload?.sha256Label || "SHA-256"}: {imageHash.slice(0, 16)}...</p>
               </div>
             )}
           </section>
@@ -355,16 +377,16 @@ export default function UploadPortraitPage() {
           {/* Section 2: ID Card */}
           <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              🪪 身份证实名认证 <span className="text-red-500">*</span>
+              🪪 {t.upload?.idCardVerification || "身份证认证"} <span className="text-red-500">*</span>
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              上传身份证正面，用于人脸比对验证身份。号码仅用于哈希存证，不会以明文存储。
+              {t.upload?.idCardTip || "上传身份证正面照进行人脸比对。"}
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
               {/* ID Card Front */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  身份证正面 <span className="text-red-500">*</span>
+                  {t.upload?.idCardFront || "身份证正面"} <span className="text-red-500">*</span>
                 </label>
                 {idCardFrontPreview ? (
                   <div className="relative">
@@ -378,7 +400,7 @@ export default function UploadPortraitPage() {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                     <div className="flex flex-col items-center justify-center py-8">
                       <div className="text-3xl mb-2">🪪</div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">点击上传身份证正面</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{t.upload?.clickToUploadID || "点击上传身份证"}</p>
                     </div>
                   </div>
                 )}
@@ -388,19 +410,19 @@ export default function UploadPortraitPage() {
               {/* ID Card Number */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  身份证号码 <span className="text-red-500">*</span>
+                  {t.upload?.idCardNumber || "身份证号码"} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={idCardNumber}
                   onChange={e => setIdCardNumber(e.target.value)}
-                  placeholder="18位身份证号码"
+                  placeholder={t.upload?.idCardNumberPlaceholder || "18位身份证号码"}
                   maxLength={18}
                   className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 />
                 {errors.idCardNumber && <p className="text-sm text-red-600">{errors.idCardNumber}</p>}
                 {idCardNumberHash && (
-                  <p className="text-xs text-gray-400 break-all">哈希: {idCardNumberHash.slice(0, 12)}...</p>
+                  <p className="text-xs text-gray-400 break-all">{t.upload?.hash || "哈希"}: {idCardNumberHash.slice(0, 12)}...</p>
                 )}
               </div>
             </div>
@@ -412,36 +434,36 @@ export default function UploadPortraitPage() {
 
           {/* Section 3: Details */}
           <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-            <h2 className="font-semibold text-gray-900 dark:text-white mb-2">详细信息</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white mb-2">{t.upload?.details || "肖像详情"}</h2>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                标题 <span className="text-red-500">*</span>
+                {t.upload?.titleRequired || "标题"} <span className="text-red-500">*</span>
               </label>
               <input type="text" value={form.title}
                 onChange={e => { setForm(f => ({ ...f, title: e.target.value })); setErrors(prev => ({ ...prev, title: "" })); }}
-                placeholder="为你的肖像添加标题..." maxLength={200}
+                placeholder={t.upload?.titlePlaceholder || "给肖像起个名字..."} maxLength={200}
                 className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
               {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">描述</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.upload?.descriptionLabel || "描述"}</label>
               <textarea value={form.description}
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                placeholder="添加描述..." rows={3} maxLength={2000}
+                placeholder={t.upload?.descriptionPlaceholder || "描述一下这幅肖像（可选）"} rows={3} maxLength={2000}
                 className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">类别</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t.upload?.categoryLabel || "分类"}</label>
               <select value={form.category}
                 onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-                <option value="general">普通</option>
-                <option value="celebrity">名人</option>
-                <option value="artist">艺术家</option>
-                <option value="athlete">运动员</option>
-                <option value="business">商务</option>
-                <option value="political">政界</option>
-                <option value="other">其他</option>
+                <option value="general">{t.upload?.categoryGeneral || "普通"}</option>
+                <option value="celebrity">{t.upload?.categoryCelebrity || "名人"}</option>
+                <option value="artist">{t.upload?.categoryArtist || "艺术家"}</option>
+                <option value="athlete">{t.upload?.categoryAthlete || "运动员"}</option>
+                <option value="business">{t.upload?.categoryBusiness || "商务"}</option>
+                <option value="political">{t.upload?.categoryPolitical || "政界"}</option>
+                <option value="other">{t.upload?.categoryOther || "其他"}</option>
               </select>
             </div>
             <div className="flex items-center gap-3">
@@ -450,27 +472,27 @@ export default function UploadPortraitPage() {
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${form.isPublic ? "translate-x-6" : "translate-x-1"}`} />
               </button>
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">公开可见</p>
-                <p className="text-xs text-gray-400">允许他人查找此肖像</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t.upload?.publicVisible || "公开可见"}</p>
+                <p className="text-xs text-gray-400">{t.upload?.publicListingDesc || "允许他人查找此肖像"}</p>
               </div>
             </div>
           </section>
 
           {/* Submit */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <button type="submit" disabled={stage === "uploading"}
+            <button type="submit" disabled={stage === "uploading" || faceMatchStatus !== "success"}
               className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto">
-              {stage === "uploading" ? "保存中..." : "创建肖像 + 认证"}
+              {stage === "uploading" ? (t.upload?.submitting || "保存中...") : faceMatchStatus === "loading" ? (t.upload?.comparingFaces || "比对人脸中...") : faceMatchStatus === "failed" ? (t.upload?.faceMatchRejected?.replace("{score}", String(faceMatchScore ?? 0)) || "人脸比对未通过") : (t.upload?.createPortrait || "创建肖像 + 认证")}
             </button>
             {(stage === "uploading" || faceMatchStatus === "loading") && (
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
-                <span>{progress || "处理中..."}</span>
+                <span>{progress || t.upload?.uploading || "上传中..."}</span>
               </div>
             )}
             <button type="button" onClick={() => router.push("/portraits")}
               className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
-              取消
+              {t.upload?.cancel || "取消"}
             </button>
           </div>
 

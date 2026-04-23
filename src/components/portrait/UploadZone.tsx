@@ -7,6 +7,15 @@ interface UploadZoneProps {
   onFileSelected: (file: File) => void;
   accept?: string;
   maxSizeMB?: number;
+  /** i18n strings for UploadZone */
+  dropzoneText?: string;
+  browseText?: string;
+  supportedText?: string;
+  cropPrompt?: string;
+  uploadingText?: string;
+  imageReadyText?: string;
+  imageSizeLabel?: string;
+  replaceText?: string;
 }
 
 export type ProcessingStage = "idle" | "cropping" | "uploading" | "done" | "error";
@@ -15,6 +24,14 @@ export default function UploadZone({
   onFileSelected,
   accept = "image/jpeg,image/png,image/webp",
   maxSizeMB = 10,
+  dropzoneText,
+  browseText,
+  supportedText,
+  cropPrompt,
+  uploadingText,
+  imageReadyText,
+  imageSizeLabel,
+  replaceText,
 }: UploadZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -80,9 +97,9 @@ export default function UploadZone({
 
   const stageLabel: Record<ProcessingStage, string> = {
     idle: "",
-    cropping: "Crop your portrait",
-    uploading: "Uploading to storage...",
-    done: "✅ Ready!",
+    cropping: cropPrompt || "Crop your portrait",
+    uploading: uploadingText || "Uploading to storage...",
+    done: imageReadyText || "✅ Ready!",
     error: "❌ Error",
   };
 
@@ -107,10 +124,10 @@ export default function UploadZone({
         >
           <div className="text-5xl mb-4">📸</div>
           <p className="text-base font-medium text-gray-700">
-            {isDragOver ? "Drop image here" : "Drag & drop your portrait"}
+            {isDragOver ? (dropzoneText ? "Drop image here" : "Drop image here") : (dropzoneText || "Drag & drop your portrait")}
           </p>
-          <p className="text-sm text-gray-400 mt-1">or click to browse</p>
-          <p className="text-xs text-gray-400 mt-2">JPG, PNG, WebP · max {maxSizeMB}MB</p>
+          <p className="text-sm text-gray-400 mt-1">{browseText || "or click to browse"}</p>
+          <p className="text-xs text-gray-400 mt-2">{supportedText || `JPG, PNG, WebP · max ${maxSizeMB}MB`}</p>
           <input
             id="file-input"
             type="file"
@@ -156,14 +173,14 @@ export default function UploadZone({
           <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
             <span className="text-green-600 text-lg">✅</span>
             <div>
-              <p className="text-sm font-medium text-green-800">Image ready!</p>
-              <p className="text-xs text-green-600">{(croppedBlob.size / 1024).toFixed(1)} KB</p>
+              <p className="text-sm font-medium text-green-800">{imageReadyText || "Image ready!"}</p>
+              <p className="text-xs text-green-600">{imageSizeLabel || "Size"}: {(croppedBlob.size / 1024).toFixed(1)} KB</p>
             </div>
             <button
               onClick={handleReset}
               className="ml-auto text-xs text-gray-500 hover:text-gray-700 underline"
             >
-              Replace
+              {replaceText || "Replace"}
             </button>
           </div>
           <img
