@@ -1,13 +1,11 @@
 /**
- * /portraits/upload — Unified Portrait Upload + KYC + Blockchain Cert
+ * /portraits/upload — Portrait Upload + Face Match + Blockchain Cert
  *
  * Flow:
  *  1. Upload portrait photo (with crop)
- *  2. Upload ID card front
- *  3. Enter ID card number
- *  4. Auto-trigger face match (portrait vs ID card photo)
- *  5. On match ≥ 60% → create portrait → upload to S3 → blockchain certify
- *  6. Submit KYC (auto-approved)
+ *  2. Upload ID card / document photo
+ *  3. Auto-trigger face match (portrait vs document photo)
+ *  4. On match ≥ 60% → create portrait → upload to S3 → blockchain certify
  */
 
 "use client";
@@ -107,11 +105,9 @@ export default function UploadPortraitPage() {
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [imageHash, setImageHash] = useState<string | null>(null);
 
-  // ── ID card ──────────────────────────────────────────────────
+  // ── ID / Document card ────────────────────────────────────────
   const [idCardFront, setIdCardFront] = useState<File | null>(null);
   const [idCardFrontPreview, setIdCardFrontPreview] = useState<string | null>(null);
-  const [idCardNumber, setIdCardNumber] = useState("");
-  const [idCardNumberHash, setIdCardNumberHash] = useState("");
 
   // ── Face match ────────────────────────────────────────────────
   const [faceMatchStatus, setFaceMatchStatus] = useState<"idle" | "loading" | "success" | "failed">("idle");
@@ -128,15 +124,7 @@ export default function UploadPortraitPage() {
     loadFaceModels().then(() => setModelsReady(true)).catch(console.error);
   }, []);
 
-  // ── Compute ID card hash ─────────────────────────────────────
-  useEffect(() => {
-    if (!idCardNumber) { setIdCardNumberHash(""); return; }
-    const encoder = new TextEncoder();
-    const data = encoder.encode(idCardNumber);
-    crypto.subtle.digest("SHA-256", data).then(buf => {
-      setIdCardNumberHash(Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join(""));
-    });
-  }, [idCardNumber]);
+
 
   // ── Auto-trigger face match when ready ───────────────────────
   const runFaceMatch = useCallback(async (portrait: File, idCard: File) => {
@@ -188,8 +176,7 @@ export default function UploadPortraitPage() {
     if (!form.title.trim()) errs.title = t.upload?.titleRequiredError || "请输入标题";
     if (form.title.length > 200) errs.title = t.upload?.titleLengthError || "标题过长";
     if (!croppedFile) errs.image = t.upload?.imageRequiredError || "请上传肖像照片";
-    if (!idCardFront) errs.idCard = t.upload?.idCardRequiredError || "请上传身份证正面";
-    if (!idCardNumber.trim()) errs.idCardNumber = t.upload?.idCardNumberError || "请输入身份证号码";
+    if (!idCardFront) errs.idCard = t.upload?.idCardRequiredError || "请上传证件照片";
     if (faceMatchStatus !== "success") {
       if (faceMatchStatus === "failed") errs.face = t.upload?.faceMatchRejected?.replace("{score}", String(faceMatchScore ?? 0)) || "人脸比对未通过";
       else if (faceMatchStatus === "loading") errs.face = t.upload?.comparingFaces || "正在比对人脸...";
@@ -213,7 +200,7 @@ export default function UploadPortraitPage() {
     }
 
     setStage("uploading");
-    setProgress("创建肖像记录...");
+    setProgress(t.upload?.creatingPortrait || "创建肖像记录...");
 
     try {
       // 1. Create portrait record
@@ -227,7 +214,7 @@ export default function UploadPortraitPage() {
       const id = createJson.data.id as string;
 
       // 2. Upload to S3
-      setProgress("上传到存储...");
+      setProgress(t.upload?.uploadingToStorage || "上传到存储...");
       const presignedRes = await fetch(`/api/portraits/${id}/upload`);
       if (!presignedRes.ok) throw new Error("Failed to get upload URL");
       const { data: uploadUrls } = await presignedRes.json();
@@ -243,7 +230,7 @@ export default function UploadPortraitPage() {
       await savePortraitLocally(id, croppedFile);
 
       // 3. Register URL
-      setProgress("保存中...");
+      setProgress(t.upload?.saving || "保存中...");
       const updateRes = await fetch(`/api/portraits/${id}/upload`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -254,7 +241,7 @@ export default function UploadPortraitPage() {
 
       // 4. Blockchain certify
       setStage("certifying");
-      setProgress("区块链存证中...");
+      setProgress(t.upload?.certifyingBlockchain || "区块链认证中...");
       let result = { success: false, error: "unknown" };
       try {
         const certifyRes = await fetch(`/api/portraits/${id}/certify`, { method: "POST" });
@@ -263,24 +250,6 @@ export default function UploadPortraitPage() {
         result = { success: false, error: (certErr as Error).message };
       }
       setCertifyResult(result);
-
-      // 5. Submit KYC (auto-approved in backend)
-      if (faceMatchScore !== null) {
-        try {
-          await fetch("/api/v1/kyc/submit", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              level: 2,
-              idCardNumberHash,
-              faceMatchScore,
-              portraitHash: imageHash,
-              documentType: "id_card",
-              idCardFrontUrl: idCardFrontPreview,
-            }),
-          });
-        } catch { /* KYC submit best-effort */ }
-      }
 
       if (result.success) {
         setProgress(`${t.upload?.certifySuccess || "区块链认证完成"}！Tx: ${result.data?.blockchainTxHash?.slice(0, 10)}...`);
@@ -374,57 +343,37 @@ export default function UploadPortraitPage() {
             )}
           </section>
 
-          {/* Section 2: ID Card */}
+          {/* Section 2: ID / Document Card */}
           <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              🪪 {t.upload?.idCardVerification || "身份证认证"} <span className="text-red-500">*</span>
+              🪪 {t.upload?.idCardVerification || "身份文件验证"} <span className="text-red-500">*</span>
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              {t.upload?.idCardTip || "上传身份证正面照进行人脸比对。"}
+              {t.upload?.idCardTip || "上传身份证、护照或其他官方证件照片，与你的肖像照片进行人脸比对验证。"}
             </p>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {/* ID Card Front */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t.upload?.idCardFront || "身份证正面"} <span className="text-red-500">*</span>
-                </label>
-                {idCardFrontPreview ? (
-                  <div className="relative">
-                    <img src={idCardFrontPreview} alt="ID" className="w-full h-40 object-cover rounded-xl border" />
-                    <button type="button" onClick={() => { setIdCardFront(null); setIdCardFrontPreview(null); setFaceMatchStatus("idle"); }}
-                      className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full text-sm hover:bg-red-600">✕</button>
+            {/* ID / Document Card Front */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t.upload?.idCardFront || "证件照片"} <span className="text-red-500">*</span>
+              </label>
+              {idCardFrontPreview ? (
+                <div className="relative">
+                  <img src={idCardFrontPreview} alt="ID document" className="w-full h-48 object-contain rounded-xl border bg-gray-50" />
+                  <button type="button" onClick={() => { setIdCardFront(null); setIdCardFrontPreview(null); setFaceMatchStatus("idle"); }}
+                    className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full text-sm hover:bg-red-600 flex items-center justify-center">✕</button>
+                </div>
+              ) : (
+                <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 transition-colors cursor-pointer group">
+                  <input type="file" accept="image/*" onChange={handleIdCardFrontChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  <div className="flex flex-col items-center justify-center py-10">
+                    <div className="text-3xl mb-2">🪪</div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t.upload?.clickToUploadID || "点击上传证件照片"}</p>
+                    <p className="text-xs text-gray-400 mt-1">{t.upload?.idDocHint || "支持身份证、护照、驾照等各国证件"}</p>
                   </div>
-                ) : (
-                  <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 transition-colors cursor-pointer group">
-                    <input type="file" accept="image/*" onChange={handleIdCardFrontChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <div className="text-3xl mb-2">🪪</div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t.upload?.clickToUploadID || "点击上传身份证"}</p>
-                    </div>
-                  </div>
-                )}
-                {errors.idCard && <p className="text-sm text-red-600">{errors.idCard}</p>}
-              </div>
-
-              {/* ID Card Number */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t.upload?.idCardNumber || "身份证号码"} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={idCardNumber}
-                  onChange={e => setIdCardNumber(e.target.value)}
-                  placeholder={t.upload?.idCardNumberPlaceholder || "18位身份证号码"}
-                  maxLength={18}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                />
-                {errors.idCardNumber && <p className="text-sm text-red-600">{errors.idCardNumber}</p>}
-                {idCardNumberHash && (
-                  <p className="text-xs text-gray-400 break-all">{t.upload?.hash || "哈希"}: {idCardNumberHash.slice(0, 12)}...</p>
-                )}
-              </div>
+                </div>
+              )}
+              {errors.idCard && <p className="text-sm text-red-600">{errors.idCard}</p>}
             </div>
 
             {/* Face match result */}
