@@ -73,6 +73,7 @@ export default function PortraitDetailPage() {
   const [editScopes, setEditScopes] = useState<string[]>([]);
   const [editProhibited, setEditProhibited] = useState<string[]>([]);
   const [editTerritory, setEditTerritory] = useState("");
+  const [hasImageError, setHasImageError] = useState(false);
 
   useEffect(() => {
     fetch(`/api/portraits/${id}`)
@@ -117,7 +118,7 @@ export default function PortraitDetailPage() {
         req.onsuccess = () => resolve(req.result as { imageBlob: Blob } | undefined);
         req.onerror = () => reject(req.error);
       });
-      if (!record?.imageBlob) { alert("未找到本地图片"); return; }
+      if (!record?.imageBlob) { alert(t.faceTrace.portraitNotFound); return; }
       const url = URL.createObjectURL(record.imageBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -126,8 +127,8 @@ export default function PortraitDetailPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      alert("照片已保存到下载文件夹");
-    } catch { alert("下载失败，请稍后重试"); }
+      alert(t.faceTrace.savedToDownloads);
+    } catch { alert(t.faceTrace.downloadFailed); }
   };
 
   const handleCertify = async () => {
@@ -237,12 +238,23 @@ export default function PortraitDetailPage() {
     );
   }
 
-  if (!portrait) return null;
-
-  const ipfsGatewayUrl = portrait.ipfsCid ? getIpfsGatewayUrl(portrait.ipfsCid) : null;
+  const ipfsGatewayUrl = portrait?.ipfsCid ? getIpfsGatewayUrl(portrait.ipfsCid) : null;
   const tc = t.portraits.detail; // Define tc early so it's available in handlers
 
-  const hasImage = !!portrait.originalImageUrl;
+  // this useState was moved above to fix React #310 error
+
+  if (loading || !portrait) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin h-8 w-8 border-3 border-blue-500 border-t-transparent rounded-full" />
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const hasImage = !!portrait.originalImageUrl && !hasImageError;
 
   return (
     <DashboardShell
@@ -265,19 +277,20 @@ export default function PortraitDetailPage() {
                   src={portrait.originalImageUrl!}
                   alt={portrait.title}
                   className="w-full h-full object-contain bg-gray-50 dark:bg-gray-800"
+                  onError={() => setHasImageError(true)}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
                   <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                     <span className="text-base">🔒</span>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">本地存储</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t.faceTrace.localStorage}</p>
                     <button
                       type="button"
                       onClick={handleDownloadPortrait}
                       className="ml-1 px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-md flex items-center gap-0.5 transition-colors"
                     >
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                      下载
+                      {t.faceTrace.download}
                     </button>
                   </div>
                 </div>
